@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/defaultLayout">
+
+    <th:block layout:fragment="css">
+
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/user/login.js}"></script>
+    </th:block>
+
+    <section class="member-container login" layout:fragment="contents" >
+    	<th:block th:replace="fragments/defaultSubHeader :: subHeaderFragment"></th:block>
+    	
+        <div id="maincontentswrap">
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+        
+        <script type="text/x-template" id="main-template" >
+            <section class="content">
+                <div class="member-header">
+                    <h2>로그인</h2>
+                </div>
+
+                <section class="login-wrap" @keyup="onkeyupForm">
+                    <div class="login-input-group">
+                        <input type="email" ref="loginEmail" v-model="login.email" autocomplete="off" placeholder="아이디를 입력해주세요">
+                    </div>
+                    <div class="login-input-group">
+                        <input type="password" ref="loginPassword" v-model="login.password" autocomplete="off" placeholder="비밀번호를 입력해주세요">
+                    </div>
+
+                    <a href="javascript:void(0);" class="btn-login basic-btn main-color" @click="onclickLogin();">로그인</a>
+                    <div class="clearfix">
+                        <label for="saveid" class="checkbox-container">
+                            <input type="checkbox" id="saveid" v-model="login.saveId">
+                            <span class="checkmark">✔</span>아이디 저장
+                        </label>
+						<div class="find-idpw">
+                            <a href="javascript:void(0);" class="btn-find-id" @click="onclickPageMove('ID');">아이디 찾기</a>
+                            <a href="javascript:void(0);" class="btn-find-pw" @click="onclickPageMove('PASS');">비밀번호 찾기</a>
+						</div>
+                    </div>
+                    <a href="javascript:void(0);" class="btn-join basic-btn main-color-line" @click="onclickPageMove('JOIN');">회원가입</a>
+                </section>
+            </section>
+        </script>
+    </section>
+
+
+</html>

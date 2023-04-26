@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed May 11 15:49:51 KST 2016-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace ="myStorageInfoDao">
+
+	<select id="inqStorageUsedList" resultType ="strgeReqInfDto" parameterType= "StorageSearchDto">
+		SELECT 
+			   a.INSTT_NM
+			  ,u.CHARGER_NM
+			  ,FN_CODE('DISS_CD', r.DISS_CD) as dissCd
+			  ,b.BUCKET_SIZE 
+			  ,a.INSTT_ID
+		  FROM TB_STRGE_REQ_INF r
+	INNER JOIN TB_USER_MST u
+		    ON r.DISS_RSPNBER_USER_ID = u.USER_ID
+	INNER JOIN TB_INSTT_MST a
+		    ON u.INSTT_ID = a.INSTT_ID
+	INNER JOIN TB_DTBX_BUCKET_MST b
+		    ON r.BUCKET_ID = b.BUCKET_ID
+		    
+		<if test='insttId != null and !insttId.equals("") '>
+			WHERE a.INSTT_ID = #{insttId}
+		</if>
+		 
+		 <if test='dissCd != null and !dissCd.equals("") '>
+			AND r.DISS_CD = #{dissCd}
+		</if>
+	  ORDER BY r.CREAT_DT desc
+	</select>
+	
+	<select id = "inqStorageUsedSummary" resultType = "strgeReqInfDto">
+		SELECT 
+			   FN_CODE('DISS_CD', diseaseCode.DTL_CD) as dissNm
+			  ,sum(d.BUCKET_SIZE) as bucketSize
+		  FROM TB_CD_GROUP_DTL diseaseCode
+	LEFT OUTER JOIN
+	   (
+	    SELECT 
+	    	   r.DISS_CD
+	    	  ,b.BUCKET_SIZE
+	   	  FROM TB_STRGE_REQ_INF r
+	INNER JOIN TB_DTBX_BUCKET_MST b
+			ON r.BUCKET_ID = b.BUCKET_ID
+		 WHERE r.STRGE_REQ_STTUS_CD = 'S_ACC'
+	   ) d
+	        ON diseaseCode.DTL_CD = d.DISS_CD
+	     WHERE diseaseCode.GROUP_CD = 'DISS_CD'
+	  GROUP BY diseaseCode.DTL_CD
+	</select>
+</mapper>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+
+    <th:block layout:fragment="css">
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/storage/myStorageMngView.js}"></script>
+        <script>
+            const storgeReqstId = "[[${param.storgeReqstId}]]";
+        </script>
+    </th:block>
+
+    <section class="mypage-container" layout:fragment="contents">
+        <div id="maincontentswrap" >
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+            <section class="content contents-width">
+                <section class="mypage-content mt-40">
+                    <h3>저장소 관리</h3>
+
+                    <section class="join-cont-box mt-30">
+                        <h4>저장소 정보</h4>
+                        <ul class="com-ul">
+                            <li class=" bdr-b">
+                                <span class="join-input-group mr-40">
+                                    <label >기관명</label>
+                                    <p class="txt-data">{{reqStorageInfo.insttNm}}</p>
+                                    </span>
+                                <span class="join-input-group">
+                                    <label >질환명</label>
+                                    <p class="txt-data">{{reqStorageInfo.dissNm}}</p>
+                                </span>
+                            </li>
+                            <li class=" bdr-b">
+                                <span class="join-input-group mr-40">
+                                    <label>데이터명</label>
+                                    <p class="txt-data">{{reqStorageInfo.storgeNm}}</p>
+                                </span>
+                                <span class="join-input-group">
+                                    <label >저장소명</label>
+                                    <p class="txt-data">{{reqStorageInfo.bucketId}}</p>
+                                </span>
+                            </li>
+                            <li>
+                                <span class="join-input-group mr-40">
+                                    <label >신청자</label>
+                                    <p class="txt-data">{{reqUserInfo.chargerNm}}</p>
+                                </span>
+                                <span class="join-input-group">
+                                    <label >총 용량</label>
+                                    <p class="txt-data">-</p>
+                                </span>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <section class="clearfix mt-30">
+                        <section class="join-cont-box mt-30 fl-l" style="padding-right:30px;overflow:auto;max-height:500px;width:calc(45% - 30px);">
+                            <h4>권한 정보</h4>
+                            <table class="table2-list mt-20">
+                                <colgroup>
+                                    <col style="width:35%" />
+                                    <col style="width:65%" />
+                                </colgroup>
+                                <thead>
+                                <tr>
+                                    <th scope="col">사용자</th>
+                                    <th scope="col">질환책임자/데이터업로더</th>
+                                </tr>
+                                </thead>
+                                <tbody v-if="myStorageAuthList.length == 0">
+                                <tr>
+                                    <td colspan="2" style="text-align: center;">
+                                        데이터가 없습니다.
+                                    </td>
+                                </tr>
+                                </tbody>
+                                <tbody v-if="myStorageAuthList.length > 0">
+                                <tr v-for="(auth, idx) in myStorageAuthList">
+                                    <td>
+                                        {{auth.chargerNm}}
+                                    </td>
+                                    <td align="center">
+                                        {{auth.userRoleSecd}}
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </section>
+
+                        <section class="join-cont-box  mt-30 fl-r" style="padding:0 30px;overflow:auto;max-height:500px;width:55%;background:#fff;">
+                            <h4>오브젝트 정보</h4>
+                            <table class="table2-list mt-20">
+                                <colgroup>
+                                    <col style="width:52%" />
+                                    <col style="width:18%" />
+                                    <col style="width:30%" />
+                                </colgroup>
+                                <thead>
+                                <tr>
+                                    <th scope="col">파일명</th>
+                                    <th scope="col">크기</th>
+                                    <th scope="col">최종수정일시</th>
+                                </tr>
+                                </thead>
+                                <tbody v-if="myStorageObjectList.length == 0">
+                                <tr>
+                                    <td colspan="3" style="text-align: center;">
+                                        데이터가 없습니다.
+                                    </td>
+                                </tr>
+                                </tbody>
+                                <tbody v-if="myStorageObjectList.length > 0">
+                                <tr v-for="(object, idx) in myStorageObjectList">
+                                    <td>
+                                        {{object.name}}
+                                    </td>
+                                    <td v-if="!object.eTag">
+                                    </td>
+                                    <td v-else align="right">
+                                        {{fileSize(object.size)}}
+                                    </td>
+                                    <td align="center">
+                                        {{object.lastModified}}
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                        </section>
+                    </section>
+
+                    <section class="btn-box a-c mt-70">
+                        <a href="#" class="btn btn-line-black btn-large" v-on:click="onclickList">목록</a>
+                        <a href="#" class="btn btn-line-error btn-large ml-20" v-on:click="onclickDelete(reqStorageInfo.storgeReqstId)">저장소 삭제</a>
+                    </section>
+                </section>
+            </section>
+        </script>
+    </section>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/defaultLayout">
+
+    <th:block layout:fragment="css"></th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/export/exportReq.js}"></script>
+    </th:block>
+
+    <section class="member-container" layout:fragment="contents">
+    	<th:block th:replace="fragments/defaultSubHeader :: subHeaderFragment"></th:block>
+    	
+        <div id="maincontentswrap" >
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+        	<section class="content" >
+            	<div class="sub-title-box">
+                	<h2>반출 신청</h2>
+	            	<div class="path">
+    	            	<ul class="clearfix">
+	                        <li><a href="/" class="home">홈</a></li>
+    	      	            <li>연구분석 환경 관리</li>
+        	       	        <li>데이터 반출 신청</li>                
+            	   		</ul>
+               		</div>
+            	</div>
+
+            	<section class="contents-width join-cont-box clearfix mt-60">
+                	<h3>신청자 정보</h3>
+                	<ul class="com-ul">
+                    	<li>
+                        	<span class="join-input-group mr-40">
+                            	<label >신청자명</label>
+                            	<input type="text" v-bind:value="userInfo.chargerNm" readonly>
+                        	</span>
+                        	<span class="join-input-group">
+                            	<label >기업명</label>
+                            	<input type="text" v-bind:value="userInfo.insttNm" readonly>
+                        	</span>
+                    	</li>
+                    	<li>
+                        	<span class="join-input-group mr-40">
+                            	<label>연락처</label>
+                            	<input type="tel" v-bind:value="userInfo.chargerMoblphonNo" readonly>
+                        	</span>
+                        	<span class="join-input-group">
+                            	<label >이메일</label>
+                            	<input type="email" v-bind:value="userInfo.email" readonly>
+                        	</span>
+                    	</li>
+                	</ul>
+            	</section>
+
+            	<section class="contents-width join-cont-box clearfix mt-60">
+                	<h3>신청 정보</h3>
+                	<span class="join-txt-caution">* 필수 입력 항목</span>
+                	<ul class="com-ul">
+                		<li class="mt-30">
+                        	<span class="join-input-group mr-40">
+                            	<label>반출 대상 데이터박스<span>*</span></label>
+                        	</span>
+                        	<span class="join-input-group a-r">
+                        		<a href="javascript:void(0);" v-on:click="onclickDataBoxAdd();" ref="dataBoxBtn" class="btn btn-basic btn-hmiddle btn-tiny mt-10">반출 대상 데이터박스 찾기</a>
+                        	</span>
+                    	</li>
+                		<li v-if="bucketListMain.length !== 0">
+                        	<span class="join-input-group mr-40">
+                            	<label >데이터박스 번호</label>
+                            	<input type="text" v-model="saveInfo.dtbxSn" readonly>
+                        	</span>
+                        	<span class="join-input-group">
+                            	<label >데이터박스명</label>
+                            	<input type="text" v-model="saveInfo.dtbxNm" readonly>
+                        	</span>
+                    	</li>
+                		<li v-if="bucketListMain.length !== 0" class="bdr-t mt-30">
+                        	<span class="join-input-group w-100">
+                            	<label style="margin: 20px 0 0;">사용 연구분석 데이터</label>
+                        	</span>
+                    	</li>
+                    	<li v-if="bucketListMain.length !== 0">
+                    		<span class="join-input-group mr-10 w-67" ref="userinput">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">순번</p>
+                        	</span>
+                        	<span class="join-input-group mr-10" style="width: calc((100% - 97px) / 3 );">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">연구분석데이터</p>
+                        	</span>
+                        	<span class="join-input-group mr-10" style="width: calc((100% - 97px) / 3 );">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">병원</p>
+                        	</span>
+                        	<span class="join-input-group" style="width: calc((100% - 97px) / 3 );">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">책임자명</p>
+                        	</span>
+                    	</li>
+                    	<li v-for="(item, idx) in bucketListTemp">
+                    		<span class="env-input-group mr-10 w-67">
+                            	<label></label>
+                            	<input type="text" class="w-67" v-bind:value="idx+1" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10" style="width: calc((100% - 97px) / 3 );">
+                            	<label></label>
+                            	<input type="text" class="w-100" v-bind:value="item.othbcDataNm" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10" style="width: calc((100% - 97px) / 3 );">
+                            	<label></label>
+                            	<input type="text" class="w-100 a-c" v-bind:value="item.insttNm" readonly>
+                        	</span>
+                        	<span class="env-input-group" style="width: calc((100% - 97px) / 3 );">
+                            	<label></label>
+                            	<input type="text" class="w-100 a-c" v-bind:value="item.chargerNm" readonly>
+                        	</span>
+                    	</li>
+                    	<li class="mt-30 bdr-t">
+                        	<span class="join-input-group w-100">
+                            	<label style="margin: 25px 0 10px;">반출 사유<span>*</span></label>
+                            	<input class="w-100" type="text" v-model="saveInfo.tkoutResn" ref="tkoutResn" placeholder="반출 사유를 입력하세요.">
+                        	</span>
+                    	</li>
+                    	<li class="mt-30 bdr-t">
+                        	<span class="join-input-group w-100">
+                            	<label style="margin: 25px 0 10px;">반출 대상 파일 경로<span>*</span></label>
+                            	<input class="w-100" type="text" v-model="saveInfo.tkoutTrgetCours" ref="tkoutTrgetCours" placeholder="반출 파일 경로를 입력하세요. (예: /example/exam01/)">
+                        	</span>
+                    	</li>
+                		
+                	</ul>
+            	</section>
+
+            	<section class="contents-width a-c mt-60">
+                	<a href="#" class="btn btn-line-black btn-large" v-on:click="onclickCancel">목록</a>
+                	<a href="#" class="btn btn-basic btn-large ml-20" v-on:click="onclickReqSave">신청</a>
+            	</section>
+        	</section>
+        </script>
+    </section>
+</html>

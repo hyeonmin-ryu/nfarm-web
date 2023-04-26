@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+	<!--Mybatis 설정 -->
+	<settings>
+		<!-- 전통적인 데이터베이스 컬럼명 형태인 A_COLUMN을 CamelCase형태의 자바 프로퍼티명 형태인 aColumn으로 자동으로 매핑하도록 함 -->
+		<setting name="mapUnderscoreToCamelCase" value="true"></setting>
+		<!--  파라미터에 Null 값이 있을 경우 에러 처리 -->
+		<setting name="jdbcTypeForNull" value="VARCHAR"></setting>
+	</settings>
+	
+	<!-- Type Aliases 설정-->
+	<typeAliases>
+		<typeAlias alias="UserDetailDto"			type="kr.re.amc.users.dto.UserDetailDto" />
+		<typeAlias alias="UserInfoDto"			    type="kr.re.amc.users.dto.UserInfoDto" />
+		<typeAlias alias="AgencyDto"                type="kr.re.amc.users.dto.AgencyDto"/>
+		
+		<typeAlias alias="UserSearchDto"		    type="kr.re.amc.users.dto.UserSearchDto" />
+		<typeAlias alias="InquiryDto"				type="kr.re.amc.board.dto.InquiryDto" />
+		<typeAlias alias="FaqDto"  					type="kr.re.amc.board.dto.FaqDto"/>
+		<typeAlias alias="NoticeDto"				type="kr.re.amc.board.dto.NoticeDto" />
+		<typeAlias alias="NoticeFileDto"			type="kr.re.amc.board.dto.NoticeFileDto" />
+		<typeAlias alias="InquiryFileDto"			type="kr.re.amc.board.dto.InquiryFileDto" />
+		
+		
+		<typeAlias alias="BoardSearchDto"			type="kr.re.amc.board.dto.BoardSearchDto" />
+		<typeAlias alias="strgeReqInfDto"	   		type="kr.re.amc.storage.dto.StrgeReqInfDto" />
+		<typeAlias alias="StorageSearchDto"         type="kr.re.amc.storage.dto.StorageSearchDto" />
+		<typeAlias alias="StrgeOthbcReqstInfDto"	type="kr.re.amc.storage.dto.StrgeOthbcReqstInfDto" />
+		<typeAlias alias="strgeUseInfDto"	    	type="kr.re.amc.storage.dto.StrgeUseInfDto" />
+		<typeAlias alias="DtbxReqMstDto"	    	type="kr.re.amc.databox.dto.DtbxReqMstDto" />
+		<typeAlias alias="DataBoxSearchDto"	    	type="kr.re.amc.databox.dto.DataBoxSearchDto" />
+		<typeAlias alias="DemandSearchDto"	    	type="kr.re.amc.demand.dto.DemandSearchDto" />
+		
+		
+		
+		
+		<typeAlias alias="DtbxUserReqMstDto"	    type="kr.re.amc.databox.dto.DtbxUserReqMstDto" />
+		<typeAlias alias="DtbxUserDtlDto"	    	type="kr.re.amc.databox.dto.DtbxUserDtlDto" />
+		<typeAlias alias="DtbxSvrDtlDto"	    	type="kr.re.amc.databox.dto.DtbxSvrDtlDto" />
+		<typeAlias alias="DtbxSvrReqMstDto"	    	type="kr.re.amc.databox.dto.DtbxSvrReqMstDto" />
+		<typeAlias alias="DtbxMstDto"	    		type="kr.re.amc.databox.dto.DtbxMstDto" />
+		<typeAlias alias="DtbxBlckStrgeReqMstDto"	type="kr.re.amc.databox.dto.DtbxBlckStrgeReqMstDto" />
+		<typeAlias alias="DtbxDataReqMstDto"		type="kr.re.amc.databox.dto.DtbxDataReqMstDto" />
+		
+		<typeAlias alias="DataBoxFrameSearchDto"	type="kr.re.amc.databoxFrame.dto.DataBoxFrameSearchDto" />
+		
+		<typeAlias alias="DtbxFrmeAdmSvrAcntInfDto"	type="kr.re.amc.databoxFrame.dto.DtbxFrmeAdmSvrAcntInfDto" />
+		<typeAlias alias="DtbxFrmeAdmSvrInfDto"		type="kr.re.amc.databoxFrame.dto.DtbxFrmeAdmSvrInfDto" />
+		<typeAlias alias="DtbxFrmeCmnuseDataInfDto"	type="kr.re.amc.databoxFrame.dto.DtbxFrmeCmnuseDataInfDto" />
+		<typeAlias alias="DtbxFrmeCreatInfDto"		type="kr.re.amc.databoxFrame.dto.DtbxFrmeCreatInfDto" />
+		
+		
+		<typeAlias alias="JoinRequest"				type="kr.re.amc.users.dto.JoinRequest" />
+		
+		<typeAlias alias="DtbxBucketMstDto"	        type="kr.re.amc.storage.dto.DtbxBucketMstDto" />
+		
+		<typeAlias alias="agencySearchDto"			type="kr.re.amc.agency.dto.AgencySearchDto" />
+
+		<typeAlias alias="ExportSearchDto"     		type="kr.re.amc.export.dto.ExportSearchDto" />
+		<typeAlias alias="ExportReqDto"     		type="kr.re.amc.export.dto.ExportReqDto" />
+		<typeAlias alias="ExportApproverInfoDto"    type="kr.re.amc.export.dto.ExportApproverInfoDto" />
+		<typeAlias alias="ExportServerInfoDto"      type="kr.re.amc.export.dto.ExportServerInfoDto" />
+		
+		<typeAlias alias="DemandCostDto"            type="kr.re.amc.demand.dto.DemandCostDto" />
+		<typeAlias alias="ProductDemandCostDto"     type="kr.re.amc.demand.dto.ProductDemandCostDto" />
+		<typeAlias alias="ProductDemandCostPopDto"  type="kr.re.amc.demand.dto.ProductDemandCostPopDto" />
+		
+		<typeAlias alias="SearchDto"				type="kr.re.amc.cmm.dto.SearchDto" />
+		<typeAlias alias="MenuDto"					type="kr.re.amc.cmm.dto.MenuDto" />
+		<typeAlias alias="CodeDto"					type="kr.re.amc.cmm.dto.CodeDto" />
+
+		<typeAlias alias="FarmDto"					type="kr.re.amc.farm.dto.FarmDto" />
+		<typeAlias alias="FarmSearchDto"			type="kr.re.amc.farm.dto.FarmSearchDto" />
+		
+	</typeAliases>
+	
+</configuration>

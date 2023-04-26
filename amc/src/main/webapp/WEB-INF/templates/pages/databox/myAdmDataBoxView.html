@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+
+    <th:block layout:fragment="css"></th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/databox/myAdmDataBoxView.js}"></script>
+        <script>
+
+            dtbxReqNo ="[[${param.dtbxReqNo}]]";
+			myMenuId ="[[${param.menuId}]]";
+        </script>
+    </th:block>
+
+    <section class="mypage-container"  layout:fragment="contents">    
+        <div id="maincontentswrap" >
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+        	<section class="content contents-width" >
+            	<div class="sub-title-box  sub-title-box1">
+                	<h2>데이터박스 상세 내역</h2>
+            	</div>
+
+            	<section class="join-cont-box mt-30 clearfix">
+                	<h3>신청자 정보</h3>
+
+                	<ul class="com-ul">
+                    	<li class="bdr-b">
+                        	<span class="join-input-group mr-40">
+                            	<label >신청자명</label>
+                            	<p class="txt-data"><input type="text" class="w-100 a-l" v-model="dataBoxInfo.chargerNm" readonly></p>
+                        	</span>
+                        	<span class="join-input-group">
+                            	<label >기업명</label>
+                            	<p class="txt-data"><input type="text" class="w-100 a-l" v-model="dataBoxInfo.insttNm" readonly></p>
+                        	</span>
+                    	</li>
+                    	<li class="bdr-b">
+                        	<span class="join-input-group mr-40">
+                            	<label>연락처</label>
+                            	<p class="txt-data"><input type="text" class="w-100 a-l" v-model="dataBoxInfo.chargerMoblphonNo" readonly></p>
+                        	</span>
+                        	<span class="join-input-group">
+                            	<label >이메일</label>
+                            	<p class="txt-data"><input type="text" class="w-100 a-l" v-model="dataBoxInfo.email" readonly></p>
+                        	</span>
+                    	</li>
+                	</ul>
+            	</section>
+            	
+            	<section class="join-cont-box clearfix">
+                	<h3>신청 정보</h3>
+                	<ul class="com-ul">
+                    	<li class="bdr-b">
+                        	<span class="join-input-group mr-40">
+                            	<label >신청유형</label>
+                            	<p class="txt-data"><input type="text" class="w-100 a-l" v-model="dataBoxInfo.dtbxReqTyNm" readonly></p>
+                        	</span>
+                        	<span class="join-input-group">
+                            	<label>처리상태</label>
+                            	<p class="txt-data"><input type="text" class="w-100 a-l" v-model="dataBoxInfo.dtbxReqstSttusNm" readonly></p>
+                        	</span>
+                    	</li>
+                    	<li class="bdr-b">
+                        	<span class="join-input-group mr-40">
+                            	<label >신청일시</label>
+                            	<p class="txt-data">
+                            		<input type="text" class="w-100 a-l" v-model="dataBoxInfo.dtbxReqTyCd === 'USE' ? dataBoxInfo.reqDt : dataBoxInfo.deleteReqstDt" readonly>
+                            	</p>
+                        	</span>
+                        	<span class="join-input-group">
+                            	<label >접수일시</label>
+                            	<p class="txt-data">
+                            		<input type="text" class="w-100 a-l" v-model="dataBoxInfo.dtbxReqTyCd === 'USE' ? dataBoxInfo.rceptDt : dataBoxInfo.deleteRceptDt" readonly>
+                            	</p>
+                        	</span>
+                    	</li>
+                    	<li class="bdr-b">
+                        	<span class="join-input-group mr-40">
+                            	<label >처리일시</label>
+                            	<p class="txt-data">
+                            		<input type="text" class="w-100 a-l" v-model="dataBoxInfo.dtbxReqTyCd === 'USE' ? dataBoxInfo.processDt : dataBoxInfo.deleteProcessDt" readonly>
+                            	</p>
+                        	</span>
+                        	<span class="join-input-group">
+                            	<label >취소일시</label>
+                            	<p class="txt-data">
+                            		<input type="text" class="w-100 a-l" v-model="dataBoxInfo.dtbxReqTyCd === 'USE' ? dataBoxInfo.canclDt : dataBoxInfo.deleteCanclDt" readonly>
+                            	</p>
+                        	</span>
+                    	</li>
+                    	<li v-if="dataBoxInfo.dataBoxReqHis.length != 0">
+                        	<span class="join-input-group mr-40" style="width:100%;">
+                            	<label>승인거절내역</label>
+                        	</span>
+                    	</li>
+                    	<li v-if="dataBoxInfo.dataBoxReqHis.length != 0">
+                    		<span class="join-input-group mr-10 w-67" ref="userinput">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">순번</p>
+                        	</span>
+                        	<span class="join-input-group mr-10 w-105">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">신청구분</p>
+                        	</span>
+                        	<span class="join-input-group mr-10 w-210">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">신청일자</p>
+                        	</span>
+                        	<span class="join-input-group mr-10 w-210">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">거절일자</p>
+                        	</span>
+                        	<span class="join-input-group mr-10 w-558">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">거절사유</p>
+                        	</span>
+                    	</li>
+                    	<li v-for="(item, idx) in dataBoxInfo.dataBoxReqHis">
+                    		<span class="env-input-group mr-10 w-67">
+                            	<label></label>
+                            	<input type="text" v-bind:value="idx+1" class="w-100 a-c" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10 w-105">
+                            	<label></label>
+                            	<input type="text" v-bind:value="item.gubun" class="w-105" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10 w-210">
+                            	<label></label>
+                            	<input type="text" v-bind:value="item.requestDate" class="w-210" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10 w-210">
+                            	<label></label>
+                            	<input type="text" v-bind:value="item.approveDate" class="w-210" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10 w-558">
+                            	<label></label>
+                            	<input type="text" v-bind:value="item.rejectResn" class="w-558" readonly>
+                        	</span>
+                    	</li>
+                    	<br v-if="dataBoxInfo.dataBoxReqHis.length != 0">
+                    	<li class="bdr-b" v-if="dataBoxInfo.dataBoxReqHis.length != 0">
+                    	</li>
+                	</ul>
+            	</section>
+            	
+            	<section class="join-cont-box clearfix">
+                	<h3>데이터박스 정보</h3>
+                	<span v-if="dataBoxInfo.dtbxReqstSttusCd === 'ACCEPT'" class="join-txt-caution">* 필수 입력 항목</span>
+                	<ul class="com-ul">
+                    	<li class="bdr-b1">
+                        	<span class="join-input-group mr-40">
+                            	<label>1. 데이터박스번호</label>
+                            	<p class="txt-data"><input type="text" class="w-100 a-l" v-model="dataBoxInfo.dtbxSn" readonly></p>
+                        	</span>
+                        	<span class="join-input-group">
+                            	<label>2. 데이터박스명</label>
+                            	<p class="txt-data"><input type="text" class="w-100 a-l" v-model="dataBoxInfo.dtbxNm" readonly></p>
+                        	</span>
+                    	</li>
+                    	<li>
+                        	<span class="join-input-group mr-40">
+                            	<label>3. 데이터박스 동시 접속자</label>
+                        	</span>
+                    	</li>
+                    	<li>
+                    		<span class="join-input-group w-67" ref="userinput">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">순번</p>
+                        	</span>
+                        	<span class="join-input-group ml-10" style="width: calc((100% - 137px) / 7);">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">접속자명</p>
+                        	</span>
+                        	<span class="join-input-group ml-10" style="width: calc((100% - 137px) / 7);">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">전화번호</p>
+                        	</span>
+                        	<span class="join-input-group ml-10" style="width: calc((100% - 137px) / 7);" v-if="!(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REQUEST') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'CANCEL') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REJECT')">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">SSL VPN ID<span class="t-red">*</span></p>
+                        	</span>
+                        	<span class="join-input-group ml-10" style="width: calc((100% - 137px) / 7);" v-if="!(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REQUEST') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'CANCEL') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REJECT')">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">SSL VPN 암호<span class="t-red">*</span></p>
+                        	</span>
+                        	<span class="join-input-group ml-10" style="width: calc((100% - 137px) / 7);" v-if="!(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REQUEST') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'CANCEL') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REJECT')">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">접속 서버 IP<span class="t-red">*</span></p>
+                        	</span>
+                        	<span class="join-input-group ml-10" style="width: calc((100% - 137px) / 7);" v-if="!(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REQUEST') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'CANCEL') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REJECT')">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">접속 서버 ID<span class="t-red">*</span></p>
+                        	</span>
+                        	<span class="join-input-group ml-10" style="width: calc((100% - 137px) / 7);" v-if="!(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REQUEST') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'CANCEL') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REJECT')">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">서버 암호<span class="t-red">*</span></p>
+                        	</span>
+                    	</li>
+                    	<li v-for="(item, idx) in dataBoxInfo.userConList">
+                    		<span class="env-input-group w-67">
+                            	<label></label>
+                            	<input type="text" v-bind:value="idx+1" class="w-100 a-c" readonly>
+                        	</span>
+                        	<span class="env-input-group ml-10" style="width: calc((100% - 137px) / 7);">
+                            	<label></label>
+                            	<input type="text" v-bind:value="item.dtbxUserName" class="w-100" readonly>
+                        	</span>
+                        	<span class="env-input-group ml-10" style="width: calc((100% - 137px) / 7);">
+                            	<label></label>
+                            	<input type="text" v-bind:value="item.dtbxUserMoblphonNo" class="w-100" readonly>
+                        	</span>
+                        	<span class="env-input-group ml-10" style="width: calc((100% - 137px) / 7);" v-if="!(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REQUEST') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'CANCEL') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REJECT')">
+                            	<label></label>
+                            	<input type="text" class="w-100" v-bind:id="'user01' + idx" v-bind:value="item.sslVpnUserId" :readonly="dataBoxInfo.dtbxReqTyCd === 'DEL'">
+                        	</span>
+                        	<span class="env-input-group ml-10" style="width: calc((100% - 137px) / 7);" v-if="!(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REQUEST') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'CANCEL') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REJECT')">
+                            	<label></label>
+                            	<input type="text" class="w-100" v-bind:id="'user02' + idx" v-bind:value="item.sslVpnUserPassword" :readonly="dataBoxInfo.dtbxReqTyCd === 'DEL'">
+                        	</span>
+                        	<span class="env-input-group ml-10" style="width: calc((100% - 137px) / 7);" v-if="!(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REQUEST') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'CANCEL') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REJECT')">
+                            	<label></label>
+                            	<input type="text" class="w-100" v-bind:id="'user03' + idx" v-bind:value="item.cnncSvrIpAdres" :readonly="dataBoxInfo.dtbxReqTyCd === 'DEL'">
+                        	</span>
+                        	<span class="env-input-group ml-10" style="width: calc((100% - 137px) / 7);" v-if="!(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REQUEST') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'CANCEL') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REJECT')">
+                            	<label></label>
+                            	<input type="text" class="w-100" v-bind:id="'user04' + idx" v-bind:value="item.cnncSvrUserId" :readonly="dataBoxInfo.dtbxReqTyCd === 'DEL'">
+                        	</span>
+                        	<span class="env-input-group ml-10" style="width: calc((100% - 137px) / 7);" v-if="!(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REQUEST') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'CANCEL') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REJECT')">
+                            	<label></label>
+                            	<input type="text" class="w-100" v-bind:id="'user05' + idx" v-bind:value="item.cnncSvrUserPassword" :readonly="dataBoxInfo.dtbxReqTyCd === 'DEL'">
+                        	</span>
+                    	</li>
+                    	<br>
+                    	<li class="bdr-b1">
+                    	</li>
+                    	<li>
+                        	<span class="join-input-group mr-40" ref="serverinput">
+                            	<label>4. 서버 신청</label>
+                        	</span>
+                    	</li>
+                    	<li v-for="(item, idx) in dataBoxInfo.serverList">
+                    		<span class="env-input-group mr-10 w-67">
+                            	<label></label>
+                            	<input type="text" v-bind:value="idx+1" class="w-100 a-c" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10" style="width: calc((100% - 87px) / 2);">
+                            	<label></label>
+                            	<input type="text" v-bind:value="item.imageGoodsNm" class="w-100" readonly>
+                        	</span>
+                        	<span class="env-input-group" style="width: calc((100% - 87px) / 2);">
+                            	<label></label>
+                            	<input type="text" v-bind:value="item.svrGoodsNm" class="w-100" readonly>
+                        	</span>
+                        	<span v-if="item.storageList.length != 0" class="join-input-group server-info">
+                            	<label>블록 스토리지</label>
+                            	<ul class="com-ul">
+                            		<li v-for="(item2, idx2) in item.storageList" class="bdr-b">
+                            			<span class="radio-wrap" v-for="(rad, idx3) in radioList">
+					                    	<input type="radio" v-bind:id="['rdo' + idx + idx2 + idx3]" v-bind:ref="['rdo' + idx + idx2 + idx3]" v-bind:value="rad.name" v-model="item2.strgeTyCd" disabled>
+					                    	<label v-bind:for="['rdo' + idx + idx2 + idx3]" style="display:inline-block;" readonly><span></span>{{rad.desc}}</label>
+					                	</span>
+					                	<span class="env-input-group w-150" style="display:inline-block;">
+					                		<label class="ml-50">서버 크기(GB)</label>
+					                	</span>
+		                        		<span class="env-input-group mr-10 w-150" style="display:inline-block;">
+		                        			<input type="text" class="w-150 a-r" v-bind:value="item2.strgeSize" readonly>
+		                        		</span>
+		                        		<span class="env-input-group mr-10 w-200" style="display:inline-block;">
+		                        			<label >( 마운트 경로 : /blkstor0{{idx2+1}})</label>
+		                        		</span>
+                            		</li>
+                            	</ul>
+                        	</span>
+                        	<span class="join-input-group  server-info1" v-if="!(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REQUEST') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'CANCEL') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REJECT')">
+                            	<label >서버 접속정보</label>
+                            	<ul class="com-ul">
+                            		<li>
+					                	<span class="env-input-group w-84" style="display:inline-block;">
+					                		<label class="a-c">IP<span class="t-red">*</span></label>
+					                	</span>
+		                        		<span class="env-input-group mr-10" style="display:inline-block; width: calc((100% - 282px) /3);">
+		                        			<input v-bind:id="['server01' + idx]" type="text" class="w-100" placeholder="IP를 입력하세요." v-bind:value="item.svrIpAdres" :readonly="dataBoxInfo.dtbxReqTyCd === 'DEL'">
+		                        		</span>
+		                        		<span class="env-input-group w-84" style="display:inline-block;">
+					                		<label class="a-c">아이디<span class="t-red">*</span></label>
+					                	</span>
+		                        		<span class="env-input-group mr-10" style="display:inline-block; width: calc((100% - 282px) /3);">
+		                        			<input v-bind:id="['server02' + idx]" type="text" class="w-100" placeholder="아이디를 입력하세요." v-bind:value="item.svrUserId" :readonly="dataBoxInfo.dtbxReqTyCd === 'DEL'">
+		                        		</span>
+		                        		<span class="env-input-group w-84" style="display:inline-block;">
+					                		<label class="a-c">암호<span class="t-red">*</span></label>
+					                	</span>
+		                        		<span class="env-input-group mr-10" style="display:inline-block; width: calc((100% - 282px) /3);">
+		                        			<input v-bind:id="['server03' + idx]" type="text" class="w-100" placeholder="암호를 입력하세요." v-bind:value="item.svrUserPassword" :readonly="dataBoxInfo.dtbxReqTyCd === 'DEL'">
+		                        		</span>
+                            		</li>
+                            	</ul>
+                        	</span>
+                    	</li>
+                    	<li class="bdr-t">
+                    	</li>
+                    	<li>
+                        	<span class="join-input-group mr-40">
+                            	<label>5. NAS-W 신청</label>
+                        	</span>
+                    	</li>
+                    	<li class="bdr-b1">
+                    		<span class="join-input-group w-150" style="display:inline-block;">
+                    			<label >크기(GB)</label>
+                    		</span>
+                    		<span class="join-input-group mr-10 w-150" style="display:inline-block;">
+                    			<input type="text" class="w-150 a-r" v-bind:value="dataBoxInfo.naswSize" readonly>
+                    		</span>
+                    		<span class="join-input-group mr-10 w-300" style="display:inline-block;">
+                    			<label >( 마운트 경로 : /nasw )</label>
+                    		</span>
+                    	</li>
+                    	<li class="mt-30">
+                        	<span class="join-input-group w-100">
+                            	<span class="env-input-group w-150" >
+			                		<label>6. 연구분석데이터 신청</label>
+			                	</span>
+                            	<span class="env-input-group w-300">
+                            		<label class="t-red">( 마운트경로 : /nasr , 총크기 : {{sumBucketSize}} GB )</label>
+                            	</span>
+                            	<div class="a-r" v-if="MY_ROLE === 'ROLE_ADMIN'" v-on:click="onclickDownload" style="height: 56px;">
+                            		<a href="javascript:;" class="btn btn-basic btn-tiny" style="width:100px">데이터 다운로드</a>
+                                <div>
+                        	</span>
+                        	<span class="join-input-group w-100 scroll-div" style="padding-top:0px;">    
+                            	<table class="table-list">
+				                	<colgroup>
+				                    	<col style="width:10%" />
+				                    	<col style="width:10%" />
+				                    	<col style="width:20%" />
+				                    	<col style="width:10%" />
+				                    	<col style="width:25%" />
+				                    	<col style="width:25%" />
+				                	</colgroup>
+				                	<thead>
+				                	<tr>
+				                    	<th scope="col" class="a-c">번호</th>
+				                    	<th scope="col" class="a-c">공개데이터명</th>
+				                    	<th scope="col" class="a-c">버킷ID</th>
+				                    	<th scope="col" class="a-c">용량(GB)</th>
+				                    	<th scope="col" class="a-c">액세스키</th>
+				                    	<th scope="col" class="a-c">시크릿키</th>
+				                	</tr>
+				                	</thead>
+				                	<tbody v-if="dataBoxInfo.bucketList.length == 0">
+				                		<tr>
+				                    		<td colspan="5" style="text-align: center">데이터가 없습니다.</td>
+				                		</tr>
+				                	</tbody>
+				                	<tbody v-if="dataBoxInfo.bucketList.length > 0">
+				                    	<tr v-for="(bucket, idx) in dataBoxInfo.bucketList">
+				                        	<td class="a-c">{{idx+1}}</td>
+				                        	<td class="a-l">{{bucket.bucketDc}}</td>
+				                        	<td class="a-c">{{bucket.bucketId}}</td>
+				                        	<td class="a-c">{{Math.ceil(bucket.bucketSize/1024/1024/1024 * 100) /100 }}</td>
+				                        	<td class="a-c">{{bucket.ncloudAccesKey}}</td>
+				                        	<td class="a-c">{{bucket.ncloudScrtyKey}}</td>
+				                        	<!--<td class="a-c" style="text-decoration: underline;"><a href="javascript:void(0);" v-on:click="onclickDown(bucket.dtbxReqNo , bucket.useStrgeNo);">{{bucket.errYn}}</a></td> -->
+				                    	</tr>
+				                	</tbody>
+			                	</table>
+                        	</span>
+						</li>
+                    	<li v-if="!(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REQUEST') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'CANCEL') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REJECT') && MY_ROLE === 'ROLE_ADMIN'" class="bdr-t mt-20">
+                        	<span class="join-input-group mr-40 mt-30">
+                            	<label>7. 어드민 서버 정보<span class="t-red">*</span></label>
+                        	</span>
+                    	</li>
+                    	<li v-if="!(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REQUEST') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'CANCEL') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REJECT' && MY_ROLE === 'ROLE_ADMIN')">
+								
+							<span class="join-input-group server-info1" style="padding: 15px 20px;" v-if="!(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REQUEST') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'CANCEL') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REJECT') && MY_ROLE === 'ROLE_ADMIN'">
+								<ul class="">
+                            		<li class="">
+					                	<span class="env-input-group w-84">
+					                		<label class="a-c">IP<span class="t-red">*</span></label>
+					                	</span>
+		                        		<span class="env-input-group mr-10" style="display:inline-block; width: calc((100% - 282px) /3);">
+		                        			<input ref="manageSvrIpAdres" type="text" class="w-100" placeholder="IP를 입력하세요." v-bind:value="dataBoxInfo.manageSvrIpAdres" :readonly="MY_ROLE === 'ROLE_USER' || dataBoxInfo.dtbxReqTyCd === 'DEL'">
+		                        		</span>
+		                        		<span class="env-input-group w-84" style="display:inline-block;">
+					                		<label class="a-c">아이디<span class="t-red">*</span></label>
+					                	</span>
+		                        		<span class="env-input-group mr-10" style="display:inline-block; width: calc((100% - 282px) /3);">
+		                        			<input ref="manageSvrUserId" type="text" class="w-100" placeholder="아이디를 입력하세요." v-bind:value="dataBoxInfo.manageSvrUserId"  :readonly="MY_ROLE === 'ROLE_USER' || dataBoxInfo.dtbxReqTyCd === 'DEL'">
+		                        		</span>
+		                        		<span class="env-input-group w-84" style="display:inline-block;">
+					                		<label class="a-c">암호<span class="t-red">*</span></label>
+					                	</span>
+		                        		<span class="env-input-group mr-10" style="display:inline-block; width: calc((100% - 282px) /3);">
+		                        			<input ref="manageSvrUserPassword" type="text" class="w-100" placeholder="암호를 입력하세요."  v-bind:value="dataBoxInfo.manageSvrUserPassword"  :readonly="MY_ROLE === 'ROLE_USER' || dataBoxInfo.dtbxReqTyCd === 'DEL'">
+		                        		</span>
+                            		</li>
+								</ul>
+							</span>
+                    	</li>						
+
+                    	<li v-if="!(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REQUEST') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'CANCEL') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REJECT') && MY_ROLE === 'ROLE_ADMIN'" class="bdr-t">
+                        	<span class="join-input-group mr-40 mt-30">
+                            	<label>8. 운영계정 정보<span class="t-red">*</span></label>
+                        	</span>
+                    	</li>
+                    	<li class="bdr-b" v-if="!(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REQUEST') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'CANCEL') && !(dataBoxInfo.dtbxReqTyCd === 'USE' && dataBoxInfo.dtbxReqstSttusCd === 'REJECT') && MY_ROLE === 'ROLE_ADMIN'">
+                    		<span class="join-input-group mr-10 w-100">
+                    			<input type="text" ref="dtbxOperAcntId" v-bind:value="dataBoxInfo.dtbxOperAcntId" class="w-100" placeholder="운영계정을 입력하세요." :readonly="MY_ROLE === 'ROLE_USER' || dataBoxInfo.dtbxReqTyCd === 'DEL'">
+                    		</span>
+                    	</li>
+                    	<li v-if="dataBoxInfo.dtbxReqstSttusCd === 'REQUEST' && MY_ROLE === 'ROLE_ADMIN'">
+                        	<span class="join-input-group mr-40">
+                            	<label>거절사유</label>
+                        	</span>
+                    	</li>
+                    	<li class="bdr-b" v-if="dataBoxInfo.dtbxReqstSttusCd === 'REQUEST' && MY_ROLE === 'ROLE_ADMIN'">
+                    		<span class="join-input-group mr-10 w-100">
+                    			<input type="text" v-model="apprInfo.rejectResn" ref="rejectResn" class="w-100" placeholder="거절사유를 입력하세요.">
+                    		</span>
+                    	</li>
+                	</ul>
+            	</section>
+            	
+            	<section class="btn-box a-c mt-60">
+                	<a href="javascript:;" class="btn btn-line-black btn-large" v-on:click="onclickList">목록</a>
+                	<a href="javascript:;" class="btn btn-basic btn-large ml-20" v-on:click="onclickSave('create')" v-if="dataBoxInfo.dtbxReqstSttusCd === 'ACCEPT' && dataBoxInfo.dtbxReqTyCd === 'USE' ">서버생성</a>
+                	<a href="javascript:;" class="btn btn-basic btn-large ml-20" v-on:click="onclickSave('approve')" v-if="(dataBoxInfo.dtbxReqstSttusCd === 'COMPLETE') || ( dataBoxInfo.dtbxReqstSttusCd === 'ACCEPT' && dataBoxInfo.dtbxReqTyCd === 'DEL' ) ">승인</a>
+                	<a href="javascript:;" class="btn btn-basic btn-large ml-20" v-on:click="onclickAccept" v-if="dataBoxInfo.dtbxReqstSttusCd === 'REQUEST'">접수</a>
+                	<a href="javascript:;" class="btn btn-line-error btn-large ml-20" v-on:click="onclickReject" v-if="dataBoxInfo.dtbxReqstSttusCd === 'REQUEST'">거절</a>
+                	<a href="javascript:;" class="btn btn-basic btn-large ml-20" v-on:click="onclickSave('update')" v-if="(dataBoxInfo.dtbxReqTyCd === 'USE' && (dataBoxInfo.dtbxReqstSttusCd === 'APPROVE') || dataBoxInfo.dtbxReqstSttusCd === 'CREATE' || dataBoxInfo.dtbxReqstSttusCd === 'COMPLETE') ">수정</a>
+            	</section>
+        	</section>
+        </script>
+    </section>
+</html>

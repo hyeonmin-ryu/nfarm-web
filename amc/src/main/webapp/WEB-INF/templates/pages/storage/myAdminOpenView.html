@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+
+    <th:block layout:fragment="css">
+
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/storage/myAdminOpenView.js}"></script>
+        <script>
+            const othbcReqstId = "[[${param.othbcReqstId}]]";
+        </script>
+    </th:block>
+
+    <section class="mypage-container" layout:fragment="contents">
+        <div id="maincontentswrap">
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+            <section class="content contents-width">
+                <section class="mypage-content mt-40">
+                    <h3>질환테이터 공개신청관리 상세</h3>
+
+                    <section class="join-cont-box mt-30">
+                        <h4>신청자 정보</h4>
+                        <ul class="com-ul">
+                            <li class=" bdr-b">
+                                <span class="join-input-group mr-40">
+                                    <label>신청자명</label>
+                                    <p class="txt-data">{{openStorageInfo.chargerNm}}</p>
+                                </span>
+                                <span class="join-input-group">
+                                    <label>병원명</label>
+                                    <p class="txt-data">{{openStorageInfo.insttNm}}</p>
+                                </span>
+                            </li>
+                            <li class=" bdr-b">
+                                <span class="join-input-group mr-40">
+                                    <label>연락처</label>
+                                    <p class="txt-data">{{openStorageInfo.chargerMoblphonNo}}</p>
+                                </span>
+                                <span class="join-input-group">
+                                    <label>관리하는 질병</label>
+                                    <p class="txt-data">{{openStorageInfo.dissNm}}</p>
+                                </span>
+                            </li>
+                            <li class="bdr-b">
+                                <span class="join-input-group">
+                                    <label>이메일</label>
+                                    <p class="txt-data">{{openStorageInfo.email}}</p>
+                                </span>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <section class="join-cont-box mt-80">
+                        <h4>저장소 정보</h4>
+                        <ul class="com-ul">
+                            <li class=" bdr-b">
+                                <span class="join-input-group mr-40">
+                                    <label>저장소명</label>
+                                    <p class="txt-data">{{openStorageInfo.storgeNm}}</p>
+                                </span>
+                                <span class="join-input-group">
+                                    <label>공개데이터명</label>
+                                    <p class="txt-data">{{openStorageInfo.othbcDataNm}}</p>
+                                </span>
+                            </li>
+                            <li class="bdr-b">
+                                <span class="join-input-group mr-40">
+                                    <label>처리상태</label>
+                                    <p class="txt-data">{{openStorageInfo.othbcReqstSttusnm}}</p>
+                                </span>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <section class="join-cont-box mt-80"
+                         v-if="openStorageInfo.othbcReqstSttuscd === 'C_REQ' ||
+                               openStorageInfo.othbcReqstSttuscd === 'C_ACC' ||
+                               openStorageInfo.othbcReqstSttuscd === 'C_REJ'">
+                        <h4>취소 정보</h4>
+                        <ul class="com-ul">
+                            <li class="bdr-b">
+                                <span class="join-input-group w-100">
+                                    <label>취소사유</label>
+                                    <input class="w-100" type="text" v-bind:value="openStorageInfo.canclResn" readonly>
+                                </span>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <section class="join-cont-box mt-80" v-if="openStorageInfo.othbcReqstSttuscd !== 'O_ACC' &&
+                                                           openStorageInfo.othbcReqstSttuscd !== 'C_ACC'">
+                        <h4>거절 정보</h4>
+                        <ul class="com-ul">
+                            <li v-if="openStorageInfo.othbcReqstSttuscd === 'O_REQ' || openStorageInfo.othbcReqstSttuscd === 'C_REQ'">
+                                <span class="join-input-group w-100" >
+                                    <label>거절사유</label>
+                                    <input class="w-100" type="text" v-model="saveInfo.rejectResn" ref="rejectResn" placeholder="거절사유를 입력해주세요">
+                                </span>
+                            </li>
+                            <li v-else  class="bdr-b">
+                                <span class="join-input-group w-100" >
+                                    <label>거절사유</label>
+                                    <input class="w-100" type="text" v-bind:value="openStorageInfo.rejectResn" readonly>
+                                </span>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <section class="btn-box mt-70 a-c" v-if="openStorageInfo.othbcReqstSttuscd === 'O_REQ' || openStorageInfo.othbcReqstSttuscd === 'C_REQ'">
+                        <a href="javascript:;" class="btn btn-line-black btn-large" v-on:click="onclickList">목록</a>
+                        <a href="javascript:;" class="btn btn-basic btn-large ml-20" v-on:click="onclickApprove">승인</a>
+                        <a href="javascript:;" class="btn btn-line-error btn-large ml-20" v-on:click="onclickCancel">거절</a>
+                    </section>
+                    <section class="btn-box mt-70 a-c" v-else>
+                        <a href="javascript:;" class="btn btn-line-black btn-large" v-on:click="onclickList">목록</a>
+                    </section>
+                </section>
+            </section>
+        </script>
+    </section>
+</html>

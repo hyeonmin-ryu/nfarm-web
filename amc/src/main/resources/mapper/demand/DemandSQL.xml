@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed May 11 15:49:51 KST 2016-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="demandDao">
+
+	<select id="inqAgencyDemandList" resultType="DemandCostDto" parameterType="DemandSearchDto" >
+		SELECT A.NCLOUD_ID , 
+				IFNULL(IF(C.INSTT_NM is null, 
+				         (SELECT INSTT_NM  FROM amc.TB_INSTT_MST A1 WHERE A1.INSTT_ID  =  
+     			         (SELECT INSTT_ID  FROM amc.TB_USER_MST B1 WHERE B1.USER_ID  = D.requestUserSeq  )) 
+				          , C.INSTT_NM) , '') INSTT_NM,
+ 			    IFNULL(IF(B.CHARGER_NM  is null,
+ 			             (SELECT CHARGER_NM  FROM amc.TB_USER_MST B1 WHERE B1.USER_ID  = D.requestUserSeq  )
+ 			             , B.CHARGER_NM) , '') CHARGER_NM
+ 			   ,D.dataBoxName, 
+ 			    IFNULL(USE_AMOUNT,0)USE_AMOUNT , 
+ 			    IFNULL(NCLOUD_DSCNT_AMOUNT, 0)NCLOUD_DSCNT_AMOUNT, 
+ 			    IFNULL(TOT_RQEST_ADUP_AMOUNT,0)TOT_RQEST_ADUP_AMOUNT
+				,CONCAT(STR_TO_DATE
+				(CONCAT(A.RQEST_YM ,'01'), '%Y%m%d'), ' ~ ', CASE WHEN DATE_FORMAT(now(), '%Y%m') = A.RQEST_YM THEN STR_TO_DATE(DATE_FORMAT(now(), '%Y%m%d'), '%Y%m%d')
+				ELSE LAST_DAY(CONCAT(A.RQEST_YM,'01')) END) as monBet , A.RQEST_YM ,
+				IFNULL(B.USER_ID,0)userSeq
+	        	 FROM   amc.TB_USER_MST B                                                       
+	        	 INNER JOIN                                                              
+	        	    (                                                                    
+	        	        SELECT                                                           
+	        	            info.DTBX_OPER_ACNT_ID AS dataBoxAccount      ,                 
+	        	            group_concat(req.DTBX_NM SEPARATOR ', ') dataBoxName ,   
+	        	            max(req.REQ_USER_ID) requestUserSeq                       
+	        	        FROM                                                             
+	        	            amc.TB_DTBX_REQ_MST as req,                                           
+	        	            amc.TB_DTBX_MST as info                                          
+	        	        WHERE                                                            
+	        	           req.DTBX_SN = info.DTBX_SN                      
+	        	         AND info.DTBX_OPER_ACNT_ID is not null                          
+	        	        group by                                                         
+	        	            info.DTBX_OPER_ACNT_ID                                          
+	        	    ) D                                                                  
+	        	        ON B.USER_ID  = D.requestUserSeq                                 
+	        	INNER JOIN                                                               
+	        	    amc.TB_RQEST_CT_USER_MST A                                                         
+	        	        ON D.dataBoxAccount = A.NCLOUD_ID                                  
+	        	LEFT OUTER JOIN                                                          
+	        	    amc.TB_INSTT_MST C                                                         
+	        	        ON B.INSTT_ID  = C.INSTT_ID                                    
+			 WHERE  A.RQEST_YM = #{endMonth} 
+				AND    	 B.USER_ID     = #{userId} 
+				AND    D.dataBoxName LIKE CONCAT('%',#{dataName} ,'%')
+	</select>
+	
+	<select id="inqAgencyDemandChart" resultType="DemandCostDto" parameterType="DemandSearchDto" >
+			SELECT 
+		           COST.RQEST_YM
+			      ,SUM(COST.USE_AMOUNT) AS totRqestAdupAmount
+			  FROM TB_DTBX_REQ_MST as REQ
+			      ,TB_DTBX_MST as INFO
+			      ,TB_RQEST_CT_USER_MST as COST
+			 WHERE REQ.REQ_USER_ID = #{userId}
+	           AND REQ.DTBX_SN = INFO.DTBX_SN 
+		       AND INFO.DTBX_OPER_ACNT_ID  = COST.NCLOUD_ID  
+			   AND COST.RQEST_YM BETWEEN #{startMonth} AND #{endMonth}
+		  GROUP BY COST.RQEST_YM
+		  ORDER BY COST.RQEST_YM ASC
+	
+	</select>
+	
+	<select id="getAgencyDemandView" resultType="DemandCostDto" parameterType="DemandSearchDto" >
+		SELECT A.NCLOUD_ID
+			  ,IFNULL(IF (C.INSTT_NM is null
+			             ,(SELECT INSTT_NM  FROM amc.TB_INSTT_MST A1 WHERE A1.INSTT_ID  =  (SELECT INSTT_ID  FROM amc.TB_USER_MST B1 WHERE B1.USER_ID  = D.requestUserSeq  ))
+			             ,C.INSTT_NM)
+			             ,'') INSTT_NM
+			  ,IFNULL(IF ( B.CHARGER_NM  is null
+			            ,(SELECT CHARGER_NM  FROM amc.TB_USER_MST B1 WHERE B1.USER_ID  = D.requestUserSeq  )
+			            ,B.CHARGER_NM)
+			            ,'') CHARGER_NM
+			  ,D.dataBoxName
+			  ,IFNULL(USE_AMOUNT,0) useAmount
+			  ,IFNULL(NCLOUD_DSCNT_AMOUNT,0) ncloudDscntAmount
+			  ,IFNULL(TOT_RQEST_ADUP_AMOUNT,0) totRqestAdupAmount
+			  ,CONCAT(STR_TO_DATE(CONCAT(A.RQEST_YM,'01')
+                                ,'%Y%m%d') 
+                                ,' ~ '
+                                ,CASE WHEN DATE_FORMAT(now(), '%Y%m') = A.RQEST_YM  THEN STR_TO_DATE(DATE_FORMAT(now(), '%Y%m%d'), '%Y%m%d') ELSE LAST_DAY(CONCAT(A.RQEST_YM,'01')) END) as monBet
+                                , A.RQEST_YM  
+                                , IFNULL(IF(B.USER_ID IS NULL,D.requestUserSeq,B.USER_ID),0) userSeq 	
+		 FROM amc.TB_RQEST_CT_USER_MST A
+	LEFT JOIN amc.TB_USER_MST B
+		   ON A.NCLOUD_ID  = B.NCLOUD_ID 
+    LEFT JOIN amc.TB_INSTT_MST C
+		   ON B.INSTT_ID  = C.INSTT_ID  
+	LEFT JOIN( 
+			  SELECT
+				     info.DTBX_OPER_ACNT_ID AS dataBoxAccount
+				  	,group_concat(req.DTBX_NM SEPARATOR ', ') dataBoxName 
+			        ,max(req.REQ_USER_ID) requestUserSeq                       
+				FROM 
+					 amc.TB_DTBX_REQ_MST as req,
+				     amc.TB_DTBX_MST as info
+			   WHERE req.DTBX_SN = info.DTBX_SN
+				 AND info.DTBX_OPER_ACNT_ID is not null
+			GROUP BY info.DTBX_OPER_ACNT_ID
+			  ) D
+		    ON A.NCLOUD_ID  = D.dataBoxAccount  
+		 WHERE A.NCLOUD_ID = #{loginId}
+		AND A.RQEST_YM BETWEEN #{startMonth} AND #{endMonth}
+	</select>
+	
+	
+	<select id="getAgencyDemandPop" resultType="ProductDemandCostDto" parameterType="DemandSearchDto" >
+		SELECT 
+		       IF
+		         (GROUPING
+		                  (COST.NCLOUD_ID
+		                  ,COST.RQEST_YM
+		                  ,COST.RQEST_ATTRB_NM) = 7
+		                  ,'TOTAL'
+		                  ,COST.NCLOUD_ID) as loginId
+		         ,COST.RQEST_YM    
+		         ,IF
+		            (GROUPING
+		                     (COST.NCLOUD_ID, COST.RQEST_YM, COST.RQEST_ATTRB_NM) = 7
+		                     ,'이용금액(합계)'
+		                     ,COST.RQEST_ATTRB_NM) AS demandAttributeCodeName
+		                     ,SUM(COST.USE_AMOUNT) as useAmount    
+	         FROM amc.TB_RQEST_CT_GOODS_MST as COST   
+			WHERE COST.NCLOUD_ID = #{loginId}
+			  AND COST.RQEST_YM = #{demandMonth}
+		 GROUP BY COST.NCLOUD_ID
+		         ,COST.RQEST_YM
+		         ,COST.RQEST_ATTRB_NM WITH ROLLUP
+  HAVING GROUPING (COST.NCLOUD_ID
+                  ,COST.RQEST_YM
+                  ,COST.RQEST_ATTRB_NM) IN (0,7)
+      </select>
+      <select id="getAgencyDemandExcel" resultType="ProductDemandCostDto" parameterType="DemandSearchDto" >
+      		SELECT COST.NCLOUD_ID 
+			     , COST.RQEST_YM  
+			     , COST.RQEST_ATTRB_NM  
+			     , COST.USE_AMOUNT  as useAmount 
+			 FROM 
+			        amc.TB_RQEST_CT_GOODS_MST as COST
+			 WHERE
+			        COST.NCLOUD_ID  = #{loginId}    
+			 AND    COST.RQEST_YM  =#{demandMonth}
+		</select>
+		
+		
+		<select id="demandAgencyListBatchExcel" resultType="ProductDemandCostDto" parameterType="DemandSearchDto" >
+			SELECT
+			A.NCLOUD_ID  
+			,IFNULL(IF(C.INSTT_NM is null, (SELECT INSTT_NM  FROM amc.TB_INSTT_MST A1 WHERE A1.INSTT_ID  =  (SELECT INSTT_ID  FROM amc.TB_USER_MST B1 WHERE B1.USER_ID  = D.requestUserSeq  ) ) , C.INSTT_NM) , '') INSTT_NM
+			,IFNULL(IF(B.CHARGER_NM  is null, (SELECT CHARGER_NM  FROM amc.TB_USER_MST B1 WHERE B1.USER_ID  = D.requestUserSeq  ) , B.CHARGER_NM) , '') CHARGER_NM
+			,IFNULL(D.dataBoxName,'') DTBX_NM
+			,CONCAT(STR_TO_DATE(CONCAT(A.RQEST_YM ,'01'), '%Y%m%d'), ' ~ ',CASE WHEN DATE_FORMAT(now(), '%Y%m') 
+			= A.RQEST_YM THEN STR_TO_DATE(DATE_FORMAT(now(), '%Y%m%d'), '%Y%m%d') ELSE LAST_DAY(CONCAT(A.RQEST_YM,'01')) END) as monBet 
+			,IFNULL(USE_AMOUNT,0)USE_AMOUNT 
+			,IFNULL(NCLOUD_DSCNT_AMOUNT,0)NCLOUD_DSCNT_AMOUNT
+			,IFNULL(TOT_RQEST_ADUP_AMOUNT,0)TOT_RQEST_ADUP_AMOUNT 
+			FROM  amc.TB_USER_MST B
+	         INNER JOIN                                                              
+	            (                                                                    
+	                SELECT                                                           
+	                       info.DTBX_OPER_ACNT_ID AS dataBoxAccount
+	                      ,group_concat(req.DTBX_NM SEPARATOR ', ') dataBoxName 
+	                      ,max(req.REQ_USER_ID) requestUserSeq                       
+	                FROM                                                             
+	                    amc.TB_DTBX_REQ_MST as req
+	                   ,amc.TB_DTBX_MST as info                                          
+	                WHERE                                                            
+	                    req.DTBX_SN  = info.DTBX_SN                  
+	                    AND info.DTBX_OPER_ACNT_ID is not null                          
+	                group by                                                         
+	                    info.DTBX_OPER_ACNT_ID                                          
+	            ) D                                                                  
+	                ON B.USER_ID  = D.requestUserSeq                                 
+	        INNER JOIN                                                               
+	            amc.TB_RQEST_CT_USER_MST A                                                         
+	                ON D.dataBoxAccount = A.NCLOUD_ID                                  
+	        LEFT OUTER JOIN                                                          
+	            amc.TB_INSTT_MST C                                                         
+	                ON B.INSTT_ID  = C.INSTT_ID                                    
+			WHERE  A.RQEST_YM  = #{endMonth}
+			AND    	 B.USER_ID     = #{userId} 
+		</select> 
+		
+		<select id="demandAdminListBatch" resultType="DemandCostDto" parameterType="DemandSearchDto" >
+			SELECT
+				   A.NCLOUD_ID
+				  ,IFNULL(IF(C.INSTT_NM is null, (SELECT INSTT_NM  FROM amc.TB_INSTT_MST A1 WHERE A1.INSTT_ID  =  (SELECT INSTT_ID  FROM amc.TB_USER_MST B1 WHERE B1.USER_ID  = D.requestUserSeq  ) ) , C.INSTT_NM) , '') insttNm
+				  ,IFNULL(IF(B.CHARGER_NM  is null, (SELECT CHARGER_NM  FROM amc.TB_USER_MST B1 WHERE B1.USER_ID  = D.requestUserSeq  ) , B.CHARGER_NM) , '') chargerNm
+				  ,D.dataBoxName
+				  ,IFNULL(USE_AMOUNT,0)USE_AMOUNT 
+				  ,IFNULL(NCLOUD_DSCNT_AMOUNT,0)NCLOUD_DSCNT_AMOUNT
+				  ,IFNULL(TOT_RQEST_ADUP_AMOUNT,0)TOT_RQEST_ADUP_AMOUNT
+     			  ,CONCAT(STR_TO_DATE(CONCAT(A.RQEST_YM,'01'), '%Y%m%d'), ' ~ ', CASE WHEN DATE_FORMAT(now(), '%Y%m') = A.RQEST_YM  THEN STR_TO_DATE(DATE_FORMAT(now(), '%Y%m%d'), '%Y%m%d') ELSE LAST_DAY(CONCAT(A.RQEST_YM,'01')) END) as monBet , A.RQEST_YM , IFNULL(B.USER_ID,0)userSeq
+		      FROM amc.TB_RQEST_CT_USER_MST A
+		 LEFT JOIN amc.TB_USER_MST B
+			    ON A.NCLOUD_ID = B.NCLOUD_ID 
+		 LEFT JOIN amc.TB_INSTT_MST C
+			    ON B.INSTT_ID  = C.INSTT_ID  
+	     LEFT JOIN(
+				   SELECT                                                           
+	                      info.DTBX_OPER_ACNT_ID AS dataBoxAccount
+	                     ,group_concat(req.DTBX_NM SEPARATOR ', ') dataBoxName 
+	                     ,max(req.REQ_USER_ID) requestUserSeq                       
+	                 FROM amc.TB_DTBX_REQ_MST as req
+	                     ,amc.TB_DTBX_MST as info                                          
+	                WHERE req.DTBX_SN  = info.DTBX_SN                  
+	                  AND info.DTBX_OPER_ACNT_ID is not null                          
+	             GROUP BY info.DTBX_OPER_ACNT_ID                   
+			       ) D
+			     ON A.NCLOUD_ID  = D.dataBoxAccount  
+		      WHERE A.RQEST_YM  = #{endMonth}
+				AND CASE WHEN nullif(#{dataName},'') IS NULL THEN  1=1   ELSE  C.INSTT_NM LIKE CONCAT('%',#{dataName} ,'%')END 
+		</select>
+		
+		<select id="getAdminDemandChart" resultType="DemandCostDto" parameterType="DemandSearchDto" >
+			SELECT 
+			       COST.RQEST_YM
+				  ,SUM(COST.TOT_RQEST_ADUP_AMOUNT) AS TOT_RQEST_ADUP_AMOUNT
+		      FROM TB_RQEST_CT_USER_MST as COST
+		     WHERE  COST.RQEST_YM BETWEEN #{startMonth} AND #{endMonth}
+		  GROUP BY COST.RQEST_YM
+		  ORDER BY COST.RQEST_YM ASC
+		</select>
+		
+		<select id="demandAdminListViewBatch" resultType="DemandCostDto" parameterType="DemandSearchDto" >
+			SELECT
+				   A.NCLOUD_ID  
+				  ,IFNULL(IF(C.INSTT_NM is null, (SELECT INSTT_NM  FROM amc.TB_INSTT_MST   A1 WHERE A1.INSTT_ID  =  (SELECT INSTT_ID  FROM amc.TB_USER_MST B1 WHERE B1.USER_ID  = D.requestUserSeq  ) ) , C.INSTT_NM) , '') INSTT_NM
+				  ,IFNULL(IF(B.CHARGER_NM  is null, (SELECT CHARGER_NM  FROM amc.TB_USER_MST B1 WHERE B1.USER_ID  = D.requestUserSeq  ) , B.CHARGER_NM) , '') CHARGER_NM
+				  ,D.dataBoxName
+				  ,IFNULL(USE_AMOUNT,0)useAmount
+				  ,IFNULL(NCLOUD_DSCNT_AMOUNT,0)NCLOUD_DSCNT_AMOUNT
+				  ,IFNULL(TOT_RQEST_ADUP_AMOUNT,0)TOT_RQEST_ADUP_AMOUNT
+    			  ,CONCAT(STR_TO_DATE(CONCAT(A.RQEST_YM,'01'), '%Y%m%d'), ' ~ ', CASE WHEN DATE_FORMAT(now(), '%Y%m') = A.RQEST_YM THEN STR_TO_DATE(DATE_FORMAT(now(), '%Y%m%d'), '%Y%m%d') ELSE LAST_DAY(CONCAT(A.RQEST_YM,'01')) END) as monBet
+				  ,A.RQEST_YM 
+				  ,IFNULL(IF(B.USER_ID IS NULL,D.requestUserSeq,B.USER_ID),0) userSeq 
+			FROM
+				amc.TB_RQEST_CT_USER_MST A
+				LEFT OUTER JOIN amc.TB_USER_MST B
+				ON A.NCLOUD_ID = B.NCLOUD_ID 
+			    LEFT OUTER JOIN amc.TB_INSTT_MST C
+				ON B.INSTT_ID  = C.INSTT_ID  
+				LEFT OUTER JOIN(
+						SELECT
+						    info.DTBX_OPER_ACNT_ID AS dataBoxAccount
+							,group_concat(req.DTBX_NM SEPARATOR ', ') dataBoxName 
+				            ,max(req.REQ_USER_ID) requestUserSeq                       
+						FROM
+							amc.TB_DTBX_REQ_MST as req,
+							amc.TB_DTBX_MST as info
+						WHERE
+							req.DTBX_SN = info.DTBX_SN
+							AND info.DTBX_OPER_ACNT_ID is not null
+						group by info.DTBX_OPER_ACNT_ID
+				) D
+				ON A.NCLOUD_ID  = D.dataBoxAccount  
+			 WHERE A.NCLOUD_ID  = #{loginId}
+ 			 AND  A.RQEST_YM BETWEEN #{startMonth} AND #{endMonth} 
+			
+		</select>
+		<select id="getAdminDemandPop" resultType="DemandCostDto" parameterType="DemandSearchDto" >
+			SELECT IF(GROUPING (COST.NCLOUD_ID
+			                   ,COST.RQEST_YM 
+			                   ,COST.RQEST_ATTRB_NM) = 7
+			                   ,'TOTAL'
+			                   ,COST.NCLOUD_ID) as loginId      
+			      ,COST.RQEST_YM        
+			      ,IF(GROUPING (COST.NCLOUD_ID, COST.RQEST_YM, COST.RQEST_ATTRB_NM) = 7
+			                   ,'당월 소계'
+			                   ,COST.RQEST_ATTRB_NM) AS demandAttributeCodeName
+			      ,SUM(COST.USE_AMOUNT) as useAmount   -- 이용금액
+				  ,SUM(COST.PROMTN_DSCNT_AMOUNT) as promotionDiscountAmount -- 할인금액 프로모션
+				  ,SUM(COST.ENGG_DSCNT_AMOUNT) as promiseDiscountAmount -- 할인금액 약정
+				  ,SUM(COST.ETC_DSCNT_AMOUNT) as etcDiscountAmount -- 할인금액 기타
+				  ,SUM(COST.GOODS_DSCNT_AMOUNT) as productDiscountAmount -- 상품할인
+				  ,SUM(COST.USE_AMOUNT) - (SUM(COST.PROMTN_DSCNT_AMOUNT) 
+				                        + SUM(COST.ENGG_DSCNT_AMOUNT) 
+				                        + SUM(COST.ETC_DSCNT_AMOUNT) 
+				                        + SUM(COST.GOODS_DSCNT_AMOUNT)) as  thisMonthAmount 
+			  FROM amc.TB_RQEST_CT_GOODS_MST as COST   
+			 WHERE COST.RQEST_YM = #{endMonth} 
+		       AND COST.NCLOUD_ID = #{loginId}
+		  GROUP BY COST.NCLOUD_ID
+		          ,COST.RQEST_YM
+		          ,COST.RQEST_ATTRB_NM WITH ROLLUP
+   HAVING GROUPING(
+                   COST.NCLOUD_ID
+                  ,COST.RQEST_YM
+                  ,COST.RQEST_ATTRB_NM) IN (0,7) 
+	     UNION ALL
+			SELECT AA.GUBUN AS loginId
+				  ,'' as demandMonth
+				  ,CASE AA.GUBUN WHEN 'TOT01' THEN '이용금액(합계)'
+				   				 WHEN 'TOT02' THEN 'NAVER Cloud 제공할인'
+				   				 WHEN 'TOT03' THEN '공급가액'
+				                 WHEN 'TOT04' THEN '부가가치세'
+				   				 ELSE '총 청구금액(부가세 포함)' 
+  				    			 END as demandAttributeCodeName
+				  ,CASE AA.GUBUN WHEN 'TOT01' THEN AA.useAmount
+				                 WHEN 'TOT02' THEN AA.naverCloudDiscountAmount
+				                 WHEN 'TOT03' THEN AA.TWMT_RQEST_AMOUNT
+				                 WHEN 'TOT04' THEN AA.TWMT_VAT_AMOUNT
+				                 ELSE AA.TOT_RQEST_ADUP_AMOUNT 
+				                 END as useAmount
+				  ,0, 0, 0, 0, 0
+			  FROM (
+				    SELECT COST.USE_AMOUNT as useAmount
+				          ,COST.ENGG_DSCNT_AMOUNT + COST.PROMTN_DSCNT_AMOUNT 
+				   		  +COST.ETC_DSCNT_AMOUNT + COST.CSTMR_DSCNT_AMOUNT 
+				   <!-- + COST.GOODS_DSCNT_AMOUNT --> 
+				    	  +COST.CRDT_DSCNT_AMOUNT + COST.UNDER_100W_DSCNT_AMOUNT 
+				   	      +COST.UNDER_1000W_DSCNT_AMOUNT + COST.COIN_USE_AMOUNT 
+				   		  +COST.BKPMS_AMOUNT + IFNULL(COST.NCLOUD_DSCNT_AMOUNT, 0) 
+				   		  +COST.MBER_TRFF_DSCNT_AMOUNT + COST.MBER_ENGG_TRFF_DSCNT_AMOUNT as naverCloudDiscountAmount
+				   		  ,COST.TWMT_RQEST_AMOUNT
+				   		  ,COST.TWMT_VAT_AMOUNT 
+				   		  ,COST.TOT_RQEST_ADUP_AMOUNT
+				   		  ,TEMP.GUBUN
+				      FROM amc.TB_RQEST_CT_USER_MST as COST
+				   ,(SELECT 'TOT01' AS GUBUN UNION
+					 SELECT 'TOT02' AS GUBUN UNION
+					 SELECT 'TOT03' AS GUBUN UNION
+					 SELECT 'TOT04' AS GUBUN UNION
+					 SELECT 'TOT05' AS GUBUN) AS TEMP
+				      WHERE COST.RQEST_YM  = #{demandMonth} 
+				        AND COST.NCLOUD_ID = #{loginId} 
+				) AA
+			</select>
+			
+			<select id="getAdminDemandExcel" resultType="ProductDemandCostDto" parameterType="DemandSearchDto" >
+				SELECT 
+				       IF(GROUPING (COST.NCLOUD_ID, COST.RQEST_YM, COST.RQEST_ATTRB_NM) = 7, 'TOTAL',  COST.NCLOUD_ID) as loginId 
+				      ,COST.RQEST_YM
+					  ,IF(GROUPING (COST.NCLOUD_ID, COST.RQEST_YM, COST.RQEST_ATTRB_NM) = 7, '당월 소계',  COST.RQEST_ATTRB_NM) AS demandAttributeCodeName       
+					  ,SUM(COST.USE_AMOUNT) as useAmount
+					  ,SUM(COST.PROMTN_DSCNT_AMOUNT) as promotionDiscountAmount
+					  ,SUM(COST.ENGG_DSCNT_AMOUNT) as promiseDiscountAmount
+					  ,SUM(COST.ETC_DSCNT_AMOUNT) as etcDiscountAmount
+					  ,SUM(COST.GOODS_DSCNT_AMOUNT) as productDiscountAmount
+					  ,SUM(COST.USE_AMOUNT) - (SUM(COST.PROMTN_DSCNT_AMOUNT) 
+					  +SUM(COST.ENGG_DSCNT_AMOUNT) + SUM(COST.ETC_DSCNT_AMOUNT)
+					  +SUM(COST.GOODS_DSCNT_AMOUNT)) as thisMonthAmount 
+				  FROM amc.TB_RQEST_CT_GOODS_MST as COST   
+				 WHERE COST.RQEST_YM = #{demandMonth} 
+			       AND COST.NCLOUD_ID = #{loginId}   
+			  GROUP BY COST.NCLOUD_ID
+			          ,COST.RQEST_YM
+			          ,COST.RQEST_ATTRB_NM WITH ROLLUP
+	   HAVING GROUPING
+	   				  (COST.NCLOUD_ID
+	   				  ,COST.RQEST_YM
+	   				  ,COST.RQEST_ATTRB_NM) IN (0,7) 
+			 UNION ALL
+					   SELECT AA.GUBUN AS loginId
+					         ,'' as demandMonth
+					         ,CASE AA.GUBUN WHEN 'TOT01' THEN '이용금액(합계)'
+					          				WHEN 'TOT02' THEN 'NAVER Cloud 제공할인'
+					                        WHEN 'TOT03' THEN '공급가액'
+					                        WHEN 'TOT04' THEN '부가가치세'
+					                        ELSE '총 청구금액(부가세 포함)' END as demandAttributeCodeName
+					     	 ,CASE AA.GUBUN WHEN 'TOT01' THEN AA.useAmount
+					                        WHEN 'TOT02' THEN AA.naverCloudDiscountAmount
+					                        WHEN 'TOT03' THEN AA.TWMT_RQEST_AMOUNT
+					                        WHEN 'TOT04' THEN AA.TWMT_VAT_RATE
+					                        ELSE AA.TOT_RQEST_ADUP_AMOUNT END as useAmount
+					     	 , 0, 0, 0, 0, 0
+					 	 FROM
+					 	 	 (SELECT COST.USE_AMOUNT as useAmount
+					     			,COST.ENGG_DSCNT_AMOUNT 
+						     		+COST.PROMTN_DSCNT_AMOUNT + COST.ETC_DSCNT_AMOUNT
+						     		+COST.CSTMR_DSCNT_AMOUNT <!-- + COST.GOODS_DSCNT_AMOUNT--> 
+						     		+COST.CRDT_DSCNT_AMOUNT + COST.UNDER_100W_DSCNT_AMOUNT 
+						     		+COST.UNDER_1000W_DSCNT_AMOUNT + COST.COIN_USE_AMOUNT 
+						     		+COST.BKPMS_AMOUNT + IFNULL(COST.NCLOUD_DSCNT_AMOUNT, 0) 
+						     		+COST.MBER_TRFF_DSCNT_AMOUNT + COST.MBER_ENGG_TRFF_DSCNT_AMOUNT  as naverCloudDiscountAmount
+					     			,COST.TWMT_RQEST_AMOUNT
+					     			,COST.TWMT_VAT_RATE 
+					     			,COST.TOT_RQEST_ADUP_AMOUNT
+					     			,TEMP.GUBUN
+					 			FROM amc.TB_RQEST_CT_USER_MST as COST
+					  				,(SELECT 'TOT01' AS GUBUN UNION
+									  SELECT 'TOT02' AS GUBUN UNION
+						 			  SELECT 'TOT03' AS GUBUN UNION
+									  SELECT 'TOT04' AS GUBUN UNION
+									  SELECT 'TOT05' AS GUBUN) AS TEMP
+					 		   WHERE COST.RQEST_YM = #{demandMonth} 
+				    			 AND COST.NCLOUD_ID = #{loginId} ) AA
+			</select>
+			
+			<select id="demandAdminListBatchExcel" resultType="ProductDemandCostDto" parameterType="DemandSearchDto" >
+				SELECT
+					   A.NCLOUD_ID  
+					  ,IFNULL(IF(C.INSTT_NM  is null, (SELECT INSTT_NM  FROM amc.TB_INSTT_MST A1 WHERE A1.INSTT_ID  =  (SELECT INSTT_ID  FROM amc.TB_USER_MST B1 WHERE B1.USER_ID  = D.requestUserSeq  ) ) , C.INSTT_NM) , '') INSTT_NM
+					  ,IFNULL(IF(B.CHARGER_NM  is null, (SELECT CHARGER_NM  FROM amc.TB_USER_MST B1 WHERE B1.USER_ID  = D.requestUserSeq  ) , B.CHARGER_NM) , '') CHARGER_NM
+					  ,IFNULL(D.dataBoxName,'')DTBX_NM 
+					  ,CONCAT(STR_TO_DATE(CONCAT(A.RQEST_YM ,'01'), '%Y%m%d'), ' ~ ', CASE WHEN DATE_FORMAT(now(), '%Y%m') 
+					  = A.RQEST_YM THEN STR_TO_DATE(DATE_FORMAT(now(), '%Y%m%d'), '%Y%m%d') ELSE LAST_DAY(CONCAT(A.RQEST_YM,'01')) END) as monBet 
+				      ,IFNULL(USE_AMOUNT,0)USE_AMOUNT 
+					  ,IFNULL(NCLOUD_DSCNT_AMOUNT,0)NCLOUD_DSCNT_AMOUNT
+					  ,IFNULL(TOT_RQEST_ADUP_AMOUNT,0)TOT_RQEST_ADUP_AMOUNT 
+				  FROM amc.TB_RQEST_CT_USER_MST A
+			 LEFT JOIN amc.TB_USER_MST B
+			 		ON A.NCLOUD_ID = B.NCLOUD_ID  
+			 LEFT JOIN amc.TB_INSTT_MST  C
+			 		ON B.INSTT_ID  = C.INSTT_ID  
+			 LEFT JOIN(
+					   SELECT info.DTBX_OPER_ACNT_ID AS dataBoxAccount
+							 ,group_concat(req.DTBX_NM SEPARATOR ', ') dataBoxName 
+				             ,max(req.REQ_USER_ID) requestUserSeq                       
+						 FROM amc.TB_DTBX_REQ_MST as req
+							 ,amc.TB_DTBX_MST as info
+						WHERE req.DTBX_SN  = info.DTBX_SN
+						  AND info.DTBX_OPER_ACNT_ID is not null
+					 GROUP BY info.DTBX_OPER_ACNT_ID
+					  ) D
+			   	    ON A.NCLOUD_ID  = D.dataBoxAccount  
+				 WHERE A.RQEST_YM  = #{endMonth} 
+				   AND CASE WHEN nullif(#{dataName},'') IS NULL THEN  1=1   
+				            ELSE C.INSTT_NM LIKE CONCAT('%',#{dataName} ,'%')
+				            END 
+			</select>
+</mapper>

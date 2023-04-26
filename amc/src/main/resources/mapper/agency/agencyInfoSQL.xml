@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="adminAgencyDao">
+
+ 	<select id="inqAgencyList" resultType="AgencyDto" parameterType="agencySearchDto">
+ 		SELECT 
+ 			   INSTT_ID
+ 			  ,INSTT_NM
+ 			  ,FN_CODE('INSTT_TY_CD' , INSTT_TY_CD ) as insttTyCd
+ 			  ,BSNM_NO
+ 			  ,RPRSNTV_NM
+ 		 FROM  TB_INSTT_MST
+ 		WHERE  INSTT_NM like CONCAT('%' , #{dataName} , '%')
+ 		ORDER  BY INSTT_ID desc
+ 	</select>
+ 	
+ 	<select id="getAgencySeq" resultType="AgencyDto" parameterType="Long">
+ 		SELECT 
+ 		       INSTT_ID
+ 			  ,INSTT_NM
+ 			  ,INSTT_TY_CD
+ 			  ,BSNM_NO
+ 			  ,RPRSNTV_NM
+ 		  FROM TB_INSTT_MST
+ 		 WHERE INSTT_ID = #{insttId}
+ 	</select>
+ 	
+ 	<insert id="regAgency" parameterType="AgencyDto" useGeneratedKeys="false" keyProperty="insttId">
+ 		INSERT 
+ 		  INTO TB_INSTT_MST
+ 	  	       (
+ 	  	        INSTT_NM
+ 			   ,BSNM_NO
+ 	    	   ,INSTT_TY_CD
+ 			   ,RPRSNTV_NM
+ 			   ,CREAT_DT
+ 			   )
+ 		VALUES
+ 		       (
+ 		        #{insttNm}
+ 	           ,#{bsnmNo}
+ 		       ,#{insttTyCd}
+ 		       ,#{rprsntvNm}
+ 		       ,now(6)
+ 		       )
+ 	</insert>
+ 	
+ 	<update id="updtAgency" parameterType="AgencyDto">
+ 		UPDATE 
+ 		       TB_INSTT_MST
+ 		   SET INSTT_NM = #{insttNm}
+ 			  ,BSNM_NO = #{bsnmNo}
+ 			  ,INSTT_TY_CD = #{insttTyCd}
+ 			  ,RPRSNTV_NM = #{rprsntvNm}
+ 			  ,UPDT_DT = now(6)
+ 		 WHERE INSTT_ID = #{insttId}
+ 	</update>
+ 	<delete id="delAgency" parameterType="Long">
+ 		DELETE 
+ 		  FROM TB_INSTT_MST
+ 		 WHERE INSTT_ID = #{insttId}
+ 	</delete>
+</mapper>

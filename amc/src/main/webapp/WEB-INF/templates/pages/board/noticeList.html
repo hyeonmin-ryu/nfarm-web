@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/defaultLayout">
+
+    <th:block layout:fragment="css">
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/board/noticeList.js}"></script>
+        <script>
+        </script>
+    </th:block>
+
+    <section class="member-container"  layout:fragment="contents">
+        
+    	<th:block th:replace="fragments/defaultSubHeader :: subHeaderFragment"></th:block>
+    	
+        <div id="maincontentswrap" >
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+        <section class="content" >
+            <section class="sub-title-box">
+                <h2>공지사항</h2>
+                <p class="eng">Notice</p>
+            </section>
+
+            <section class="board-list-search-wrap a-c">
+                <label>
+                	<input type="text" v-model="cond.keyword" @keyup="onKeyup" placeholder="검색어를 입력하세요">
+				</label>
+                <a href="#" class="btn btn-basic btn-small ml-10" v-on:click="onclickSearch">검색</a>
+            </section>
+
+            <table class="contents-width table-list mt-50">
+                <colgroup>
+                    <col style="width:5%" />
+                    <col/>
+                    <col style="width:15%" />
+                    <col style="width:10%" />
+                </colgroup>
+                <thead>
+                <tr>
+                    <th scope="col">번호</th>
+                    <th scope="col" class="a-l pl-20">제목</th>
+                    <th scope="col">게시일</th>
+                    <th scope="col">조회수</th>
+                </tr>
+                </thead>
+                <tbody v-if="noticeList.length == 0">
+                <tr>
+                    <td colspan="4" style="text-align: center">
+                        데이터가 없습니다.
+                    </td>
+                </tr>
+                </tbody>
+
+                <tbody v-if="noticeList.length > 0">
+                    <tr v-for="(item, idx) in noticeList" class="tr-link" v-on:click="onclickView(item.noticeNo)">
+                        <td v-if="item.imprtncYn === 'Y'" class="t-red">중요</td>
+                        <td v-else>{{item.noticeNo}}</td>
+                        <td class="a-l"><a href="javascript:void(0);" v-on:click="onclickView(item.noticeNo)">{{item.noticeSj}}</a></td>
+                        <td>{{item.creatDt}}</td>
+                        <td>{{item.inqireCo}}</td>
+                    </tr>
+                </tbody>
+                </table>
+
+            <!-- 페이징 -->
+            <section class="contents-width mt-40">
+                <div class="pagination fl-l">
+                    <a href="#" v-on:click="onclickPage(pageInfo.prev)">
+						<span class="next"></span>
+					</a>
+
+                    <a href="#" v-for="(page, idx) in pageInfo.pages" v-on:click="onclickPage(page)" v-bind:class="{active:pageInfo.curr==page}">
+                        {{page}}
+                    </a>
+
+                    <a href="#" v-on:click="onclickPage(pageInfo.next)">
+						<span class="prev"></span>
+					</a>
+                </div>
+                
+				<!--<a href="#" class="btn btn-basic btn-large fl-r" v-on:click="onclickReg">등록</a>-->
+				<a href="#" v-if="MY_ROLE === 'ROLE_ADMIN'" class="btn btn-basic btn-large fl-r" v-on:click="onclickReg">등록</a>
+            </section>
+        </section>
+        </script>
+    </section>
+</html>

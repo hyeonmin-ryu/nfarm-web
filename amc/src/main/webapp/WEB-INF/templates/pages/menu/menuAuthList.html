@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+
+    <th:block layout:fragment="css">
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/menu/menuAuthList.js}"></script>
+        <script th:src="@{/static/element-ui/lib/index.js}"></script>
+        <link rel="stylesheet" href="">
+        
+    </th:block>
+
+    <section class="mypage-container" layout:fragment="contents">
+        <div id="maincontentswrap" >
+            <maincontents ref="maincontents"></maincontents>
+		</div>
+		
+		<script type="text/x-template" id="main-template">
+			<section class="content contents-width">
+				<section class="mypage-content">
+					<!--<h3>메뉴 관리</h3>-->
+
+					<section class="code-page clearfix">
+						<section class="join-cont-box">
+							<h4>메뉴 정보</h4>
+
+							<table class="table-list mt-10">
+                        		<colgroup>
+                            		<col style="width:40%" />
+                            		<col style="width:60%" />
+                        		</colgroup>
+                        		<thead>
+                        		<tr>
+                            		<th scope="col">권한명</th>
+                            		<th scope="col">권한코드</th>
+		                        </tr>
+                        		</thead>
+							</table>
+							<div class="table-wrap">
+								<table class="table-list">
+    	                    		<colgroup>
+        	                    		<col style="width:40%" />
+            	                		<col style="width:40%" />
+										<col style="width:20%" />
+                    	    		</colgroup>
+		                	        <tbody>
+        			        	        <tr  v-for="(codeGroup, idx) in codeGroupList" :key ="idx" class="tr-link" v-on:click="getMenuAuthList(codeGroup.nm , codeGroup.dc);">
+            	        			        <td>{{codeGroup.dc}}</td>
+			    	                	    <td>{{codeGroup.nm}}</td>
+			        	                </tr>
+                    			    </tbody>
+								</table>
+							</div>
+
+							<section class="btn-box mt-20 a-l">
+								<a href="#" class="btn btn-line btn-middle" v-on:click="onclickSearch">검색</a>
+							</section>
+
+						</section>
+
+						<section class="join-cont-box" >
+							<h4 id="textRole"></h4>
+								<section class="btn-box a-l">
+								<a href="#" class="btn btn-line btn-middle mb-10" v-on:click="onclickmod">수정</a>
+							</section>
+							
+			                <div class="">
+			                        <div class="upload-box-l-inner">
+			                           <el-tree 
+			                                :data="treeData" 
+			                                :props="defaultProps" 
+			                                :current-node-key="0"
+			                                @check="checkData"
+			                                 node-key="id" 
+			                                 ref="markupTree"
+			                                 highlight-current default-expand-all
+			                                 show-checkbox check-strictly
+			                                 :expand-on-click-node="false"
+			                                 >
+			                    </div>
+						</section>						
+					</section>
+				</section>
+			</section>
+		</script>
+	</section>
+</html>

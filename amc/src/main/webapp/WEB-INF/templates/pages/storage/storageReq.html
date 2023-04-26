@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/defaultLayout">
+
+    <th:block layout:fragment="css">
+
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/storage/storageReq.js}"></script>
+
+    </th:block>
+
+    <section class="member-container" layout:fragment="contents">
+    
+		<th:block th:replace="fragments/defaultSubHeader :: subHeaderFragment"></th:block>
+    
+        <div id="maincontentswrap" >
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+        <section class="content">
+            <div class="sub-title-box">
+                <h2>질환데이터 저장신청</h2>
+                <div class="path">
+                    <ul class="clearfix">
+                        <li><a href="/" class="home">홈</a></li>
+                        <li>연구분석 데이터 관리</li>
+                        <li>질환데이터 저장신청</li>                
+                   </ul>
+                </div>
+            </div>
+
+			<section class="content-body common-inner">	
+                <section class="join-cont-box clearfix">
+                    <h3>신청자 정보</h3>
+                    <ul class="com-ul">
+                        <li>
+                            <span class="join-input-group mr-40">
+                                <label >신청자명</label>
+                                <input type="text" v-bind:value="userInfo.chargerNm" readonly>
+                            </span>
+                            <span class="join-input-group">
+                                <label >병원명</label>
+                                <input type="text" v-bind:value="userInfo.insttNm" readonly>
+                            </span>
+                        </li>
+                        <li>
+<!--                        <span class="join-input-group mr-40">-->
+<!--                            <label>질병주관병원 여부</label>-->
+<!--                            <span class="radio-wrap join-radio bdr-b" v-for="radio in isYn">-->
+<!--                                <input type="radio" v-bind:id="radio.value" v-bind:value="radio.value" disabled v-model="userInfo.diseaseMainYn">-->
+<!--                                <label v-if="radio.value=='Y'">예</label>-->
+<!--                                <label v-if="radio.value=='N'">아니오</label>-->
+<!--                            </span>-->
+<!--                        </span>-->
+                            <span class="join-input-group mr-40">
+                                    <label>질병주관병원 여부</label>
+                                    <span class="radio-wrap join-radio">
+                                        <input type="radio" id="radio3_op1" value="1" name="save-op3" v-bind:checked="userInfo.dissMainYn === 'Y'" disabled/>
+                                        <label for="radio3_op1"><span></span>예</label>
+                                        <input type="radio" id="radio3_op2" value="2" name="save-op3" v-bind:checked="userInfo.dissMainYn === 'N'" disabled/>
+                                        <label for="radio3_op2"><span></span>아니오</label>
+                                    </span>
+                                </span>
+                            <span class="join-input-group">
+                                <label>관리하는 질병</label>
+                                <input type="text" v-bind:value="userInfo.dissNm" readonly>
+                            </span>
+                        </li>
+                        <li>
+                                <span class="join-input-group mr-40">
+                                <label>연락처</label>
+                                <input type="tel" v-bind:value="userInfo.chargerMoblphonNo" readonly>
+                            </span>
+                            <span class="join-input-group">
+                                <label >이메일</label>
+                                <input type="email" v-bind:value="userInfo.email" readonly>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="join-input-group ">
+                                <label >질병 책임자명</label>
+                                <input type="text" v-bind:value="userInfo.managerUserName" readonly>
+                            </span>
+                        </li>
+                    </ul>
+                </section>
+
+                <section class="join-cont-box">
+                    <h3>신청 정보</h3>
+                    <span class="join-txt-caution">* 필수 입력 항목</span>
+                    <ul class="com-ul">
+                        <li>
+                            <span class="join-input-group w-100">
+                                <label>저장 데이터명<span>*</span></label>
+                                <input class="w-100" type="text" ref="storgeNm" v-model="saveInfo.storgeNm" placeholder="저장 데이터명을 입력해주세요">
+                            </span>
+                        </li>
+                    </ul>
+                </section>
+
+                <section class="contents-width a-c mt-60">
+                    <a href="#" class="btn btn-line-black btn-large" v-on:click="onclickCancel">목록</a>
+                    <a href="#" class="btn btn-basic btn-large ml-20" v-on:click="onclickReqSave">신청</a>
+                </section>
+            </section>
+		</section>	
+        </script>
+    </section>
+</html>

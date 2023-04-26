@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed May 11 15:49:51 KST 2016-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace ="exportReqDao">
+
+	<select id = "inqDataBoxList" resultType="ExportReqDto" parameterType="ExportSearchDto">
+		SELECT e.TKOUT_REQST_NO
+			  ,FN_CODE('TKOUT_PROCESS_STTUS_CD', e.TKOUT_PROCESS_STTUS_CD) as tkoutProcessSttusCd 
+		      ,DATE_FORMAT(e.REQST_DT, '%Y-%m-%d') as reqstDt
+		      ,DATE_FORMAT(e.PROCESS_DT, '%Y-%m-%d') as processDt
+		      ,d.DTBX_REQ_NO
+		      ,d.DTBX_NM
+		      ,u.CHARGER_NM
+		      ,a.INSTT_NM 
+		  FROM TB_DTBX_TKOUT_REQST_MST e
+	INNER JOIN TB_DTBX_TKOUT_SVR_DTL es
+		    ON e.TKOUT_REQST_NO = es.TKOUT_REQST_NO
+	INNER JOIN TB_DTBX_REQ_MST d
+		    ON e.DTBX_SN = d.DTBX_REQ_NO
+	INNER JOIN TB_USER_MST u
+		    ON e.TKOUT_REQST_USER_ID = u.USER_ID
+    INNER JOIN TB_INSTT_MST a
+    	    ON u.INSTT_ID = a.INSTT_ID 
+    	 WHERE d.DTBX_NM like CONCAT('%', #{dataName}, '%') 
+    <if test='dataName != null and !dataName.equals("")'>
+    	   OR a.INSTT_NM like CONCAT('%', #{dataName}, '%')
+    	   OR u.CHARGER_NM like CONCAT('%', #{dataName}, '%')
+    </if>
+    <if test ='tkoutProcessSttusCd != null and !tkoutProcessSttusCd.equals("")'>
+    	  AND e.TKOUT_PROCESS_STTUS_CD = #{tkoutProcessSttusCd} 
+    </if>
+	  ORDER BY e.TKOUT_REQST_NO desc
+	</select>
+	
+	<select id = "getExportView" resultType ="ExportReqDto">
+		SELECT 
+			   A.DTBX_SN
+			  ,B.DTBX_NM
+			  ,FN_CODE('TKOUT_PROCESS_STTUS_CD', TKOUT_PROCESS_STTUS_CD) as tkoutProcessSttusCd
+			  ,A.REQST_DT
+			  ,A.CANCL_DT
+			  ,A.RCEPT_DT
+			  ,A.PROCESS_DT
+			  ,A.TKOUT_RESN
+			  ,A.TKOUT_TRGET_COURS
+			  ,A.TKOUT_REQST_USER_ID
+			  ,C.TKOUT_SVR_IP_ADRES
+			  ,C.TKOUT_SVR_USER_ID
+			  ,C.TKOUT_SVR_USER_PASSWORD
+			  ,A.TKOUT_PROCESS_STTUS_CD as exportReqStatCodeName
+		  FROM TB_DTBX_TKOUT_REQST_MST A
+	INNER JOIN TB_DTBX_REQ_MST B
+	        ON A.DTBX_SN = B.DTBX_REQ_NO
+	INNER JOIN TB_DTBX_TKOUT_SVR_DTL C
+	        ON A.TKOUT_REQST_NO = C.TKOUT_REQST_NO
+		 WHERE A.TKOUT_REQST_NO = #{tkoutReqstNo}
+	</select>
+	
+	<select id = "inqExportApproverList" resultType ="ExportApproverInfoDto" parameterType="Long">
+		SELECT E.OTHBC_DATA_NM 
+		      ,F.CHARGER_NM
+		      ,G.INSTT_NM
+		      ,A.PROCESS_DT
+		      ,A.REJECT_RESN
+		      ,E.DISS_RSPNBER_USER_ID
+		  FROM TB_DTBX_TKOUT_REQST_MST A 
+     LEFT JOIN TB_DTBX_REQ_MST B 
+            ON A.DTBX_SN = B.DTBX_REQ_NO 
+     LEFT JOIN TB_DTBX_DATA_REQ_MST C 
+            ON B.DTBX_REQ_NO = C.DTBX_REQ_NO 
+     LEFT JOIN TB_STRGE_USE_INF D 
+            ON D.USE_STRGE_ID = C.USE_STRGE_ID 
+     LEFT JOIN TB_STRGE_OTHBC_REQST_INF E 
+            ON D.OTHBC_REQST_ID = E.OTHBC_REQST_ID 
+     LEFT JOIN TB_USER_MST F 
+            ON F.USER_ID  = E.DISS_RSPNBER_USER_ID  
+     LEFT JOIN TB_INSTT_MST G 
+            ON F.INSTT_ID = G.INSTT_ID 
+         WHERE TKOUT_REQST_NO = #{tkoutReqstNo}
+	</select>
+	
+	<select id = "inqUseDataBoxList" resultType ="ExportReqDto" parameterType="ExportSearchDto">
+		SELECT DTBX_REQ_NO
+		      ,DTBX_NM
+		      ,DTBX_SN
+          FROM TB_DTBX_REQ_MST  
+         WHERE REQ_USER_ID = #{userId}
+           AND(
+              (DTBX_REQ_TY_CD = 'USE' 
+           AND DTBX_REQST_STTUS_CD = 'APPROVE') 
+            OR(DTBX_REQ_TY_CD='DEL' 
+           AND DTBX_REQST_STTUS_CD ='ACCEPT')
+            OR(DTBX_REQ_TY_CD = 'DEL' 
+           AND DTBX_REQST_STTUS_CD='REQUEST')
+              )
+      ORDER BY DTBX_REQ_NO DESC
+	</select>
+	
+	<select id = "inqBucketList" resultType ="ExportApproverInfoDto" parameterType="Long">
+		SELECT D.OTHBC_DATA_NM 
+		      ,E.CHARGER_NM
+		      ,F.INSTT_NM
+		      ,F.INSTT_ID
+		      ,D.DISS_RSPNBER_USER_ID
+		  FROM TB_DTBX_REQ_MST A 
+     LEFT JOIN TB_DTBX_DATA_REQ_MST B 
+            ON A.DTBX_REQ_NO = B.DTBX_REQ_NO 
+     LEFT JOIN TB_STRGE_USE_INF C
+            ON C.USE_STRGE_ID = B.USE_STRGE_ID 
+     LEFT JOIN TB_STRGE_OTHBC_REQST_INF D 
+            ON C.OTHBC_REQST_ID = D.OTHBC_REQST_ID 
+     LEFT JOIN TB_USER_MST E
+            ON E.USER_ID  = D.DISS_RSPNBER_USER_ID  
+     LEFT JOIN TB_INSTT_MST F 
+            ON E.INSTT_ID = F.INSTT_ID 
+         WHERE DTBX_SN = #{dtbxSn}
+	</select>
+	
+	<insert id="regExport" parameterType="ExportReqDto" useGeneratedKeys="true"  keyProperty="tkoutReqstNo">
+		INSERT 
+		  INTO TB_DTBX_TKOUT_REQST_MST
+		      (
+		       DTBX_SN
+		      ,TKOUT_RESN
+		      ,TKOUT_TRGET_COURS
+		      ,TKOUT_REQST_USER_ID
+		      ,REQST_DT
+		      ,TKOUT_PROCESS_STTUS_CD
+		      ,CREAT_USER_ID
+		      ,CREAT_DT
+		      ,UPDT_USER_ID
+		      ,UPDT_DT
+		      )
+		VALUES
+		     (
+		      #{dtbxSn}
+		      ,#{tkoutResn}
+		      ,#{tkoutTrgetCours}
+		      ,#{tkoutReqstUserId}
+		      ,now(6)
+		      ,'REQUEST'
+		      ,#{creatUserId}
+		      ,now(6)
+		      ,#{updtUserId}
+		      ,now(6) 
+		     )
+	</insert>
+	
+	<insert id="regExportServerInfo" parameterType="ExportServerInfoDto" useGeneratedKeys="true">
+		INSERT 
+		  INTO TB_DTBX_TKOUT_SVR_DTL
+		      (
+		       TKOUT_REQST_NO
+		      ,TKOUT_SVR_IP_ADRES
+		      ,TKOUT_SVR_USER_ID
+		      ,TKOUT_SVR_USER_PASSWORD
+		      ,CREAT_USER_ID
+		      ,CREAT_DT
+		      ,UPDT_USER_ID
+		      ,UPDT_DT
+		      )
+		VALUES
+		     (
+		      #{tkoutReqstNo}
+		      ,#{tkoutSvrIpAdres}
+		      ,#{tkoutSvrUserId}
+		      ,#{tkoutSvrUserPassword}
+		      ,#{creatUserId}
+		      ,now(6)
+		      ,#{updtUserId}
+		      ,now(6)
+		     )
+	</insert>
+	
+	
+	<insert id="regExportApproverInfo" parameterType="ExportApproverInfoDto" useGeneratedKeys="true">
+		INSERT 
+		  INTO TB_DTBX_TKOUT_CONFM_DTL
+		      (
+		       TKOUT_REQST_NO
+		      ,TKOUT_CONFM_USER_ID
+		      ,TKOUT_PROCESS_STTUS_CD
+		      ,CREAT_USER_ID
+		      ,CREAT_DT
+		      ,UPDT_USER_ID
+		      ,UPDT_DT
+		      )
+		VALUES
+		     (
+		      #{tkoutReqstNo}
+		      ,#{dissRspnberUserId}
+		      ,'REQUEST'
+		      ,#{creatUserId}
+		      ,now(6)
+		      ,#{updtUserId}
+		      ,now(6)
+		      )
+	</insert>
+	
+	<update id="cancelExport" parameterType="ExportReqDto">
+		UPDATE 
+			   TB_DTBX_TKOUT_REQST_MST
+		   SET CANCL_DT = now(6)
+		      ,TKOUT_PROCESS_STTUS_CD ='CANCEL'
+		 WHERE TKOUT_REQST_NO =#{tkoutReqstNo}
+	</update>
+	
+	<update id="myAdminExportAccept" parameterType="exportReqDto">
+		UPDATE
+			   TB_DTBX_TKOUT_SVR_DTL
+		   SET TKOUT_SVR_IP_ADRES = #{tkoutSvrIpAdres}
+		      ,TKOUT_SVR_USER_ID = #{tkoutSvrUserId}
+		      ,TKOUT_SVR_USER_PASSWORD = #{tkoutSvrUserPassword}
+		 WHERE TKOUT_REQST_NO = #{tkoutReqstNo}  
+	</update>
+	
+	<update id="myExportAccept" parameterType="Long">
+		UPDATE
+		   	   TB_DTBX_TKOUT_REQST_MST
+		   SET RCEPT_DT = now(6)
+		      ,TKOUT_PROCESS_STTUS_CD = 'APPROVING'
+		 WHERE TKOUT_REQST_NO = #{tkoutReqstNo}
+	</update>
+	
+	<select id = "ExportConfmInfo" resultType ="exportApproverInfoDto" parameterType="exportApproverInfoDto">
+		SELECT 
+			   TKOUT_CONFM_SN
+			  ,TKOUT_CONFM_USER_ID
+			  ,FN_CODE('TKOUT_PROCESS_STTUS_CD', TKOUT_PROCESS_STTUS_CD) as tkoutProcessSttusCd
+		      ,TKOUT_PROCESS_STTUS_CD as tkoutProcessSttusCdNm
+			  ,CONFM_RESN
+			  ,PROCESS_DT
+		  FROM TB_DTBX_TKOUT_CONFM_DTL
+		 WHERE TKOUT_REQST_NO = #{tkoutReqstNo}
+	  ORDER BY TKOUT_REQST_NO
+	     LIMIT #{idx}, 1
+	</select>
+	
+	
+	<update id="myExportApprove" parameterType="ExportApproverInfoDto">
+		UPDATE 
+			   TB_DTBX_TKOUT_CONFM_DTL
+		   SET PROCESS_DT = now(6)
+		      ,TKOUT_PROCESS_STTUS_CD ='APPROVE'
+		 WHERE TKOUT_CONFM_SN =#{tkoutConfmSn}
+	</update>
+	
+	<update id="ExportApprove" parameterType="ExportReqDto">
+		UPDATE
+			   TB_DTBX_TKOUT_REQST_MST
+		   SET PROCESS_DT = now(6)
+		      ,TKOUT_PROCESS_STTUS_CD = 'APPROVE'
+		      ,UPDT_DT = now(6)
+		      ,UPDT_USER_ID = #{updtUserId}
+		 WHERE TKOUT_REQST_NO = #{tkoutReqstNo}
+	</update>
+	
+	<update id="myExportReject" parameterType="ExportApproverInfoDto">
+		UPDATE
+			   TB_DTBX_TKOUT_CONFM_DTL
+		   SET PROCESS_DT = now(6)
+		      ,TKOUT_PROCESS_STTUS_CD = 'REJECT'
+		      ,CONFM_RESN = #{confmResn}
+		 WHERE TKOUT_CONFM_SN = #{tkoutConfmSn}
+	</update>
+	
+	<update id="ExportReject" parameterType="ExportReqDto">
+		UPDATE
+			   TB_DTBX_TKOUT_REQST_MST
+		   SET PROCESS_DT = now(6)
+		      ,TKOUT_PROCESS_STTUS_CD = 'REJECT'
+		      ,REJECT_RESN = #{rejectResn}
+		      ,UPDT_DT = now(6)
+		      ,UPDT_USER_ID = #{updtUserId}
+		 WHERE TKOUT_REQST_NO = #{tkoutReqstNo}
+	</update>
+	
+	<select id = "getExportSvrInfo" parameterType = "ExportApproverInfoDto" resultType="ExportReqDto">
+		SELECT
+		  	   A.TKOUT_SVR_IP_ADRES
+		  	  ,A.TKOUT_SVR_USER_ID
+		  	  ,A.TKOUT_SVR_USER_PASSWORD
+		  	  ,B.TKOUT_TRGET_COURS
+          FROM TB_DTBX_TKOUT_SVR_DTL A
+    INNER JOIN TB_DTBX_TKOUT_REQST_MST B
+            ON A.TKOUT_REQST_NO = B.TKOUT_REQST_NO
+		 WHERE A.TKOUT_REQST_NO = #{tkoutReqstNo}
+	</select>
+</mapper>

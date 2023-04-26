@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/defaultLayout">
+
+    <th:block layout:fragment="css">
+        <style>
+            input::-webkit-outer-spin-button,
+            input::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+            }
+        </style>
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/storage/useReq.js}"></script>
+        <script>
+            const othbcReqstId = "[[${param.othbcReqstId}]]";
+        </script>
+    </th:block>
+
+    <section class="member-container" layout:fragment="contents">
+    	<th:block th:replace="fragments/defaultSubHeader :: subHeaderFragment"></th:block>
+    	
+        <div id="maincontentswrap" >
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+            <section class="content">
+                <div class="sub-title-box">
+                    <h2>연구분석데이터 사용신청</h2>
+	            	<div class="path">
+    	            	<ul class="clearfix">
+        	            	<li><a href="/" class="home">홈</a></li>
+            	        	<li>연구분석 데이터 관리</li>
+                        	<li>연구분석데이터 사용신청</li>                
+                 		</ul>
+                	</div>
+                </div>
+
+                <section class="contents-width join-cont-box clearfix mt-60">
+                    <h3>신청자 정보</h3>
+                    <ul class="com-ul com-ul1">
+                        <li><span class="join-input-group mr-40">
+                                <label>신청자명</label>
+                                <input type="text" v-bind:value="userInfo.userId" readonly>
+                            </span>
+                        </li>
+                        <li><span class="join-input-group">
+                                <label>기업명</label>
+                                <input type="text" v-bind:value="userInfo.insttNm" readonly>
+                            </span>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li><span class="join-input-group mr-40">
+                                <label>연락처</label>
+                                <input type="text" v-bind:value="userInfo.chargerMoblphonNo" readonly>
+                            </span>
+                        </li>
+                        <li><span class="join-input-group">
+                                <label>이메일</label>
+                                <input type="text" v-bind:value="userInfo.email" readonly>
+                            </span>
+                        </li>
+                    </ul>
+                </section>
+
+                <section class="contents-width join-cont-box clearfix mt-60">
+                    <h3>신청 정보(공개데이터 정보)</h3>
+                    <ul class="com-ul com-ul1">
+                        <li><span class="join-input-group mr-40">
+                                <label>공개데이터명</label>
+                                <input type="text" v-bind:value="openStorageInfo.othbcDataNm" readonly>
+                            </span>
+                        </li>
+                        <li><span class="join-input-group">
+                                <label>병원명</label>
+                                <input type="text" v-bind:value="openStorageInfo.insttNm" readonly>
+                            </span>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li><span class="join-input-group mr-40">
+                                <label>질환명</label>
+                                <input type="text" v-bind:value="openStorageInfo.dissNm" readonly>
+                            </span>
+                        </li>
+                        <li><span class="join-input-group">
+                                <label>연구책임자</label>
+                                <input type="text" v-bind:value="openStorageInfo.chargerNm" readonly>
+                            </span>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li><span class="join-input-group mr-40">
+                                <label>연락처</label>
+                                <input type="text" v-bind:value="openStorageInfo.chargerMoblphonNo" readonly>
+                            </span>
+                        </li>
+                        <li><span class="join-input-group">
+                                <label>이메일</label>
+                                <input type="text" v-bind:value="openStorageInfo.email" readonly>
+                            </span>
+                        </li>
+                    </ul>
+                    <!-- 2021.11.09 고객요청으로 임시 주석처리-->
+<!--                    <ul>-->
+<!--                        <li><span class="join-input-group">-->
+<!--                                <label>사용일수<span>*</span></label>-->
+<!--                                <input type="number"  v-model="saveInfo.usingDays" ref="usingDays"  placeholder="사용 일수를 입력하세요">-->
+<!--                            </span>-->
+<!--                        </li>-->
+<!--                    </ul>-->
+                </section>
+
+                <section class="contents-width a-c mt-60">
+                    <a href="#" class="btn btn-line-black btn-large" v-on:click="onclickCancel">취소</a>
+                    <a href="#" class="btn btn-basic btn-large ml-20" v-on:click="onclickReqSave">신청</a>
+                </section>
+
+            </section>
+        </script>
+    </section>
+</html>

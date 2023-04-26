@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+
+    <th:block layout:fragment="css">
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/demand/adminDemandList.js}"></script>
+        <script>
+            //const reqStorageStatCode = "[[${param.reqStorageStatCode}]]";
+        </script>
+        
+        <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>-->
+        <script th:src="@{/js/chart/Chart.min.js}"></script>
+    </th:block>
+
+    <div class="mypage-container"  layout:fragment="contents">
+        <div id="maincontentswrap" >
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+        <div class="content" >
+        	
+        	<div class="mypage-content contents-width mt-40">
+                <h3>월별 공급가액 추이</h3>
+	            <div class="list-search-wrap a-r mt-50 mb-20">
+	                <!--label>Search</label-->
+	                <div class="custom-select search-select mr-10" style="width: 150px;">
+			            <select v-model="cond.monthType" ref="monthType" id="monthType" onchange="selectedChange(id)">
+			                <option v-for="option in monthTypeList" v-bind:value="option.name">{{option.desc}}</option>
+			            </select>
+			        </div>
+	                <input type="month" id="startMonth" style="width:170px;" disabled>
+	                <input type="month" id="endMonth" style="width:170px;" disabled>
+	                <a href="#" class="btn btn-basic ml-10" v-on:click="onclickChart">검색</a>
+	            </div>
+	            
+	            <canvas id="myChart" width="400" height="150"></canvas>
+	            
+			</div>
+        	
+        
+            <div class="mypage-content contents-width mt-100">
+                <h3>회원별 공급가액</h3>
+
+            <div class="list-search-wrap a-r mt-50">
+                <!--label>Search</label-->
+                <input type="text" v-model="cond.dataName" @keyup="onKeyup" placeholder="기업명을 입력하세요">
+                <a href="#" class="btn btn-basic ml-10" v-on:click="onclickSearch">검색</a>
+            </div>
+
+            <table class="table-list f14">
+                <colgroup>
+                    <col style="width:20%" />
+                    <col style="width:10%" />
+                    <col style="width:10%" />
+                    <col style="width:10%" />
+                    <col style="width:20%" />
+                    <col style="width:10%" />
+                    <col style="width:10%" />
+                    <col style="width:10%" />
+                </colgroup>
+                <thead>
+                <tr>
+                    <th scope="col">네이버클라우드계정</th>
+                    <th scope="col">기관명</th>
+                    <th scope="col">사용자명</th>
+                    <th scope="col">데이터박스명</th>
+                    <th scope="col">이용기간</th>
+                    <th scope="col">이용금액</th>
+                    <th scope="col">네이버클라우드 제공할인</th>
+                    <th scope="col">공급가액</th>
+                </tr>
+                </thead>
+                <tbody v-if="demandList.length == 0">
+                <tr>
+                    <td colspan="8" style="text-align: center">
+                        데이터가 없습니다.
+                    </td>
+                </tr>
+                </tbody>
+                <tbody v-if="demandList.length > 0">
+                    <tr v-for="(item, idx) in demandList">
+                        <td><a href="javascript:void(0);" v-on:click="onclickDetail(item.ncloudId);">{{item.ncloudId}}</a></td>
+                        <td><a href="javascript:void(0);" v-on:click="onclickDetail(item.ncloudId);">{{item.insttNm}}</a></td>
+                        <td><a href="javascript:void(0);" v-on:click="onclickDetail(item.ncloudId);">{{item.chargerNm}}</a></td>
+                        <td><a href="javascript:void(0);" v-on:click="onclickDetail(item.ncloudId);">{{item.dataBoxName}}</a></td>
+                        <td>{{item.monBet}}</td>
+                        <td>{{replaceComma(item.useAmount)}}</td>
+                        <td>{{replaceComma(item.ncloudDscntAmount)}}</td>
+                        <td>{{replaceComma(item.totRqestAdupAmount)}}</td>
+                    </tr>
+                </tbody>
+                </table>
+
+            <!-- 페이징 -->
+            <div class="btn-box mt-40">
+                <div class="pagination fl-l">
+                    <a href="#" v-on:click="onclickPage(pageInfo.prev)"><span class="next"></span></a>
+                    <a href="#" v-for="(page, idx) in pageInfo.pages" v-on:click="onclickPage(page)" v-bind:class="{active:pageInfo.curr==page}">
+                        {{page}}
+                    </a>
+                    <a href="#" v-on:click="onclickPage(pageInfo.next)"><span class="prev"></span></a>
+                </div>
+                <a href="#" v-on:click="excelDownload" class="btn btn-basic btn-large fl-r">다운로드</a>
+            </div>
+			</div>
+        </div>
+        </script>
+    </div>
+</html>

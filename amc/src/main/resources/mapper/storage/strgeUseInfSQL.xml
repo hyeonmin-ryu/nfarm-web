@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed May 11 15:49:51 KST 2016-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="strgeUseInfDao">
+
+
+	<select id="inqUseStorageList" resultType="StrgeOthbcReqstInfDto" parameterType="StorageSearchDto">
+	    SELECT
+	        O.OTHBC_REQST_ID,
+	        U.USER_ID,
+	        A.INSTT_ID,
+	        A.INSTT_NM,
+	        U.DISS_CD ,
+	        FN_CODE('DISS_CD' , U.DISS_CD ) dissNm,
+	        U.CHARGER_NM,
+	        O.OTHBC_REQST_STTUSCD,
+	        O.OTHBC_DATA_NM ,
+	        FN_CODE('OTHBC_REQST_STTUSCD' , O.OTHBC_REQST_STTUSCD ) OTHBC_REQST_STTUSNM ,
+	        O.CREAT_DT,
+	        O.UPDT_DT
+	    FROM
+	        TB_STRGE_OTHBC_REQST_INF O 
+	    INNER JOIN
+	        TB_USER_MST U 
+	            ON O.DISS_RSPNBER_USER_ID=U.USER_ID 
+	    INNER JOIN
+	        TB_INSTT_MST A 
+	            ON U.INSTT_ID=A.INSTT_ID 
+	    WHERE
+	            O.OTHBC_REQST_STTUSCD = #{othbcReqstSttuscd}
+		  AND   O.OTHBC_DATA_NM like CONCAT('%' , #{othbcDataNm} , '%')
+		    
+			<if test='dissRspnberUserId != null and !dissRspnberUserId.equals("") '>
+				AND O.DISS_RSPNBER_USER_ID = #{dissRspnberUserId}
+			</if>
+			
+	   		<if test='userId != null and !userId.equals("") '>
+				AND U.USER_ID= #{userId}
+			</if>					
+			
+			<if test='dissCd != null and !dissCd.equals("") '>
+				AND U.DISS_CD = #{dissCd}
+			</if>
+		    
+		    ORDER BY
+		        O.CREAT_DT desc
+	</select>
+	
+	<select id="inqMyUseStorageList" resultType="StrgeUseInfDto" parameterType="StorageSearchDto">
+	    SELECT
+	        U.USE_STRGE_ID,
+	        O.OTHBC_REQST_ID,
+	        diseaseUser.USER_ID ,
+	        diseaseUser.DISS_CD,
+	        FN_CODE('DISS_CD' , diseaseUser.DISS_CD ) dissNm,
+	        O.OTHBC_DATA_NM,
+	        diseaseUser.CHARGER_NM ,
+	        reqUser.CHARGER_NM AS reqChargerNm ,
+	        reqUser.USER_ID AS reqUserId, 
+	        diseaseAgency.INSTT_NM,
+	        diseaseAgency.INSTT_ID , 
+	        reqAgency.INSTT_NM AS reqInsttNm,
+	        reqAgency.INSTT_ID AS reqinsttId , 
+	        U.CREAT_USER_ID , 
+	        U.CREAT_DT , 
+	        U.UPDT_USER_ID , 
+	        U.UPDT_DT , 
+	        U.CONFM_DT , 
+	        U.CANCL_RESN , 
+	        U.END_DT , 
+<!-- 	        U.reqSeq ,  -->
+	        U.OTHBC_REQST_ID , 
+	        U.REJECT_RESN , 
+	        U.OTHBC_USER_ID , 
+	        U.USE_REQST_STTUS_SECD ,
+	        FN_CODE('USE_REQST_STTUS_SECD' , U.USE_REQST_STTUS_SECD ) USE_REQST_STTUS_SENM , 
+	        U.USE_DAYCNT
+	    FROM
+	        TB_STRGE_USE_INF U 
+	    INNER JOIN
+	        TB_STRGE_OTHBC_REQST_INF O 
+	            ON U.OTHBC_REQST_ID = O.OTHBC_REQST_ID 
+	    INNER JOIN
+	        TB_USER_MST diseaseUser 
+	            ON O.DISS_RSPNBER_USER_ID=diseaseUser.USER_ID 
+	    INNER JOIN
+	        TB_USER_MST reqUser 
+	            ON U.OTHBC_USER_ID=reqUser.USER_ID 
+	    INNER JOIN
+	        TB_INSTT_MST reqAgency 
+	            ON reqUser.INSTT_ID = reqAgency.INSTT_ID 
+	    INNER JOIN
+	        TB_INSTT_MST diseaseAgency 
+	            ON diseaseUser.INSTT_ID=  diseaseAgency.INSTT_ID 
+	            
+	    	AND   O.OTHBC_DATA_NM like CONCAT('%' , #{othbcDataNm} , '%')    
+	    	
+    		<if test='userId != null and !userId.equals("") '>
+				AND reqUser.USER_ID= #{userId}
+			</if>	
+	    	
+			<if test='dissRspnberUserId != null and !dissRspnberUserId.equals("") '>
+				AND O.DISS_RSPNBER_USER_ID= #{dissRspnberUserId}
+			</if>
+			
+			<if test='useReqstSttusSecd != null and !useReqstSttusSecd.equals("") '>
+				AND U.USE_REQST_STTUS_SECD = #{useReqstSttusSecd}
+			</if>
+		    
+		    ORDER BY
+		        O.CREAT_DT desc
+	</select>	
+	
+	
+	
+	<select id="getUseStorageInfo" resultType="StrgeOthbcReqstInfDto" parameterType="String">
+	    SELECT
+	        O.OTHBC_REQST_ID,
+	        U.USER_ID,
+	        A.INSTT_ID,
+	        A.INSTT_NM,
+	        U.DISS_CD,
+	        FN_CODE('DISS_CD' , U.DISS_CD ) dissNm,
+	        U.USER_ID,
+	        U.EMAIL,   
+			U.CHARGER_NM,
+			U.CHARGER_MOBLPHON_NO,
+	        O.OTHBC_REQST_STTUSCD,
+	        O.OTHBC_DATA_NM ,
+	        FN_CODE('OTHBC_REQST_STTUSCD' , O.OTHBC_REQST_STTUSCD ) OTHBC_REQST_STTUSNM ,
+	        O.CREAT_DT,
+	        O.UPDT_DT
+	    FROM
+	        TB_STRGE_OTHBC_REQST_INF O 
+	    INNER JOIN
+	        TB_USER_MST U 
+	            ON O.DISS_RSPNBER_USER_ID = U.USER_ID 
+	    INNER JOIN
+	        TB_INSTT_MST A 
+	            ON U.INSTT_ID = A.INSTT_ID 
+	    WHERE OTHBC_REQST_ID = #{othbcReqstId}
+		    
+	</select>	
+	
+	
+	<select id="getMyUseStorageInfo" resultType="StrgeUseInfDto" parameterType="String">
+	    SELECT
+	        U.USE_STRGE_ID,
+	        O.OTHBC_REQST_ID,
+	        diseaseUser.USER_ID ,
+	        diseaseUser.DISS_CD,
+	        FN_CODE('DISS_CD' , diseaseUser.DISS_CD ) DISS_NM,
+	        O.OTHBC_DATA_NM,
+	        diseaseUser.CHARGER_NM ,
+	        reqUser.CHARGER_NM AS reqChargerNm ,
+	        diseaseAgency.INSTT_NM,
+	        reqAgency.INSTT_NM AS reqInsttNm,
+	        reqUser.EMAIL AS reqEmail,
+	        diseaseUser.EMAIL,
+	        reqUser.CHARGER_MOBLPHON_NO AS reqChargerMoblphonNo,
+	        diseaseUser.CHARGER_MOBLPHON_NO,
+	        diseaseAgency.INSTT_ID , 
+	        reqUser.USER_ID , 
+	        reqAgency.INSTT_ID AS reqinsttId , 
+	        U.UPDT_USER_ID , 
+	        U.CREAT_DT , 
+	        U.UPDT_USER_ID , 
+	        U.UPDT_DT , 
+	        U.CONFM_DT , 
+	        U.CANCL_RESN , 
+	        U.END_DT , 
+<!-- 	        U.reqSeq ,  -->
+	        U.OTHBC_REQST_ID , 
+	        U.REJECT_RESN , 
+	        U.OTHBC_USER_ID , 
+	        U.USE_REQST_STTUS_SECD ,
+	        FN_CODE('USE_REQST_STTUS_SECD' , U.USE_REQST_STTUS_SECD ) USE_REQST_STTUS_SENM , 
+	        U.USE_DAYCNT,
+	        R.BUCKET_ID
+	    FROM
+	        TB_STRGE_USE_INF U 
+	    INNER JOIN
+	        TB_STRGE_OTHBC_REQST_INF O 
+	            ON U.OTHBC_REQST_ID=O.OTHBC_REQST_ID 
+	    INNER JOIN
+	        TB_USER_MST diseaseUser 
+	            ON O.DISS_RSPNBER_USER_ID=diseaseUser.USER_ID 
+	    INNER JOIN
+	        TB_USER_MST reqUser 
+	            ON U.OTHBC_USER_ID=reqUser.USER_ID 
+	    INNER JOIN
+	        TB_INSTT_MST reqAgency 
+	            ON reqUser.INSTT_ID=reqAgency.INSTT_ID 
+	    INNER JOIN
+	        TB_INSTT_MST diseaseAgency 
+	            ON diseaseUser.INSTT_ID=diseaseAgency.INSTT_ID 
+	    INNER JOIN
+	        TB_STRGE_REQ_INF R  
+	            ON O.STORGE_REQST_ID=R.STORGE_REQST_ID 	            
+	    WHERE USE_STRGE_ID = #{useStrgeId}
+		    
+	</select>		
+	
+	
+	<insert id="regReqUseStorage" parameterType="StrgeOthbcReqstInfDto">
+		INSERT INTO TB_STRGE_USE_INF
+		   (USE_STRGE_ID,
+			CREAT_USER_ID,
+			CREAT_DT,
+			UPDT_USER_ID,
+			UPDT_DT,
+			OTHBC_REQST_ID,
+			OTHBC_USER_ID,
+			USE_REQST_STTUS_SECD,
+			USE_DAYCNT
+			)
+		VALUES(#{useStrgeId},
+		    #{creatUserId},
+			now(6),
+			#{updtUserId},
+			now(6),
+			#{othbcReqstId},
+			#{creatUserId},
+			#{useReqstSttusSecd},
+			#{useDaycnt})			
+	</insert>	
+
+
+	<!-- 승인 -->
+	<update id="updtUseStorageApproveStat" parameterType="StrgeUseInfDto">
+		UPDATE TB_STRGE_USE_INF
+		SET UPDT_USER_ID= #{updtUserId}
+		  , UPDT_DT = now(6)
+		  , CONFM_DT   = now()  
+		  , END_DT = IF(USE_DAYCNT > 0 , DATE_ADD(now(), INTERVAL USE_DAYCNT DAY)  , DATE_ADD(now(), INTERVAL 9999 DAY) )
+		  , USE_REQST_STTUS_SECD = #{useReqstSttusSecd}
+		WHERE USE_STRGE_ID = #{useStrgeId}
+	</update>	
+	
+	<update id="updtUseStorageStat" parameterType="StrgeUseInfDto">
+		UPDATE TB_STRGE_USE_INF
+		SET UPDT_USER_ID= #{updtUserId}
+		  , UPDT_DT = now(6)
+		  
+   		<if test='rejectResn != null and !rejectResn.equals("") '>
+			, REJECT_RESN = #{rejectResn}
+		</if>		
+		
+   		<if test='canclResn != null and !canclResn.equals("") '>
+			, CANCL_RESN = #{canclResn}
+		</if>		  
+		  , USE_REQST_STTUS_SECD = #{useReqstSttusSecd}
+		WHERE USE_STRGE_ID = #{useStrgeId}
+	</update>		
+	
+	
+	
+</mapper>

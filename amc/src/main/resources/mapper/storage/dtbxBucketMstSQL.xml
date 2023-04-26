@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed May 11 15:49:51 KST 2016-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dtbxBucketMstDao">
+
+	<insert id="regBucketInfo" parameterType="DtbxBucketMstDto">
+		INSERT INTO TB_DTBX_BUCKET_MST(		
+		              BUCKET_ID
+		            , CREAT_APP_ID
+		            , CREAT_DT
+		            , UPDT_USER_ID
+		            , UPDT_DT
+		            , BUCKET_DC
+		            , OTHBC_USER_ID
+		            , BUCKET_SIZE)
+			 VALUES (
+			         #{bucketId}
+			         ,#{creatUserId}
+					 ,now(6)
+					 ,#{updtUserId}
+					 ,now(6)
+			         ,#{bucketDc}
+			         ,#{othbcUserId}
+			         , 0);
+	</insert>	
+	
+	
+</mapper>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+
+    <th:block layout:fragment="css"></th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/databoxFrame/dataBoxFrameReq.js}"></script>
+        <script>
+			myMenuId ="[[${param.menuId}]]";
+        </script>
+    </th:block>
+
+    <section class="mypage-container" layout:fragment="contents">
+        <div id="maincontentswrap" >
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+        <section class="content contents-width databoxFrame-page" >
+			<section class="mypage-content mt-40">
+               	<h3 class="page-title">데이터박스프레임 등록</h3>
+
+            	<section class="join-cont-box mt-30 clearfix">
+                	<h3>신청 정보</h3>
+                	<span class="join-txt-caution">* 필수 입력 항목</span>
+                	<ul class="com-ul">
+                    	<li class="pt-10">
+                        	<span class="join-input-group w-100">
+                            	<label>데이터박스 프레임명<span>*</span></label>
+                            	<input class="w-100" type="text" ref="dtbxFrmeNm" v-model="saveInfo.dtbxFrmeNm" placeholder="데이터박스프레임명을 입력해 주세요. (최대 100자)" maxlength="50">
+                        	</span>
+                    	</li>
+                    	
+                        <li class="mb-40">
+                        	<span class="join-input-group w-100">
+                            	<label>메모</label>
+                            	<input class="w-100" type="text" ref="dtbxFrmeCn" v-model="saveInfo.dtbxFrmeCn" placeholder="메모 입력해 주세요. (최대 500자)" maxlength="50">
+                        	</span>
+                    	</li>
+
+                    	<li class="pt-10 line">
+                        	<span class="join-input-group w-100">
+                            	<label>My 어드민 서버<span>*</span>&nbsp;&nbsp;&nbsp;&nbsp;( 선택 후 추가를 눌러주세요 )</label>
+                            	
+                            	
+                            <span class="join-input-group" style="width:60px;">
+	                        	<label class="th">Type</label>
+	                        </span>
+
+                            	<span  class="join-input-group  w-210 mr-40">
+			                    	<div class="custom-select w-100" id="admSvrTyCdDiv" name="admSvrTyCdDiv" >
+                                    	<select id="admSvrTyCd" ref="admSvrTyCd" v-model="serverData.admSvrTyCd">
+	                                    	<option value=""></option>
+	                                    	<option value="1">ubuntu</option>
+	                                    	<option value="2">centos</option>
+                                    	</select>
+                                	</div>
+	                        	</span>
+	                        	
+	                        <span class="join-input-group" style="width:60px;">
+	                        	<label class="th">spec</label>
+	                        </span>
+	                        
+                            	<span  class="join-input-group  mr-40" style="width:calc(100% - 740px);">
+			                    	<div class="custom-select w-100" id="admSvrSpecCdDiv" name="admSvrSpecCdDiv">
+                                    	<select id="admSvrSpecCd" ref="admSvrSpecCd" v-model="serverData.admSvrSpecCd">
+                                    		<option value=""></option>
+											<option value="CPU Linux Server (S2 L1 : 2vCPU 8GB Mem)">CPU Linux Server (S2 L1 : 2vCPU 8GB Mem)</option>
+											<option value="CPU Linux Server (S4 L1 : 4vCPU 16GB Mem)">CPU Linux Server (S4 L1 : 4vCPU 16GB Mem)</option>
+											<option value="CPU Linux Server (S8 L1 : 8vCPU 32GB Mem)">CPU Linux Server (S8 L1 : 8vCPU 32GB Mem)</option>
+											<option value="CPU Linux Server (S16 L1 : 16vCPU 64GB Mem)">CPU Linux Server (S16 L1 : 16vCPU 64GB Mem)</option>
+											<option value="CPU Linux Server (S32 L1 : 32vCPU 128GB Mem)">CPU Linux Server (S32 L1 : 32vCPU 128GB Mem)</option>
+											<option value="CPU Linux Server (C2 L1 : 2vCPU 4GB Mem)">CPU Linux Server (C2 L1 : 2vCPU 4GB Mem)</option>
+											<option value="CPU Linux Server (C4 L1 : 4vCPU 8GB Mem)">CPU Linux Server (C4 L1 : 4vCPU 8GB Mem)</option>
+											<option value="CPU Linux Server (C8 L1 : 8vCPU 16GB Mem)">CPU Linux Server (C8 L1 : 8vCPU 16GB Mem)</option>
+                                    	</select>
+                                	</div>
+	                        	</span>
+	                        	
+		                        <span class="join-input-group" style="width:50px;">
+		                        	<label class="th">수량</label>
+		                        </span>
+	                        	<span  class="join-input-group  mr-10" style="width:150px">
+									<input type="number" class="w-100" min="1" max="4" value="1" id="admSvrQy" onkeydown="keydownEvent(event)" ref="admSvrQy"  maxlength="1">
+	                        	</span>
+	                        	
+	                        	<span class="env-input-group" style="width: 84px; padding:0;" disabled="disabled">
+	                            	<a href="javascript:void(0);" v-on:click="onclickServerAdd();" ref="addBtn1" class="btn btn-basic btn-middle">추가</a>
+	                        	</span>
+                        	</span>
+                    	</li>
+                    	
+                    	<!-- 서버신청 추가영역 START-->
+                    	<li v-if="serverList.length != 0">
+                    		<span class="join-input-group mt-10">
+	                        	<label class="silver">서버신청 추가목록</label>
+	                        </span>
+                    	</li>
+                    	<li v-for="(item, idx) in serverList" class="mb-10">
+                    		<span class="env-input-group mr-10 w-67">
+                            	<label></label>
+                            	<input type="text" class="w-67 no-line" v-bind:value="idx+1" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10 w-200">
+                            	<label></label>
+                            	<input type="text" class="w-200 no-line" v-bind:value="item.admSvrTyCd" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10" style="width: calc(100% - 491px);">
+                            	<label></label>
+                            	<input type="text" class="w-100 no-line" v-bind:value="item.admSvrSpecCd" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10 w-67">
+                            	<label></label>
+                            	<input type="text" class="w-67 no-line" v-bind:value="item.admSvrQy" readonly>
+                        	</span>
+                        	
+                        	<span class="env-input-group w-84">
+                            	<label></label>
+                            	<a href="javascript:void(0);" v-on:click="onclickServerDel(idx);" class="btn btn-line-error btn-middle">삭제</a>
+                        	</span>
+                    	</li>
+                    	<!-- 서버신청 추가영역 END-->
+                    	
+                    	
+                     	<li class="mt-30 line">
+                        	<span class="join-input-group w-100 pt-10" v-if="serverAccountList.length !== 0">
+                            	<label>My 어드민 서버 계정정보<span>*</span></label>
+                            </span>	
+							<div  class="sub-line clearfix" v-for="(item, idx) in serverAccountList">
+                            	<span class="join-input-group">
+	                        		<label>USER</label>
+	                        	</span>
+                            		<span  class="join-input-group mr-40" style="width:120px">
+	                            		<input type="text" class="w-100" value="root" readonly maxlength="1">
+		                        	</span>
+	    	                    	
+	        	                <span class="join-input-group">
+	            	            	<label>Password</label>
+	                	        </span>
+	                    	    
+                        		<span  class="join-input-group mr-40" style="width: calc((100% - 520px) * 0.3);">
+		              				 <input type="text" class="w-100" id="dtbxFrmeAdmAcntPassword"       name="dtbxFrmeAdmAcntPassword"  ref="dtbxFrmeAdmAcntPassword" maxlength="20" >
+			              			 <!--<input type="text" style="margin-right:6px;width:320px" id="dataBoxFrameAccountPwdChk" name="dataBoxFrameAccountPwdChk" ref="dataBoxFrameAccountPwdChk"  > -->
+    	                    	</span>
+	                        	
+	    	                    <span class="join-input-group">
+	        	                	<label>호스트명</label>
+	            	            </span>
+                    	    	<span  class="join-input-group mr-40" style="width: calc((100% - 520px) * 0.3);">
+									<input type="text" class="w-100" id="dtbxFrmeAdmHostNm" name="dtbxFrmeAdmHostNm" ref="dtbxFrmeAdmHostNm" maxlength="100" >
+	                        	</span>
+
+                        	
+    	                    	<span class="join-input-group">
+	    	                    	<label>IP</label>
+	        	                </span>
+                	        	<span  class="join-input-group" style="width: calc((100% - 520px) * 0.4);">
+									<input type="text" class="w-100"  id="dtbxFrmeAdmIp" name="dtbxFrmeAdmIp"  ref="dtbxFrmeAdmIp" maxlength="20">
+                        		</span>
+                        	</div>
+                    	</li>            
+                    	
+                    	
+                    	<li class="mt-10 mb-30">
+                        	<span class="join-input-group w-100">
+                            	<label>공용데이터 저장<span>*</span><p class="guide-txt">기본 용량은 500GB~10,000GB이며, 100GB 단위로 추가하실 수 있습니다. 수량은 최대 20개까지 가능합니다.<p></label>
+                            	 <span class="join-input-group mr-40" style="width:calc(100% - 339px);">
+                            		<input class="w-100" type="text" id="cmnuseDataCpcty" ref="cmnuseDataCpcty"  placeholder="용량을 100단위로 입력해주세요.(최소 500GB ~ 최대 10000GB)" min="0" onKeyup="this.value=this.value.replace(/[^-0-9]/g,'');" v-on:blur="setNaswNum(event)" maxlength="15">
+		                        </span>
+                            	
+                        		<span class="join-input-group" style="width:50px;">
+		                        	<label class="th">수량</label>
+		                        </span>
+
+	                        	<span  class="join-input-group  mr-10" style="width:120px">
+									<input type="number" class="w-100" min="1" max="20" value="1" id="cmnuseDataQy" onkeydown="keydownEvent(event)" ref="cmnuseDataQy"  maxlength="1">
+	                        	</span>
+	                        	
+	                        	<span class="env-input-group" style="width: 84px; padding:0;" disabled="disabled">
+	                            	<a href="javascript:void(0);" v-on:click="onclickStorageAdd();" ref="addBtn2" class="btn btn-basic btn-middle">추가</a>
+	                        	</span>
+                        	</span>
+                    	</li>
+                    	
+                    	<!--서버신청 - 블록스토리지 추가영역 START-->
+                    	<li v-for="(item, idx) in storageList" class="sub-list">
+                    		<span class="env-input-group mr-10 w-67">
+                            	<label></label>
+                            	<input type="text" class="w-67 no-line" v-bind:value="idx+1" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10 w-var">
+                            	<label></label>
+                            	<input type="text" class="w-100 no-line" v-bind:value="item.cmnuseDataCpcty" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10 w-var">
+                            	<label></label>
+                            	<input type="text" class="w-100 no-line" v-bind:value="item.cmnuseDataQy" readonly>
+                        	</span>
+                        	<span class="env-input-group w-84">
+                            	<label></label>
+                            	<a href="javascript:void(0);" v-on:click="onclickStorageDel(idx);" class="btn btn-line-error btn-middle">삭제</a>
+                        	</span>
+                    	</li>
+                    	<!-- 서버신청 - 블록스토리지 추가영역 END-->                    	
+                    	
+                    	
+                    	
+                	</ul>
+            	</section>
+            	<section class="btn-box a-c">
+                	<a href="#" class="btn btn-line-black btn-large" v-on:click="onclickCancel">목록</a>
+                	<a href="#" class="btn btn-basic btn-large ml-20" v-on:click="onclickReqSave">등록</a>
+            	</section>
+        	</section>
+		</section>
+        </script>
+    </div>
+</html>

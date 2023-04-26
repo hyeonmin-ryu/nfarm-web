@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed May 11 15:49:51 KST 2016-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="commonDao">
+
+ 	<select id="inqMenuList" resultType="menuDto" parameterType="menuDto" >
+		with recursive CTE (MENU_ID, MENU_NM, MENU_URL, PARNTS_MENU_ID,MENU_INDICT_ORDR, HIERARCHY) as (
+		  SELECT a.MENU_ID,
+		         MENU_NM,
+		         MENU_URL,
+		         PARNTS_MENU_ID,
+		         MENU_INDICT_ORDR,
+		         CONCAT('/', MENU_INDICT_ORDR) AS HIERARCHY
+		    FROM TB_MENU_MST a
+      INNER JOIN (SELECT MENU_ID  
+		                FROM TB_MENU_ROLE_MST
+                       WHERE USER_ROLE_SECD  = #{userRoleSecd}) b
+             ON a.MENU_ID = b.MENU_ID
+		  WHERE      a.MENU_ID = #{menuType}
+		    AND      a.MENU_USE_YN = 'Y'
+		  UNION ALL
+		  SELECT     d.MENU_ID,
+		             d.MENU_NM,
+		             d.MENU_URL,
+		             d.PARNTS_MENU_ID,
+		             d.MENU_INDICT_ORDR,
+		             CONCAT_WS('/', HIERARCHY, d.MENU_INDICT_ORDR) 
+		  FROM       TB_MENU_MST d
+		  INNER JOIN (SELECT MENU_ID  
+		                FROM TB_MENU_ROLE_MST
+                       WHERE USER_ROLE_SECD  = #{userRoleSecd}) b
+             ON      d.MENU_ID = b.MENU_ID
+		  INNER JOIN CTE
+		          on d.PARNTS_MENU_ID = CTE.MENU_ID
+		      WHERE MENU_USE_YN = 'Y'
+		)
+		SELECT * from CTE
+		ORDER BY HIERARCHY
+ 	</select>
+ 	
+ 	
+ 	<select id="inqCodeList" resultType="CodeDto" parameterType="String" >
+		SELECT 
+		       DTL_CD AS nm
+		      ,DTL_CD_NM AS dc
+		  FROM TB_CD_GROUP_DTL
+		 WHERE GROUP_CD = #{code}
+      ORDER BY INDICT_ORDR 
+ 	</select> 	
+ 	
+ 	<select id="inqCodeGroupList" resultType="CodeDto">
+ 		SELECT 
+ 			   GROUP_CD AS nm
+ 			  ,GROUP_CD_NM AS dc
+ 		  FROM TB_CD_GROUP_MST
+ 	</select> 
+ 	
+ 	<delete id ="delCode" parameterType="String">
+ 		DELETE 
+ 		  FROM TB_CD_GROUP_DTL
+ 		 WHERE DTL_CD = #{nm}
+ 	</delete>
+ 	
+ 	<delete id="delCodeAll" parameterType="String">
+ 		DELETE
+ 		  FROM TB_CD_GROUP_DTL
+ 		 WHERE GROUP_CD =#{codeGroup}
+ 	</delete>
+ 	
+ 	<delete id="delCodeGroup" parameterType="String">
+ 		DELETE
+ 		  FROM TB_CD_GROUP_MST
+ 		 WHERE GROUP_CD =#{codeGroup}
+ 	</delete>
+ 	
+ 	
+ 	<insert id ="regCode" parameterType="CodeDto" >
+ 		INSERT
+ 		  INTO TB_CD_GROUP_DTL
+ 		  	  (
+ 		  	   DTL_CD
+ 		  	  ,GROUP_CD
+ 		  	  ,DTL_CD_NM
+ 		  	  ,DTL_CD_DC
+ 		  	  ,USE_YN
+ 		  	  ,CREAT_USER_ID
+ 		  	  ,CREAT_DT
+ 		  	  ,INDICT_ORDR
+ 		  	  )
+ 		VALUES
+ 			  (
+ 			   UPPER(#{nm})
+ 			  ,UPPER(#{codeGroup})
+ 			  ,#{dc}
+ 			  ,#{dc}
+ 			  ,'Y'
+ 			  ,#{createdBy}
+ 			  ,now(6)
+ 			  ,#{MENU_INDICT_ORDR}
+ 			  )
+ 	</insert>
+ 	
+ 	<select id ="inqmaxIndctOrdr" resultType="Long" parameterType="CodeDto">
+ 		SELECT
+ 			   MAX(INDICT_ORDR)
+ 		  FROM TB_CD_GROUP_DTL
+ 		 WHERE GROUP_CD= UPPER(#{codeGroup});
+ 	</select>
+ 	
+ 	<select id="regCodeGroup" parameterType="CodeDto">
+ 		INSERT
+ 		  INTO TB_CD_GROUP_MST
+ 		  	  (
+ 		  	   GROUP_CD
+ 		  	  ,GROUP_CD_NM
+ 		  	  ,GROUP_CD_DC
+ 		  	  ,USE_YN
+ 		  	  ,CREAT_USER_ID
+ 		  	  ,CREAT_DT
+ 		  	  )
+ 		VALUES
+ 			  (
+ 			   UPPER(#{nm})
+ 			  ,#{dc}
+ 			  ,#{dc}
+ 			  ,'Y'
+ 			  ,#{createdBy}
+ 			  ,now(6)
+ 			  )
+ 	</select>
+ 	
+ 	<select id ="chkRegCode" resultType="String" parameterType= "CodeDto">
+ 		SELECT
+ 		  	   DTL_CD
+ 		  FROM TB_CD_GROUP_DTL
+ 		 WHERE DTL_CD = #{nm}
+ 		   AND GROUP_CD = #{codeGroup}
+ 	</select>
+ 	
+ 	<select id="chkRegCodeGroup" resultType="String" parameterType="CodeDto">
+ 		SELECT
+ 			   GROUP_CD
+ 		  FROM TB_CD_GROUP_MST
+ 		 WHERE GROUP_CD= UPPER(#{nm})
+ 	</select>
+</mapper>

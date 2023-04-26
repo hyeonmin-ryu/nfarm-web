@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/defaultLayout">
+
+    <th:block layout:fragment="css">
+
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/user/login.js}"></script>
+        <script>
+            type = "[[${param.type}]]";
+        </script>
+    </th:block>
+
+    <section class="member-container" layout:fragment="contents" >
+    	<th:block th:replace="fragments/defaultSubHeader :: subHeaderFragment"></th:block>
+    	
+        <div id="maincontentswrap">
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+        
+        <script type="text/x-template" id="main-template" >
+            <section class="content" v-if="type === 'ID'">
+                <div class="sub-title-box">
+                    <h2>아이디 찾기</h2>
+                    <p class="eng">FIND MEMBER ID</p>
+                </div>
+
+                <section class="login-wrap passwd-chg mt-60">
+                    <p class="member-info mb-30">회원가입시 등록한 이름 및 전화번호를 입력해주세요</p>
+                        <div class="login-input-group">
+                            <label >이름</label>
+                            <input type="text" ref="userName" v-model="info.chargerNm" placeholder="이름을 입력하세요." @input="onkeyupHanName" maxlength="10">
+                            <p class="text-alert" style="display:none;">{{messages}}<br/>
+                        </div>
+                        <div class="login-input-group">
+                            <label >휴대폰번호</label>
+                            <input type="text" ref="userPhoneNumber" v-model="info.chargerMoblphonNo" @input="onkeyupPhoneNumber" maxlength="11" placeholder="휴대폰번호를 (-)없이 입력하세요." >
+                        </div>
+
+                        <a href="javascript:void(0);" class="btn btn-basic btn-100 mt-10" @click="onclickFindId();">확인</a>
+                        <a href="javascript:void(0);" class="btn btn-line-black btn-100 mt-20" @click="onclickPageMove('BACK');">취소</a>
+
+                        <div class="pb-20 mt-60" v-if="resultId.length > 0">
+                            <h4  style="color:var(--main-color);">&centerdot;입력하신 정보와 일치하는 아이디 목록입니다.</h4>
+
+                            <div class="searchlinks-box"  style="border: 1px solid #434e54; ">
+                                <span v-for="item in resultId">{{item}}<br/></span>
+                            </div>
+
+							<div class="a-c mt-40" v-if="resultId.length > 0">
+                            	<a href="/login" class="btn btn-basic btn-100">로그인</a>
+                            	<a href="javascript:void(0);" class="btn btn-line-black btn-100 mt-20" @click="onclickPageMove('PASS');">비밀번호찾기</a>
+                            </div>
+                        </div>
+                </section>
+            </section>
+
+            <section class="content" v-else-if="type === 'PASS'">
+                <section v-show="certOk">
+                	<div class="sub-title-box">
+                    	<h2>비밀번호 찾기</h2>
+                    	<p class="eng">FIND MEMBER PASSWORD</p>
+	                </div>
+
+    	            <div class="login-wrap passwd-chg mt-60">
+        	            <p class="member-info" style="line-height: 1.5">회원가입시 등록한 이메일을 입력해주세요.</p>
+            	        <p class="member-info-s"  style="line-height: 1.5">
+							이메일로 인증코드가 전송됩니다.<br/>
+                	        인증이 완료되면 비밀번호를 재설정 할 수 있습니다.	
+						</p>
+
+                        <div class="login-input-group mt-20">
+                            <label>아이디</label>
+                            <input class="input-certi" type="email" ref="email" v-model="info.userEmail" @input="onkeyupEmail" placeholder="회원가입시 등록한 이메일을 입력해주세요" maxlength="50">
+                            <a href="javascript:void(0);" class="btn btn-line btn-100 mb-10" @click="onclickCertSend();">인증요청</a>
+                            <p class="text-alert" style="display:none;">{{messages3}}<br/>
+                        </div>
+
+                        <div class="login-input-group">
+                            <label>인증코드</label>
+                            <input type="text" ref="certCode" v-model="info.certCode" @input="onkeyupCertCode" placeholder="발송된 인증코드 6자리를 입력해주세요." maxlength="6">
+                            <p class="text-alert" style="display:none;">{{messages4}}<br/>
+                        </div>
+
+	                    <a href="javascript:void(0);" class="btn btn-basic btn-100 mt-20" @click="onclickCertChk();">인증확인</a>
+    	                <a href="javascript:void(0);" class="btn btn-line-black btn-100 mt-20" @click="onclickPageMove('BACK');">취소</a>
+    	            </div>
+                </section>
+
+                <section v-show="passChg">
+                    <div class="sub-title-box">
+                        <h2>비밀번호 재설정</h2>
+                        <p class="eng">CHANGE PASSWORD</p>
+                    </div>
+
+                    <section class="login-wrap passwd-chg mt-60">
+                        <p class="member-info mb-30">변경할 비밀번호를 입력해주세요</p>
+
+                        <div class="login-input-group">
+                            <label>새로운 비밀번호</label>
+                            <input type="password" ref="password1" v-model="info.password1" autocomplete="off"  v-on:blur="onblurPassChk1();"
+                                   placeholder="10~15자 영문, 숫자를 조합하여 입력해주세요" maxlength="15">
+                            <p class="text-alert" style="display:none;">{{messages5}}</p>
+                        </div>
+
+                        <div class="login-input-group mt-20">
+                            <label>새로운 비밀번호 확인</label>
+                            <input type="password" ref="password2" v-model="info.password2" autocomplete="off" maxlength="15">
+                            <p class="text-alert" style="display:none;">{{messages6}}</p>
+                        </div>
+
+                        <a href="javascript:void(0);" class="btn btn-basic btn-100 mt-10" @click="onclickPassChg()">확인</a>
+                        <a href="javascript:void(0);" class="btn btn-line-black btn-100 mt-20" @click="onclickPageMove('BACK');">취소</a>
+
+                    </section>
+                </section>
+            </section>
+        </script>
+    </section>
+</html>

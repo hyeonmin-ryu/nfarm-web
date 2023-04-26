@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+
+    <th:block layout:fragment="css">
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/storage/myAdminStorageReq.js}"></script>
+        <script>
+            const storgeReqstId = "[[${param.storgeReqstId}]]";
+        </script>
+    </th:block>
+
+    <section class="mypage-container" layout:fragment="contents">
+        <div id="maincontentswrap" >
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+        <section class="content contents-width" >
+            <section class="mypage-content mt-40">
+                <h3>질환데이터 저장신청 관리</h3>
+
+                <div class="join-cont-box mt-30">
+                    <h4>신청자 정보</h4>
+                    <ul class="com-ul">
+                        <li class=" bdr-b">
+                            <span class="join-input-group mr-40">
+                                <label >신청자명</label>
+                                <p class="txt-data">{{reqStorageInfo.chargerNm}}</p>
+                                </span>
+                            <span class="join-input-group">
+                                <label >병원명</label>
+                                <p class="txt-data">{{reqStorageInfo.insttNm}}</p>
+                            </span>
+                        </li>
+                        <li class=" bdr-b">
+                            <span class="join-input-group mr-40">
+                                <label>질병주관병원 여부</label>
+                                <span class="radio-wrap join-radio">
+                                    <input type="radio" id="radio3_op1" value="1" name="save-op3" v-bind:checked="reqStorageInfo.diseaseMainYn === 'Y'" disabled/>
+                                    <label for="radio3_op1"><span></span>예</label>
+                                    <input type="radio" id="radio3_op2" value="2" name="save-op3" v-bind:checked="reqStorageInfo.diseaseMainYn === 'N'" disabled/>
+                                    <label for="radio3_op2"><span></span>아니오</label>
+                                </span>
+                            </span>
+                         <span class="join-input-group">
+                                <label>관리하는 질병</label>
+                                <p class="txt-data">{{reqStorageInfo.dissNm}}</p>
+                            </span>
+                        </li>
+                        <li class=" bdr-b">
+                            <span class="join-input-group mr-40">
+                                <label>연락처</label>
+                                <p class="txt-data">{{reqStorageInfo.chargerMoblphonNo}}</p>
+                            </span>
+                            <span class="join-input-group">
+                                <label >이메일</label>
+                                <p class="txt-data">{{reqStorageInfo.email}}</p>>
+                            </span>
+                        </li>
+                        <li class=" bdr-b">
+                            <span class="join-input-group ">
+                                <label >질병 책임자명</label>
+                                <p class="txt-data">{{reqStorageInfo.managerUserName}}</p>
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="join-cont-box mt-80">
+                    <h4>신청 정보</h4>
+                    <ul class="com-ul">
+                        <li  class=" bdr-b">
+                            <span class="join-input-group w-100">
+                                <label>저장 데이터명</label>
+                                <p class="txt-data">{{reqStorageInfo.storgeNm}}</p>
+                            </span>
+                        </li>
+                        <li class=" bdr-b">
+                            <span class="join-input-group mr-40">
+                                <label>신청일자</label>
+                                <p class="txt-data">{{reqStorageInfo.creatDt}}</p>
+                            </span>
+                            <span class="join-input-group">
+                                <label >처리상태</label>
+                                <p class="txt-data">{{reqStorageInfo.strgeReqSttusNm}}</p>
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="join-cont-box mt-80"
+                     v-if="reqStorageInfo.strgeReqSttusCd !== 'S_REJ' &&
+                           reqStorageInfo.strgeReqSttusCd !== 'S_CCL'">
+                    <h4>저장소 정보</h4>
+                    <ul class="com-ul">
+                        <li v-if="reqStorageInfo.strgeReqSttusCd === 'S_ACC'" class=" bdr-b">
+                            <span class="join-input-group w-100">
+                                <label>저장소명</label>
+                                <p class="txt-data">{{reqStorageInfo.bucketId}}</p>
+                            </span>
+                        </li>
+                        <li class=" bdr-b">
+                            <span class="join-input-group w-100">
+                                <label>저장소설명<span v-if="reqStorageInfo.strgeReqSttusCd === 'S_REQ'">*</span></label>
+                                <input v-if="reqStorageInfo.strgeReqSttusCd === 'S_REQ'" ref="bucketDc" class="w-100" type="text" v-model="saveInfo.bucketDc" placeholder="저장신청 승인시 필수입력입니다.">
+                                <input v-else-if="reqStorageInfo.bucketDc != null" class="w-100" type="text" v-bind:value="reqStorageInfo.bucketDc" readonly>
+                            </span>
+                        </li>
+<!--                        <li v-if="reqStorageInfo.strgeReqSttusCd === 'S_REQ' ||-->
+<!--                                  reqStorageInfo.strgeReqSttusCd === 'S_REJ' ||-->
+<!--                                  reqStorageInfo.strgeReqSttusCd === 'D_REQ' ||-->
+<!--                                  reqStorageInfo.strgeReqSttusCd === 'D_REJ'">-->
+<!--                            <span class="join-input-group w-100">-->
+<!--                                <label>거절사유<span>*</span></label>-->
+<!--                                <input v-if="reqStorageInfo.strgeReqSttusCd === 'S_REQ' ||-->
+<!--                                             reqStorageInfo.strgeReqSttusCd === 'D_REQ'"-->
+<!--                                       ref="rejectResn" class="w-100" type="text" v-model="saveInfo.rejectResn" placeholder="거절시 필수입력입니다.">-->
+<!--                                <input v-else-if="reqStorageInfo.strgeReqSttusCd === 'S_REJ' ||-->
+<!--                                                  reqStorageInfo.strgeReqSttusCd === 'D_REJ'"-->
+<!--                                       class="w-100" type="text" v-model="reqStorageInfo.rejectResn" readonly>-->
+<!--                            </span>-->
+<!--                        </li>-->
+<!--                        <li v-if="reqStorageInfo.strgeReqSttusCd === 'D_REQ'">-->
+<!--                            <span class="join-input-group w-100">-->
+<!--                                <label>취소사유</label>-->
+<!--                                <p class="txt-data">{{reqStorageInfo.deleteReason}}</p>-->
+<!--                            </span>-->
+<!--                        </li>-->
+                    </ul>
+                </div>
+
+                <div class="join-cont-box mt-80" v-if="reqStorageInfo.strgeReqSttusCd === 'D_REQ' ||
+                                                       reqStorageInfo.strgeReqSttusCd === 'D_ACC' ||
+                                                       reqStorageInfo.strgeReqSttusCd === 'D_REJ'">
+                    <h4>취소 정보</h4>
+                    <ul class="com-ul">
+                        <li class=" bdr-b">
+                            <span class="join-input-group w-100">
+                                <label>취소사유</label>
+                                <input class="w-100" type="text" v-model="reqStorageInfo.deleteReason" readonly>
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="join-cont-box mt-80"
+                     v-if="reqStorageInfo.strgeReqSttusCd === 'S_REQ' ||
+                           reqStorageInfo.strgeReqSttusCd === 'S_REJ' ||
+                           reqStorageInfo.strgeReqSttusCd === 'D_REQ' ||
+                           reqStorageInfo.strgeReqSttusCd === 'D_REJ'">
+                    <h4>거절 정보</h4>
+                    <ul class="com-ul">
+                        <li class=" bdr-b">
+                            <span class="join-input-group w-100">
+                                <label>거절사유<span v-if="reqStorageInfo.strgeReqSttusCd === 'S_REQ' ||
+                                                         reqStorageInfo.strgeReqSttusCd === 'D_REQ'">*</span>
+                                </label>
+                                <input v-if="reqStorageInfo.strgeReqSttusCd === 'S_REQ' ||
+                                             reqStorageInfo.strgeReqSttusCd === 'D_REQ'"
+                                       ref="rejectResn" class="w-100" type="text" v-model="saveInfo.rejectResn" placeholder="거절시 필수입력입니다.">
+                                <input v-else-if="reqStorageInfo.strgeReqSttusCd === 'S_REJ' ||
+                                                  reqStorageInfo.strgeReqSttusCd === 'D_REJ'"
+                                       class="w-100" type="text" v-model="reqStorageInfo.rejectResn" readonly>
+                            </span>
+                        </li>
+
+                    </ul>
+                </div>
+
+                <div class="btn-box mt-70 a-c">
+                    <a href="#" class="btn btn-line-black btn-large" v-on:click="onclickList">목록</a>
+                    <a href="#" v-if="reqStorageInfo.strgeReqSttusCd === 'S_REQ'" class="btn btn-basic btn-large ml-20" v-on:click="onclickApprove">승인</a>
+                    <a href="#" v-if="reqStorageInfo.strgeReqSttusCd === 'D_REQ'" class="btn btn-basic btn-large ml-20" v-on:click="onclickDelApprove">승인</a>
+                    <a href="#" v-if="reqStorageInfo.strgeReqSttusCd === 'S_REQ' || reqStorageInfo.strgeReqSttusCd === 'D_REQ'"
+                       class="btn btn-line-error btn-large ml-20" v-on:click="onclickReject">거절</a>
+                </div>
+            </section>
+        </section>
+        </script>
+    </section>
+</html>

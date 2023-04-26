@@ -1,0 +1,27 @@
+@charset "UTF-8";
+
+.contents-width {
+	max-width: 1400px;
+	margin: 0 auto;
+}
+
+@media (max-width: 1460px) {
+	body {
+		min-width: 1024px;
+	}
+	.contents-width {
+		max-width: calc(100% - 60px);
+		margin: 0 auto;
+	}
+	.pad-scroll-box {
+		width: calc(100% - 60px);
+		padding: 0;
+		margin: 0 30px;
+	}
+	.scroll-div {
+		overflow-x: auto;	
+	}
+	.scroll-div .table-list {
+		width: 1500px;
+	}
+}

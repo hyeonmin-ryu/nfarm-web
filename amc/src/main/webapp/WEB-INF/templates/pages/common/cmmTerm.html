@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/defaultLayout">
+
+    <th:block layout:fragment="css">
+
+    </th:block>
+
+    <th:block layout:fragment="script">
+    <script th:src="@{/js/common/common.js}"></script>
+    </th:block>
+
+    <section class="member-container" layout:fragment="contents">
+    	<th:block th:replace="fragments/defaultSubHeader :: subHeaderFragment"></th:block>
+    	
+        <section class="content">
+            <div class="sub-title-box">
+                <h2>회원이용약관</h2>
+                <p class="eng">MEMBERSHIP CLAUSE</p>
+            </div>
+            
+            <section class="contents-width join-cont-box mt-50" style="height: 600px;overflow-y: scroll;border: 1px solid #aaaaaa;">
+                <th:block th:insert="pages/user/term.html"></th:block>
+                <!--<iframe class="term-iframe" src="/pages/user/term.html" frameborder="0" ></iframe>-->
+            </section>
+        </section>
+
+    </section>
+
+</html>

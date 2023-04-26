@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/defaultLayout">
+
+<th:block layout:fragment="css">
+
+</th:block>
+
+
+<th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/user/join.js}"></script>
+        <script>
+            agree1 = "[[${join.agree1}]]";
+            agree2 = "[[${join.agree2}]]";
+            next = "[[${join.next}]]";
+        </script>
+    </th:block>
+
+    <section class="member-container" layout:fragment="contents" >
+    	<th:block th:replace="fragments/defaultSubHeader :: subHeaderFragment"></th:block>
+    	
+        <div id="maincontentswrap">
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+        
+        <script type="text/x-template" id="main-template" >
+            <section class="content">
+                
+                <div class="sub-title-box">
+                    <h2>회원가입</h2>
+                    <p class="eng">MEMBER REGISTER</p>
+                </div>
+
+				<div class="contents-width">
+	                <div class="join-step">
+    	                <div class="step1"><span>1</span>약관동의</div>
+        	            <div class="step2 active"><span>2</span>회원정보 입력</div>
+            	        <div class="step3"><span>3</span>가입완료</div>
+	                </div>
+
+    	            <section class="join-cont-box">
+        	            <h3>회원 구분</h3>
+            	        <ul class="com-ul" ref="ddd">
+                	        <li class="mt-20">
+                    	        <span class="radio-wrap" v-for="(agency, idx) in info.agencyTypeList" >
+                        	    <input type="radio" v-bind:id="['rdo' + idx]" v-bind:ref="['rdo' + idx]" v-model="info.insttTyCd" v-bind:value="agency.nm" v-on:change="onclickAgency();"><label v-bind:for="['rdo' + idx]"><span></span>{{agency.dc}}</label>
+	                            </span>
+    	                    </li>
+        	            </ul>
+            		</section>
+
+	                <section class="join-cont-box ">
+    	                <h3>회원정보 입력</h3>
+        	            <span class="join-txt-caution">* 필수 입력 항목</span>
+            	        <ul class="com-ul">
+                	        <li class="bdr-b pb-30">
+                    	        <span class="join-input-group mr-40">
+                        	        <span class="join-txt-caution-pw" v-text="message1"></span>
+	                                <label >이메일<span>*</span></label>
+    	                            <input type="email" style="width: calc(100% - 119px);" ref="userEmail" v-model="info.email" @input="onkeyupEmail" placeholder="이메일을 입력해주세요" maxlength="50"/>
+	
+    	                            <a href="javascript:void(0);" class="btn btn-basic btn-small ml-10" v-on:click="onclickCertSend();">인증요청</a>
+        	                    </span>
+	
+    	                        <span class="join-input-group">
+        	                        <span class="join-txt-caution-pw" v-text="message2"></span>
+            	                    <label>이메일 인증코드<span>*</span></label>
+                	                <input type="text" style="width: calc(100% - 119px);" ref="certCode" v-model="info.certCode" @input="onkeyupCertCode" placeholder="발송된 인증코드 6자리를 입력해주세요." maxlength="6"/>
+	
+    	                            <a href="javascript:void(0);" v-on:click="onclickCertChk();" class="btn btn-basic btn-small ml-10">인증확인</a>
+        	                    </span>
+            	            </li>
+                	        <li>
+                    	        <span class="join-input-group mr-40">
+                                <span class="join-txt-caution-pw" v-text="message3"></span>
+	                                <label>비밀번호<span>*</span></label>
+    	                            <input type="password" ref="password1" v-model="info.password1" v-on:blur="onblurPassChk1();" placeholder="10~15자 이내의 영문,숫자를 조합하여 입력해주세요" maxlength="15" autocomplete="off"/>
+        	                    </span>
+            	                <span class="join-input-group">
+                	               <span class="join-txt-caution-pw" v-text="message4"></span>
+                    	            <label >비밀번호 확인<span>*</span></label>
+                        	        <input type="password" ref="password2" v-model="info.password2" v-on:blur="onblurPassChk2();" placeholder="비밀번호를 다시 입력해주세요." maxlength="15" autocomplete="off"/>
+                            	</span>
+                        	</li>
+	                    </ul>
+    	            </section>
+
+	                <section class="join-cont-box clearfix">
+    	                <h3>추가정보 입력</h3>
+        	            <span class="join-txt-caution">* 필수 입력 항목</span>
+            	        <ul class="com-ul">
+                	        <li>
+                    	        <span class="join-input-group mr-40">
+                        	        <label>기관명 <span>*</span></label>
+	                              	<input type="text" style="width: calc(100% - 90px);" v-model="info.insttNm" placeholder="기관팝업을 이용해주세요." readonly>
+    	                           	<a href="javascript:void(0);" class="btn btn-basic btn-small ml-10" @click="popupAgency();">검색</a>
+        	                    </span>
+	
+    	                        <span class="join-input-group">
+        	                        <label>질병명<span>*</span></label>
+	
+    	                            <div class="custom-select w-100">
+        	                            <select id="diseaseCode" ref="diseaseCode" v-model="info.dissCd">
+            	                        <option value="">선택</option>
+                	                    <option v-for="(item, idx) in info.diseaseList"  v-bind:value="item.nm">{{item.dc}}</option>
+                    	                </select>
+                        	        </div>
+                            	</span>
+	                        </li>
+    	                    <li>
+        	                    <span class="join-input-group mr-40">
+            	                    <label >대표자명</label>
+                	                <input type="text" v-model="info.rprsntvNm" placeholder="기관팝업을 이용해주세요." readonly>
+                    	        </span>
+                        	    <span class="join-input-group">
+                            	    <label >사업자번호</label>
+	                                <input type="text" v-model="info.bsnmNo" placeholder="기관팝업을 이용해주세요." readonly>
+    	                        </span>
+        	                </li>
+            	            <li>
+                	            <span class="join-input-group mr-40">
+                    	            <label>담당자 이름<span>*</span></label>
+                        	        <input type="text" ref="userName" v-model="info.chargerNm" @input="onkeyupHanName" maxlength="10" placeholder="담당자 이름를을 입력해주세요">
+                            	</span>
+	                            <span class="join-input-group">
+    	                            <label >담당자 휴대번호<span>*</span></label>
+        	                        <input type="text" ref="userPhoneNumber" v-model="info.chargerMoblphonNo" @input="onkeyupPhoneNumber" maxlength="11" placeholder="하이픈('-') 없이 입력해주세요.">
+            	                </span>
+                	        </li>
+                    	    <li v-show="info.insttTyCd !== '01'">
+                        	    <span class="join-input-group mr-40">
+                            	    <label >질병책임자 여부</label>
+	                                <span class="radio-wrap join-radio">
+    	                                <input type="radio" ref="diseaseManagerY" id="diseaseManagerY" v-model="info.dissRspnberYn" value="Y"><label for="diseaseManagerY"><span></span>질병책임자</label>
+        	                            <input type="radio" id="diseaseManagerN" v-model="info.dissRspnberYn" value="N" v-on:click="onclickManager()"><label for="diseaseManagerN"><span></span>데이터업로더</label>
+            	                    </span>
+                	            </span>
+                    	    </li>
+	                        <li v-show="info.dissRspnberYn === 'Y'">
+    	                        <span class="join-input-group mr-40">
+        	                        <label>네이버클라우드 아이디<span>*</span></label>
+            	                    <input type="text" placeholder="네이버클라우드 엑세스키를 입력해주세요" ref="nCloudId" v-model="info.ncloudId" maxlength="50">
+                	            </span>
+                    	        <span class="join-input-group">
+                        	        <label>오브젝트 스토리지 아이디<span>*</span></label>
+                            	    <input type="text" placeholder="오브젝트 스토리지 아이디를 입력해주세요 (ncp-0000000-0 형태)" ref="nCloudObjStorageId" @input="onkeyupObjId" v-model="info.ncloudObjStrgeId" maxlength="50">
+                            	</span>
+                        	</li>
+	                        <li v-show="info.dissRspnberYn === 'Y'">
+    	                        <span class="join-input-group mr-40">
+        	                        <label>네이버클라우드 엑세스키<span>*</span></label>
+            	                    <input type="text" placeholder="네이버클라우드 엑세스키를  입력해주세요" ref="nCloudAccessKey" v-model="info.ncloudAccesKey" maxlength="50">
+                	            </span>
+                    	        <span class="join-input-group">
+                        	        <label >네이버클라우드 시크릿키<span>*</span></label>
+                            	    <input type="text" placeholder="네이버클라우드 시크릿키를  입력해주세요" ref="nCloudSecretKey" v-model="info.ncloudScrtyKey" maxlength="50">
+	                            </span>
+    	                    </li>
+	
+    	                </ul>
+        	        </section>
+	
+
+    	            <section class="btn-box a-c mt-60">
+        	            <a href="javascript:void(0);" class="btn btn-line-black btn-large" @click="onclickBack();">취소</a>
+            	        <a href="javascript:void(0);" class="btn btn-basic btn-large ml-20" @click="btnSave();">확인</a>
+                	</section>
+				</div>
+
+            </section>
+        </script>
+
+    <!-- 기관검색 팝업 -->
+
+
+    </section>
+
+</html>

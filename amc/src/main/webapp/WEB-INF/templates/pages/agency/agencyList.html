@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+
+    <th:block layout:fragment="css">
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/agency/agencyList.js}"></script>
+    </th:block>
+
+    <section class="mypage-container"  layout:fragment="contents">
+        <div id="maincontentswrap" >
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+            <section class="content">
+                <section class="mypage-content">
+                    <!--<h3>기관목록</h3>-->
+
+            		<section class="list-search-wrap">
+		                <input type="text" v-model="cond.dataName" @keyup="onKeyup"  placeholder="기관명을 입력하세요">
+        		        <a href="javascript:;" class="btn btn-basic btn-small ml-10" v-on:click="onclickSearch">검색</a>
+            		</section>
+
+					<section class="common-inner mt-50">
+			            <table class="table-list">
+            			    <colgroup>
+			                    <col style="width:20%" />
+            			        <col style="width:20%" />
+			                    <col style="width:20%" />
+                    			<col style="width:20%" />
+                    			<col style="width:20%" />
+                			</colgroup>
+                			<thead>
+                			<tr>
+			                    <th scope="col" class="a-c">기관번호</th>
+            			        <th scope="col" class="a-c">기관명</th>
+                    			<th scope="col" class="a-c">기관타입</th>
+                    			<th scope="col" class="a-c">기관사업자번호</th>
+                    			<th scope="col" class="a-c">기관대표자</th>
+                			</tr>
+                			</thead>
+                			<tbody v-if="agencyList.length == 0">
+                			<tr>
+                    			<td colspan="5" style="text-align: center">
+                        			데이터가 없습니다.
+                    			</td>
+                			</tr>
+                			</tbody>
+                			<tbody v-if="agencyList.length > 0">
+                    			<tr v-for="(item, idx) in agencyList" class="tr-link" v-on:click="onclickDetail(item.insttId);">
+			                        <td class="a-c">{{item.insttId}}</td>
+            			            <td class="a-c"><a href="javascript:void(0);" v-on:click="onclickDetail(item.insttId);">{{item.insttNm}}</a></td>
+			                        <td class="a-c">{{item.insttTyCd}}</td>
+            			            <td class="a-c">{{replaceBlNumber(item.bsnmNo)}}</td>
+			                        <td class="a-c">{{item.rprsntvNm}}</td>
+            			        </tr>
+                			</tbody>
+                		</table>
+
+            			<!-- 페이징 -->
+            			<div class="btn-box mt-40">
+                			<div class="pagination fl-l">
+                    			<a href="javascript:;" v-on:click="onclickPage(pageInfo.prev)"><span class="next"></span></a>
+                    			<a href="javascript:;" v-for="(page, idx) in pageInfo.pages" v-on:click="onclickPage(page)" v-bind:class="{active:pageInfo.curr==page}">
+                        			{{page}}
+                    			</a>
+                    			<a href="javascript:;" v-on:click="onclickPage(pageInfo.next)"><span class="prev"></span></a>
+                			</div>
+                			<a href="#" class="btn btn-basic btn-large fl-r" v-on:click="onClickSave" v-if="MY_ROLE==='ROLE_ADMIN'">등록</a>
+						</div>
+					</section>
+    	    	</section>
+	    	</section>
+        </script>
+    </section>
+</html>

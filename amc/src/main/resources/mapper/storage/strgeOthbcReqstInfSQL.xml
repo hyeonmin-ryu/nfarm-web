@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed May 11 15:49:51 KST 2016-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="strgeOthbcReqstInfDao">
+
+	<select id="inqOpenStorageList" resultType="StrgeOthbcReqstInfDto" parameterType="StorageSearchDto">
+	    SELECT
+	        O.OTHBC_REQST_ID,
+	        U.USER_ID,
+	        A.INSTT_ID,
+	        A.INSTT_NM,
+	        U.DISS_CD ,
+	        FN_CODE('DISS_CD' , U.DISS_CD ) dissNm,
+	        U.CHARGER_NM,
+	        O.OTHBC_REQST_STTUSCD,
+	        O.OTHBC_DATA_NM ,
+	        FN_CODE('OTHBC_REQST_STTUSCD' , O.OTHBC_REQST_STTUSCD ) othbcReqstSttusnm ,
+	        O.CREAT_DT,
+	        O.UPDT_DT
+	    FROM
+	        TB_STRGE_OTHBC_REQST_INF O 
+	    INNER JOIN
+	        TB_USER_MST U 
+	            on O.DISS_RSPNBER_USER_ID = U.USER_ID 
+	    INNER JOIN
+	        TB_INSTT_MST A 
+	            on U.INSTT_ID = A.INSTT_ID 
+	    WHERE
+		        O.OTHBC_DATA_NM like CONCAT('%' , #{othbcDataNm} , '%')
+	   		<if test='userId != null and !userId.equals("") '>
+				AND U.USER_ID= #{userId}
+			</if>					
+			
+			<if test='othbcReqstSttuscd != null and !othbcReqstSttuscd.equals("") '>
+				AND O.OTHBC_REQST_STTUSCD= #{othbcReqstSttuscd}
+			</if>
+		    
+		    ORDER BY
+		        O.CREAT_DT desc
+	</select>
+	
+	<select id="getOpenStorageInfo" resultType="StrgeOthbcReqstInfDto" parameterType="String">
+	    SELECT
+	        O.OTHBC_REQST_ID,
+	        U.USER_ID,
+	        A.INSTT_ID,
+	        A.INSTT_NM,
+	        U.DISS_CD ,
+	        FN_CODE('DISS_CD' , U.DISS_CD ) dissNm,
+	        U.CHARGER_NM,
+	        U.EMAIL,
+	        U.CHARGER_MOBLPHON_NO,
+	        O.OTHBC_REQST_STTUSCD,
+	        O.DISS_RSPNBER_USER_ID,
+			R.STORGE_NM,
+	        O.OTHBC_DATA_NM ,
+	        FN_CODE('OTHBC_REQST_STTUSCD' , O.OTHBC_REQST_STTUSCD ) othbcReqstSttusnm ,
+	        O.CREAT_DT,
+	        O.UPDT_DT,
+	        O.CANCL_RESN,
+            O.REJECT_RESN,
+            O.CREAT_USER_ID,
+            O.UPDT_USER_ID
+	    FROM
+	        TB_STRGE_OTHBC_REQST_INF O 
+	    INNER JOIN
+	        TB_USER_MST U 
+	            ON O.DISS_RSPNBER_USER_ID=U.USER_ID 
+	    INNER JOIN
+	        TB_INSTT_MST A 
+	            ON U.INSTT_ID=A.INSTT_ID 
+		INNER JOIN
+            TB_STRGE_REQ_INF R 
+                ON O.STORGE_REQST_ID = R.STORGE_REQST_ID  	            
+	    WHERE
+	    	O.OTHBC_REQST_ID = #{othbcReqstId}
+	</select>		
+	
+	<insert id="regOpenStorage" parameterType="StrgeOthbcReqstInfDto">
+		INSERT INTO TB_STRGE_OTHBC_REQST_INF
+					(OTHBC_REQST_ID,
+					CREAT_USER_ID,
+				    CREAT_DT,
+				    UPDT_USER_ID,
+				    UPDT_DT,
+				    BUCKET_ID,
+				    STORGE_REQST_ID,
+				    OTHBC_DATA_NM,
+				    DISS_RSPNBER_USER_ID,
+				    REJECT_RESN,
+				    OTHBC_REQST_STTUSCD
+				    )
+			VALUES(#{othbcReqstId},
+			        #{creatUserId},
+					now(6),
+					#{creatUserId},
+					now(6),
+					#{bucketId},
+					#{storgeReqstId},
+					#{othbcDataNm},
+					#{dissRspnberUserId},
+					#{rejectResn},
+					#{othbcReqstSttuscd}
+					)
+	</insert>		
+	
+	
+	<!-- 삭제 거절 -->
+	<update id="updtOpenStorageStat" parameterType="StrgeOthbcReqstInfDto">
+		UPDATE TB_STRGE_OTHBC_REQST_INF
+		SET UPDT_USER_ID= #{updtUserId}
+		  , UPDT_DT = now(6)
+		  
+   		<if test='rejectResn != null and !rejectResn.equals("") '>
+			, REJECT_RESN = #{rejectResn}
+		</if>		
+		
+   		<if test='canclResn != null and !canclResn.equals("") '>
+			, CANCL_RESN = #{canclResn}
+		</if>		  
+		  , OTHBC_REQST_STTUSCD = #{othbcReqstSttuscd}
+		WHERE OTHBC_REQST_ID = #{othbcReqstId}
+	</update>		
+</mapper>

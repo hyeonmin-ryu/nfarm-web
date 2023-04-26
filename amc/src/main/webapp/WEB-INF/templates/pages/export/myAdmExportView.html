@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+
+    <th:block layout:fragment="css"></th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/export/myAdmExportView.js}"></script>
+        <script>
+        tkoutReqstNo ="[[${param.tkoutReqstNo}]]";
+			myMenuId ="[[${param.menuId}]]";
+        </script>
+    </th:block>
+
+    <section class="mypage-container" layout:fragment="contents">
+    	<th:block th:replace="fragments/defaultSubHeader :: subHeaderFragment"></th:block>
+    	
+        <div id="maincontentswrap" >
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+        	<section class="content contents-width" >
+            	<div class="sub-title-box sub-title-box1">
+                	<h2>반출 상세 내역</h2>
+            	</div>
+            	
+            	<section class="join-cont-box mt-30 clearfix">
+                	<h3>신청자 정보</h3>
+                	<ul class="com-ul">
+                    	<li>
+                        	<span class="join-input-group mr-40">
+                            	<label >신청자명</label>
+                            	<p class="txt-data"><input type="text" class="w-100 a-l" v-model="exportInfo.chargerNm" readonly></p>
+                        	</span>
+                        	<span class="join-input-group">
+                            	<label >기업명</label>
+                            	<p class="txt-data"><input type="text" class="w-100 a-l" v-model="exportInfo.insttNm" readonly></p>
+                        	</span>
+                    	</li>
+                    	<li class="bdr-b">
+                        	<span class="join-input-group mr-40">
+                            	<label >연락처</label>
+                            	<p class="txt-data"><input type="text" class="w-100 a-l" v-model="exportInfo.chargerMoblphonNo" readonly></p>
+                        	</span>
+                        	<span class="join-input-group">
+                            	<label >이메일</label>
+                            	<p class="txt-data"><input type="text" class="w-100 a-l" v-model="exportInfo.email" readonly></p>
+                        	</span>
+                    	</li>
+                	</ul>
+            	</section>
+
+            	<section class="join-cont-box clearfix">
+                	<h3>데이터박스 정보</h3>
+                	<ul class="com-ul">
+                    	<li class="bdr-b">
+                        	<span class="join-input-group mr-40">
+                            	<label >데이터박스 번호</label>
+                            	<p class="txt-data"><input type="text" class="w-100 a-l" v-model="exportInfo.dtbxSn" readonly></p>
+                        	</span>
+                        	<span class="join-input-group">
+                            	<label >데이터박스명</label>
+                            	<p class="txt-data"><input type="text" class="w-100 a-l" v-model="exportInfo.dtbxNm" readonly></p>
+                        	</span>
+                    	</li>
+                    	<li>
+                        	<span class="join-input-group w-100">
+                            	<label>사용 연구분석 데이터</label>
+                        	</span>
+                    	</li>
+                    	<li>
+                    		<span class="join-input-group mr-10 w-67" ref="userinput">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">순번</p>
+                        	</span>
+                        	<span class="join-input-group mr-10 w-3">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">연구분석데이터</p>
+                        	</span>
+                        	<span class="join-input-group mr-10 w-3">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">병원</p>
+                        	</span>
+                        	<span class="join-input-group w-3">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">책임자명</p>
+                        	</span>
+                    	</li>
+                    	<li v-for="(item, idx) in exportInfo.exportApproverInfo">
+                    		<span class="env-input-group mr-10 w-67">
+                            	<label></label>
+                            	<input type="text" class="w-67" v-bind:value="idx+1" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10 w-3">
+                            	<label></label>
+                            	<input type="text" class="w-100" v-bind:value="item.othbcDataNm" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10 w-3">
+                            	<label></label>
+                            	<input type="text" class="w-100 a-c" v-bind:value="item.insttNm" readonly>
+                        	</span>
+                        	<span class="env-input-group w-3">
+                            	<label></label>
+                            	<input type="text" class="w-100 a-c" v-bind:value="item.chargerNm" readonly>
+                        	</span>
+                    	</li>
+                    	<br>
+                    	<li class="bdr-b">
+                    	</li>
+                    	<li class="mt-30 bdr-b">
+                        	<span class="join-input-group w-100">
+                            	<label>반출 사유</label>
+                            	<input class="w-100" type="text" v-model="exportInfo.tkoutResn" ref="exportReason" readonly>
+                        	</span>
+                    	</li>
+                    	<li class="mt-30 bdr-b">
+                        	<span class="join-input-group w-100">
+                            	<label>반출 대상 파일 경로</label>
+                            	<input class="w-100" type="text" v-model="exportInfo.tkoutTrgetCours" ref="exportPath" readonly>
+                        	</span>
+                    	</li>
+                	</ul>
+            	</section>
+            	
+            	<section class="join-cont-box clearfix">
+                	<h3>진행 정보</h3>
+                	<ul class="com-ul">
+                    	<li class="bdr-b">
+                        	<span class="join-input-group mr-40">
+                            	<label >처리상태</label>
+                            	<p class="txt-data"><input type="text" class="w-100 a-l" v-model="exportInfo.tkoutProcessSttusCd" readonly></p>
+                        	</span>
+                        	<span class="join-input-group">
+                            	<label >신청일시</label>
+                            	<p class="txt-data"><input type="text" class="w-100 a-l" v-model="exportInfo.reqstDt" readonly></p>
+                        	</span>
+                    	</li>
+                    	<li class="bdr-b">
+                        	<span class="join-input-group mr-40">
+                            	<label >접수일시</label>
+                            	<p class="txt-data"><input type="text" class="w-100 a-l" v-model="exportInfo.rceptDt" readonly></p>
+                        	</span>
+                        	<span class="join-input-group">
+                            	<label >취소일시</label>
+                            	<p class="txt-data"><input type="text" class="w-100 a-l" v-model="exportInfo.canclDt" readonly></p>
+                        	</span>
+                    	</li>
+                    	<li class="bdr-b">
+                        	<span class="join-input-group mr-40">
+                            	<label >승인/거절일시</label>
+                            	<p class="txt-data"><input type="text" class="w-100 a-l" v-model="exportInfo.processDt" readonly></p>
+                        	</span>
+                    	</li>
+                	</ul>
+            	</section>
+            	
+            	<section class="join-cont-box clearfix">
+                	<h3>승인 정보</h3>
+                	<ul class="com-ul">
+                    	<li v-if="exportInfo.exportApproverInfo.length !== 0">
+                    		<span class="join-input-group mr-10 w-67" ref="userinput">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">순번</p>
+                        	</span>
+                        	<span class="join-input-group mr-10 w-5">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">병원명</p>
+                        	</span>
+                        	<span class="join-input-group mr-10 w-5">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">책임자명</p>
+                        	</span>
+                        	<span class="join-input-group mr-10 w-5">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">승인상태</p>
+                        	</span>
+                        	<span class="join-input-group mr-10 w-5">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">승인/거절일자</p>
+                        	</span>
+                        	<span class="join-input-group w-5">
+                            	<p class="txt-data a-c" style="padding-bottom:0px;">거절사유</p>
+                        	</span>
+                    	</li>
+                    	<li v-for="(item, idx) in exportInfo.exportApproverInfo">
+                    		<span class="env-input-group mr-10 w-67">
+                            	<label></label>
+                            	<input type="text" class="w-67" v-bind:value="idx+1" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10 w-5">
+                            	<label></label>
+                            	<input type="text" class="w-100 a-c" v-bind:value="item.insttNm" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10 w-5">
+                            	<label></label>
+                            	<input type="text" class="w-100 a-c" v-bind:value="item.chargerNm" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10 w-5">
+                            	<label></label>
+                            	<input type="text" class="w-100 a-c" v-bind:value="item.tkoutProcessSttusCd" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10 w-5">
+                            	<label></label>
+                            	<input type="text" class="w-100 a-c" v-bind:value="item.processDt" readonly>
+                        	</span>
+                        	<span class="env-input-group w-5">
+                            	<label></label>
+                            	<input type="text" class="w-100 a-c" v-bind:value="item.rejectResn" readonly>
+                        	</span>
+                    	</li>
+                    	<br>
+                    	<li class="bdr-b">
+                    	</li>
+                	</ul>
+            	</section> 
+            	
+            	<section class="join-cont-box clearfix">
+                	<h3>반출 서버 정보</h3>
+                	<span class="join-txt-caution">* 필수 입력 항목</span>
+                	<ul class="com-ul">
+                    	<li class="bdr-b"> 
+                        	<span class="join-input-group mr-40" style="width: calc((100% - 80px) / 3)">
+                            	<label>반출서버 접속 IP<span>*</span></label>
+                            	<p class="txt-data">
+                            		<input type="text" class="w-100 a-l" v-model="apprInfo.tkoutSvrIpAdres" ref="exportServerIp" placeholder="IP를 입력해주세요." maxlength="15" :readonly="exportInfo.exportReqStatCodeName !== 'REQUEST'">
+                            	</p>
+                        	</span>
+                        	<span class="join-input-group mr-40" style="width: calc((100% - 80px) / 3)">
+                            	<label>반출서버 접속 ID<span>*</span></label>
+                            	<p class="txt-data">
+                            		<input type="text" class="w-100 a-l" v-model="apprInfo.tkoutSvrUserId" ref="exportServerId" placeholder="ID를 입력해주세요." maxlength="20" :readonly="exportInfo.exportReqStatCodeName !== 'REQUEST'">
+                            	</p>
+                        	</span>
+                        	<span class="join-input-group" style="width: calc((100% - 80px) / 3)">
+                            	<label>반출서버 접속 암호<span>*</span></label>
+                            	<p class="txt-data">
+                            		<input type="text" class="w-100 a-l" v-model="apprInfo.tkoutSvrUserPassword" ref="exportServerPw" placeholder="암호를 입력해주세요." maxlength="50" :readonly="exportInfo.exportReqStatCodeName !== 'REQUEST'">
+                            	</p>
+                        	</span>
+                    	</li>
+                	</ul>
+            	</section>
+            	
+            	<section class="btn-box a-c mt-60">
+                	<a href="javascript:;" class="btn btn-line-black btn-large ml-10 mr-10" v-on:click="onclickList">목록</a>
+                	<a href="javascript:;" class="btn btn-basic btn-large ml-10 mr-10" v-on:click="onclickAccept" v-if="exportInfo.exportReqStatCodeName === 'REQUEST' && MY_ROLE === 'ROLE_ADMIN'">반출서버 등록</a>
+            	</section>
+        	</section>
+        </script>
+    </section>
+</html>

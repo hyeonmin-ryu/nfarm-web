@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed May 11 15:49:51 KST 2016-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="userDao">
+
+ 	<select id="inqUserId" resultType="UserDetailDto" parameterType="String" >
+		 SELECT 
+			    u.USER_ID	
+			   ,a.INSTT_ID
+			   ,DISS_CD
+			   ,DISS_RSPNBER_YN
+			   ,SBSCRB_STTUS_CD
+			   ,LAST_LOGIN_DT
+			   ,LOGIN_CO
+			   ,LOGIN_PASSWORD
+			   ,NCLOUD_ACCES_KEY
+			   ,NCLOUD_ID
+			   ,NCLOUD_SCRTY_KEY
+			   ,UPPER_USER_ID
+		       ,EMAIL
+			   ,CHARGER_NM
+			   ,CHARGER_MOBLPHON_NO
+			   ,USER_ROLE_SECD
+			   ,NCLOUD_OBJ_STRGE_ID
+		   FROM TB_USER_MST u
+     INNER JOIN TB_INSTT_MST a                      
+		     ON u.INSTT_ID  = a.INSTT_ID  	
+		  WHERE u.EMAIL = #{username}
+ 	</select>
+ 	
+  	<select id="inqUserEmlYn" resultType="int" parameterType="String" >
+	 	SELECT 
+	 	       COUNT(*) FROM TB_USER_MST
+		 WHERE EMAIL = #{email}
+ 	</select>	
+ 	 	
+ 	<select id= "inqUserList" resultType="UserInfoDto" parameterType="UserSearchDto">
+ 		SELECT 
+ 		       u.USER_ID
+ 			  ,a.INSTT_ID
+ 			  ,a.INSTT_NM
+ 			  ,u.USER_ROLE_SECD
+ 			  ,CHARGER_NM
+ 			  ,FN_CODE('DISS_CD', u.DISS_CD) as dissCd
+ 			  ,CHARGER_MOBLPHON_NO
+ 			  ,EMAIL
+ 			  ,FN_CODE('SBSCRB_STTUS_CD', u.SBSCRB_STTUS_CD) as sbscrbSttusCd
+ 			  ,DATE_FORMAT(u.CREAT_DT, '%Y-%m-%d') as creatDt
+ 			  ,DATE_FORMAT(u.UPDT_DT, '%Y-%m-%d') as updtDt
+ 		  FROM TB_USER_MST u
+    INNER JOIN TB_INSTT_MST a
+ 			ON u.INSTT_ID = a.INSTT_ID
+ 		 WHERE CHARGER_NM like CONCAT ('%', #{chargerNm}, '%')
+ 		   	<if test='userType != null and !userType.equals("") '>
+				<choose>
+					<when test ='userType.equals("01")'>
+						AND USER_ROLE_SECD = 'ROLE_ADMIN'
+					</when>
+					
+					<when test = 'userType== ("03")'>
+						AND (USER_ROLE_SECD = 'ROLE_UPLOADER'
+						OR USER_ROLE_SECD = 'ROLE_MANAGER')
+					</when>
+					
+					<when test ='userType== ("02")'>
+						AND USER_ROLE_SECD = 'ROLE_USER'
+					</when>
+				</choose>
+			</if>
+			
+			<if test='insttId != null and !insttId.equals("") '>
+				AND a.INSTT_ID= #{insttId}
+			</if>
+			<if test='dissCd != null and !dissCd.equals("") '>
+				AND DISS_CD= #{dissCd}
+			</if>
+			<if test='sbscrbSttusCd != null and !sbscrbSttusCd.equals("") '>
+				AND SBSCRB_STTUS_CD= #{sbscrbSttusCd}
+			</if>
+ 	</select>
+ 	
+ 	<select id="getUserSeq" resultType="UserInfoDto" parameterType="Long">
+ 		SELECT 
+ 		       USER_ID
+ 		      ,USER_ROLE_SECD
+ 			  ,CHARGER_NM
+ 			  ,DISS_CD
+ 			  ,FN_CODE('DISS_CD', u.DISS_CD) as dissNm
+ 			  ,DISS_RSPNBER_YN
+ 			  ,CHARGER_MOBLPHON_NO
+ 			  ,EMAIL
+ 			  ,FN_CODE('SBSCRB_STTUS_CD', u.SBSCRB_STTUS_CD) as sbscrbSttusCd
+ 			  ,u.CREAT_DT
+ 			  ,u.UPDT_DT
+ 			  ,u.UPPER_USER_ID
+ 			  ,NCLOUD_OBJ_STRGE_ID
+ 			  ,NCLOUD_ID
+ 			  ,NCLOUD_ACCES_KEY
+ 			  ,NCLOUD_SCRTY_KEY
+ 			  ,a.INSTT_ID
+ 			  ,FN_CODE('INSTT_TY_CD', a.INSTT_TY_CD) as insttTyCd
+ 			  ,a.INSTT_NM
+ 			  ,a.RPRSNTV_NM
+ 			  ,a.BSNM_NO
+ 		  FROM TB_USER_MST u
+    INNER JOIN TB_INSTT_MST a
+ 		    ON u.INSTT_ID = a.INSTT_ID
+ 		 WHERE USER_ID = #{userId}
+ 	</select>
+
+
+	<select id="getAgencySeq" resultType="AgencyDto" parameterType="UserSearchDto">
+		SELECT 
+			   INSTT_ID
+			  ,INSTT_NM
+			  ,INSTT_TY_CD
+		  FROM TB_INSTT_MST
+	</select>
+	
+	<select id="getAgencyList" resultType="AgencyDto" parameterType="UserSearchDto">
+		SELECT 
+			   INSTT_ID
+			  ,INSTT_NM
+			  ,INSTT_TY_CD
+			  ,RPRSNTV_NM
+			  ,BSNM_NO
+		  FROM TB_INSTT_MST
+		 WHERE INSTT_TY_CD = #{insttTyCd}
+	</select>
+	
+  	<select id="inqUserInfoSeq" resultType="UserInfoDto" parameterType="Long" >
+		 SELECT
+				 u.USER_ID	
+				,u.USER_ID managerUserSeq
+				,a.INSTT_NM
+				,DISS_CD
+				,FN_CODE('DISS_CD', u.DISS_CD) as DISS_NM
+				,IF(a.INSTT_TY_CD ='MNHP' , 'Y' , 'N' )DISS_MAIN_YN
+				,SBSCRB_STTUS_CD
+				,LAST_LOGIN_DT
+				,LOGIN_CO
+				,NCLOUD_ACCES_KEY
+				,NCLOUD_ID
+				,NCLOUD_SCRTY_KEY
+				,UPPER_USER_ID
+				,EMAIL
+				,CHARGER_NM
+				,CHARGER_NM managerUserName
+				,CHARGER_MOBLPHON_NO
+				,USER_ROLE_SECD
+				,NCLOUD_OBJ_STRGE_ID
+		FROM TB_USER_MST u
+		INNER JOIN                              
+		    TB_INSTT_MST a                      
+		        ON u.INSTT_ID  = a.INSTT_ID  	
+		WHERE u.USER_ID = #{userId}
+ 	</select>		
+	
+	
+	<update id= "updtUserInfo" parameterType="UserInfoDto">
+		UPDATE TB_USER_MST
+		   SET CHARGER_NM = #{chargerNm}
+		      ,CHARGER_MOBLPHON_NO = #{chargerMoblphonNo}
+		 WHERE USER_ID = #{userId}
+	</update>
+	
+	<update id = "updtPassword" parameterType = "userDetailDto">
+		UPDATE TB_USER_MST
+		   SET LOGIN_PASSWORD = #{loginPassword}
+		 WHERE Email = #{email}
+	</update>
+	
+	<select id="inqMyUploaderList" resultType = "UserInfoDto" parameterType ="String">
+	    SELECT CHARGER_NM
+	          ,USER_ROLE_SECD
+	     FROM TB_USER_MST u
+   INNER JOIN TB_STRGE_REQ_INF r
+   		   ON r.DISS_RSPNBER_USER_ID = u.USER_ID
+   		WHERE r.STORGE_REQST_ID = #{storgeReqstId}
+   		UNION ALL
+		SELECT CHARGER_NM
+			  ,USER_ROLE_SECD
+		  FROM TB_USER_MST u
+	INNER JOIN TB_STRGE_REQ_INF r
+		    ON r.DISS_RSPNBER_USER_ID = u.UPPER_USER_ID
+		 WHERE r.STORGE_REQST_ID = #{storgeReqstId}
+	</select>
+	
+	<insert id="join" parameterType="JoinRequest">
+		INSERT 
+		  INTO TB_USER_MST
+		  	  (
+		  	   Email
+		  	  ,USER_ROLE_SECD
+		  	  ,INSTT_ID
+		  	  ,DISS_CD
+		  	  ,CHARGER_NM
+		  	  ,CHARGER_MOBLPHON_NO
+		  	  ,DISS_RSPNBER_YN
+		  	  ,NCLOUD_ID
+		  	  ,NCLOUD_OBJ_STRGE_ID
+		  	  ,NCLOUD_ACCES_KEY
+		  	  ,NCLOUD_SCRTY_KEY
+		  	  ,SBSCRB_STTUS_CD
+		  	  ,UPPER_USER_ID
+		  	  ,CREAT_DT
+		  	  ,LOGIN_PASSWORD
+		  	  ,LOGIN_CO
+		  	  )
+		VALUES
+			  (
+			   #{email}
+			  ,#{userRoleSecd}
+			  ,#{insttId}
+			  ,#{dissCd}
+			  ,#{chargerNm}
+			  ,#{chargerMoblphonNo}
+			  ,#{dissRspnberYn}
+			  ,#{ncloudId}
+			  ,#{ncloudObjStrgeId}
+			  ,#{ncloudAccesKey}
+			  ,#{ncloudScrtyKey}
+			  ,'02'
+			  ,#{upperUserId}
+			  ,now(6)
+			  ,#{inputPw}
+			  ,0
+			  )
+	</insert>
+	
+	<update id ="acceptUser" parameterType = "UserInfoDto">
+		UPDATE
+			   TB_USER_MST
+		   SET SBSCRB_STTUS_CD = '01'
+		   	  ,UPDT_DT = now(6)
+		   	  ,UPDT_USER_ID = #{updtUserId}
+		 WHERE USER_ID = #{userId}
+	</update>
+	
+	<delete id = "rejectUser" parameterType="UserInfoDto">
+		DELETE 
+		  FROM TB_USER_MST
+		 WHERE USER_ID = #{userId}
+	</delete>
+	
+	<select id = "inqMyUploader" resultType = "UserInfoDto" parameterType ="UserInfoDto">
+		SELECT USER_ID
+		      ,DISS_RSPNBER_YN
+		      ,UPPER_USER_ID
+		      ,USER_ROLE_SECD
+		      ,CHARGER_NM
+		  FROM TB_USER_MST
+		 WHERE USER_ROLE_SECD = 'ROLE_UPLOADER'
+		   AND INSTT_ID = #{insttId}
+		   AND DISS_CD = #{dissCd}
+		   AND(
+		       UPPER_USER_ID = #{userId} 
+		    OR UPPER_USER_ID IS NULL
+		      )
+	  ORDER BY CHARGER_NM		   
+	</select>
+	
+	<update id="saveUploader" parameterType="UserInfoDto">
+		UPDATE TB_USER_MST
+		   SET UPPER_USER_ID = #{upperUserId}
+		 WHERE USER_ID = #{userId}
+	</update>
+	
+	<select id = "findUserInfo" resultType = "UserInfoDto" parameterType ="UserInfoDto">
+		SELECT EMAIL
+		  FROM TB_USER_MST
+		 WHERE CHARGER_NM = #{chargerNm}
+		   AND CHARGER_MOBLPHON_NO =#{chargerMoblphonNo}
+			  
+	</select>
+	
+	
+	<select id = "findEmail" resultType = "int" parameterType ="String">
+		SELECT COUNT(*)
+		  FROM TB_USER_MST
+		 WHERE EMAIL = #{email}
+	</select>
+	
+	<select id = "setPw" resultType = "UserInfoDto" parameterType ="UserInfoDto">
+		UPDATE TB_USER_MST
+		   SET LOGIN_PASSWORD= #{inputNewPw}
+		 WHERE EMAIL = #{email}
+	</select>
+</mapper>

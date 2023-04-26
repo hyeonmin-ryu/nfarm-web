@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<div th:fragment="footerFragment">
+    <script th:src="@{/js/fragments/defaultFooter.js}"></script>
+    <div class="footer-wrapper" id="footercontentswrap" >
+        <footercontents ref="footercontents"></footercontents>
+    </div>
+
+    <script type="text/x-template" id="footer-template" >
+
+        <footer class="footer">
+			<!--<section class="footer-wrap">
+            	<section class="footer-nav contents-width">
+                	<a href="/board/notice/main" class="hover-maincolor">공지사항</a>
+                	<a href="/board/inquiry/main" class="hover-maincolor">문의하기</a>
+                	<a href="/board/faq/main" class="hover-maincolor">FAQ</a>                
+                	<a href="/common/term" class="hover-maincolor">이용약관</a>
+                	<a href="/common/privatePolicy" class="hover-maincolor">개인정보처리방침</a>
+            	</section>
+			</section>
+
+			
+            <section class="clearfix">
+				<section class="contents-width">
+                <section class="footer-company">
+                    <p class="comname">(주)아이티스마트</p>
+                    <p class="address">서울특별시 강서구 양천로 583 우림블루나인비즈니스센터 A동 2010호</p>
+                    <div class="copyright">COPYRIGHT &copy; 2020 BY ITSMART.CO.LTD ALL RIGHTS RESERVED</div>
+                </section>
+            
+                <section class="family-link">
+                    <div id="myDropdown" class="dropdown">
+                        <button onclick="myFunction()" class="dropbtn">관련 사이트<span class="arrow"></span></button>
+                        <div class="dropdown-content">
+                            <a href="https://www.dranswer.kr" target="_blank">K - Dash</a>
+                            <a href="https://www.msit.go.kr" target="_blank">과학기술정보통신부</a>
+                            <a href="https://www.nipa.kr" target="_blank">정보통신산업진흥원</a>
+                        </div>
+                    </div>
+                </section>
+				</section>
+			</section>-->
+        </footer>
+
+    </script>
+</div>
+</html>

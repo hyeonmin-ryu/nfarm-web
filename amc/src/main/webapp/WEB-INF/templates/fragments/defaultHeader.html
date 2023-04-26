@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<div th:fragment="headerFragment">
+    <script th:src="@{/js/fragments/defaultHeader.js}"></script>
+    <script>
+        const MY_ROLE= "[[${#authentication.authorities[0]}]]";
+    </script>
+
+    <div class="header-wrapper" id="headercontentswrap">
+        <headercontents ref="headercontents"></headercontents>
+    </div>
+
+    <script type="text/x-template" id="header-template" >
+
+            <header class="header common-inner">
+                <h1 class="logo"><a href="/"><img src="/images/nfarm01.png" alt="아산메디컬센터" /></a></h1>
+
+<!--                <nav class="main-nav header_menu" id="mainNav">
+                    <p v-for="(item, idx) in menuList" v-if="item.parntsMenuId == 'root'" class="menu"><span>{{item.menuNm}}</span></p>
+                </nav>
+-->
+                <nav class="main-nav header_menu" id="mainNav">
+                    <!--<p v-for="(item, idx) in menuList" v-if="item.parntsMenuId == 'root'" class="menu"><span>{{item.menuNm}}</span>
+                       <ul v-bind:class="'sub1'" >
+                           <li v-for="(item2, idx2) in menuList" v-if="item.menuId == item2.parntsMenuId"><a v-bind:href="item2.menuUrl">{{item2.menuNm}}</a></li>
+                       </ul>
+					</p>-->
+					<p class="menu"><span>농장 DB 관리</span>
+						<ul class="sub1" >
+                    		<li><a href="/farm/list">농장 DB 리스트</a></li>
+                    	</ul>
+					</p>
+					<p class="menu"><span>회원 관리</span>
+						<ul class="sub1" >
+                    		<li><a href="/">조사기관 회원 목록</a></li>
+                    	</ul>
+						<ul class="sub1" >
+                    		<li><a href="/">생육조사원 회원 목록</a></li>
+                    	</ul>
+					</p>
+					<p class="menu"><span>생육 조사 관리</span>
+						<ul class="sub1" >
+                    		<li><a href="/">생육 조사 목록</a></li>
+                    	</ul>
+					</p>
+					<div class="sub-wrap"></div>
+                </nav>
+
+                <div class="top-menu" sec:authorize="isAnonymous()" >
+                    <a href="/login" class="login">로그인</a>
+                    <a href="/signup">회원가입</a>
+                </div>
+                <div class="top-menu" sec:authorize="isAuthenticated()">
+                    <a href="#" v-on:click="onclickMypage()">마이페이지</a>
+                    <a href="#" v-on:click="onclickLogout()">로그아웃</a>
+                </div>
+
+<!--
+            <div class="nav-cont-wrap header_menu" id="mainNavPop">
+                <div class="nav-cont">
+                    <div class="gnb-wrap">
+
+                        <ul class="sub1" >
+                            <li><a href="https://dranswer.kr/" target="_blank">국토연구원 소개</a></li>
+                            <li><a href="/intro/guide">사용가이드</a></li>
+                        </ul>
+                        <ul class="sub2">
+                            <li><a href="/lndata/store/main">질환 데이터 저장 신청</a></li>
+                            <li><a href="/lndata/open/main">질환 데이터 공개 신청</a></li>
+                            <li><a href="/lndata/use/main">연구분석 데이터 사용 신청</a></li>
+                        </ul>
+						<ul class="sub3">
+                            <li><a href="/data/box/main">데이터 박스 사용 신청</a></li>
+                            <li><a href="/data/out/main">데이터 반출 신청</a></li>
+                        </ul>
+                        <ul class="sub4">
+                            <li><a href="javascript:;" v-on:click="onclickStatus">질환 데이터 적재 현황</a></li>
+                        </ul>
+                            <ul v-bind:class="'sub1'" >
+                                <li v-for="(item2, idx2) in menuList" v-if="item.menuId == item2.parntsMenuId"><a v-bind:href="item2.menuUrl">{{item2.menuNm}}</a></li>
+                            </ul>
+                        </template>
+                    </div>
+                </div>
+            </div>
+-->
+
+            </header>
+
+    </script>
+
+</div>
+</html>

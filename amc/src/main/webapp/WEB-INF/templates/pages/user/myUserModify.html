@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+
+    <th:block layout:fragment="css">
+        <style>
+
+            input[readonly]{border:none;background:#f2f2f2 !important;}
+        </style>
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/user/myUserModify.js}"></script>
+
+    </th:block>
+
+    <section class="mypage-container" layout:fragment="contents">    	
+        <div id="maincontentswrap">
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+        <section class="content">
+            <section class="contents-width mypage-content mt-40">
+                <!--h3>회원 정보 변경</h3-->
+
+                <ul class="mt-20 clearfix">
+                    <li>
+                        <span class="join-input-group mr-40">
+                            <label>회원구분</label>
+                            <input type="text"  :value="memberText" readonly>
+                        </span>
+                        <span class="join-input-group">
+                            <label>가입처리 상태</label>
+                            <input type="text" :value="info.sbscrbSttusCd" readonly>
+                        </span>
+                    </li>
+                    <li>
+                        <span class="join-input-group mr-40">
+                            <label>기관명</label>
+                            <input type="text" :value="info.insttNm" readonly>
+                        </span>
+                        <span class="join-input-group">
+                            <label>이메일</label>
+                            <input type="text" :value="info.email" readonly>
+                        </span>
+                    </li>
+                    <li>
+                        <span class="join-input-group mr-40">
+                            <label>담당자 이름</label>
+                            <input type="text" id="userName" ref="userName" v-model="info.chargerNm" @input="onkeyupHanName" maxlength="10"/>
+                        </span>
+                        <span class="join-input-group">
+                            <label>담당자 휴대전화</label>
+                            <input type="text" ref="userPhoneNumber"  v-model="info.chargerMoblphonNo" placeholder="하이픈('-') 없이 입력해주세요." maxlength="11" />
+                        </span>
+                    </li>
+                    <li>
+                        <span class="join-input-group mr-40">
+                            <label>대표자명</label>
+                            <input type="text" :value="info.rprsntvNm" readonly>
+                        </span>
+                        <span class="join-input-group">
+                            <label>사업자 번호</label>
+                            <input type="text" :value="info.bsnmNO" readonly>
+                        </span>
+                    </li>
+                    <li>
+                        <span class="join-input-group mr-40">
+                            <label>질병명</label>
+                            <input type="text" :value="info.dissNm" readonly>
+                        </span>
+                        <span class="join-input-group" v-if="managerYn">
+                            <label>질병책임자 여부</label>
+                            <input style="width: calc(100% - 194px);" type="text" :value="info.diseaseManagerName" readonly>
+                            <a href="javascript:void(0);" class="btn btn-line btn-small ml-10" @click="onclickUploderPop();" >데이터 업로더 설정</a>
+                        </span>
+                        <span class="join-input-group" v-else>
+                            <label>질병책임자 여부</label>
+                            <input type="text" :value="info.diseaseManagerName" readonly>
+                        </span>
+                    </li>
+                    <li v-show="info.parentUserYn">
+                        <span class="join-input-group mr-40">
+                            <label>질병 책임자명</label>
+                            <input type="text" :value="info.dissRspnberUserNm" readonly>
+                            <a href="javascript:void(0);" class="com-btn btn-s btn-w-208" v-show="info.parentYn" @click="onclickChgManage();">질병책임자 변경</a>
+                        </span>
+                    </li>
+                    <li v-if="info.userRoleSecd !=='ADMIN' && info.insttTyCd === '질병주관병원' && this.info.dissRspnberYn === 'Y'">
+                        <span class="join-input-group mr-40">
+                            <label>네이버클라우드 아이디</label>
+                            <input type="text" ref="nCloudId" v-model="info.ncloudId" maxlength="50"/>
+                        </span>
+                        <span class="join-input-group">
+                            <label>오브젝트 스토리지 아이디</label>
+                            <input type="text" ref="nCloudObjStorageId" v-model="info.ncloudObjStrgeId" maxlength="50"/>
+                        </span>
+                    </li>
+                    <li v-if="info.userRoleSecd !=='ADMIN' && info.insttTyCd === '질병주관병원' && this.info.dissRspnberYn === 'Y'">
+                        <span class="join-input-group mr-40">
+                            <label>네이버클라우드 액세스키</label>
+                            <input type="text" ref="nCloudAccessKey" v-model="info.ncloudAccesKey" maxlength="50"/>
+                        </span>
+                        <span class="join-input-group">
+                            <label>네이버클라우드 시크릿키</label>
+                            <input type="text" ref="nCloudSecretKey" v-model="info.ncloudScrtyKey" maxlength="50"/>
+                        </span>
+
+                    </li>
+                </ul>
+
+                <section class="btn-box mt-70 a-c">
+                    <a href="javascript:void(0);" class="btn btn-line-black btn-large" @click="onclickMovePage()">비밀번호 변경</a>
+                    <a href="javascript:void(0);" class="btn btn-basic btn-large ml-20" @click="onclickSave();">수정</a>
+                </section>
+            </section>
+
+        </section>
+        </script>
+
+        <!-- 데이터 업로더 팝업 -->
+        <div id="uploadcontentswrap">
+            <uploadcontents ref="uploadcontents"></uploadcontents>
+        </div>
+
+        <script type="text/x-template" id="upload-template" >
+        <section id="uploaderModal" class="common-popup">
+
+            <section class="common-popup-content data-uploader">
+                <h3>데이터 업로더 설정</h3>
+
+                <section class="search-content">
+                    <ul class="popup-ul">
+                        <li class="clearfix">
+                            <label>기관명</label>
+                            <p v-text="insttNm"></p>
+                        </li>
+                        <li class="title clearfix">
+                            <label>질병명</label>
+                            <p v-text="dissNm"></p>
+                        </li>
+                        <li class="title clearfix">
+                            <label>질병책임자</label>
+                            <p v-text="chargerNm"></p>
+                        </li>
+                    </ul>
+
+                    <ul class="ul-hosp-result">
+                        <li class="title2">
+                            <span>데이터 업로더명</span>
+                            <span class="txt-r">데이터업로더 설정여부</span>
+                        </li>
+                        <li v-if="uploaderList.length == 0">
+                            <span class="txt-cont">데이타가 없습니다.</span>
+                        </li>
+                        <li v-for="(item, idx) in uploaderList">
+                            <span class="txt-cont">{{item.chargerNm}}</span>
+                            <label class="checkbox-container checkbox-container2 large">
+                                <input type="checkbox" v-model="checked" v-bind:value="item.userId">
+                                <span class="checkmark" style="margin: 0">✔</span>
+                            </label>
+                        </li>
+                    </ul>
+                </section>
+
+                <section class="btn-box a-c">
+                    <a href="javascript:;" class="btn btn-line-black modal-btn" onclick="fnClosePopup('uploaderModal')">닫기</a>
+                    <a href="javascript:;" class="btn btn-basic modal-btn" v-on:click="onclickUploaderSave();">수정</a>
+                </section>
+				<button class="modal-close-btn" id="btnClose" @click="fnClosePopup('uploaderModal')"></button>
+            </section>
+        </section>
+        </script>
+    </section>
+</html>

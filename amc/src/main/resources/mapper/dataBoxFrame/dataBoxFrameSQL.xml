@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed May 11 15:49:51 KST 2016-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dataBoxFrameDao">
+
+
+	<select id="inqDataBoxFrameList" resultType="DtbxFrmeCreatInfDto" parameterType="DataBoxFrameSearchDto">
+			SELECT
+				DTBX_FRME_NO,
+				DTBX_FRME_NM,
+				DTBX_FRME_CN,
+				MY_ADM_SVR_CO,
+				CMNUSE_NAS_CO,
+				TKOUT_OBJ_STRGE_ID,
+				TKOUT_OBJ_STRGE_ACCES_KEY,
+				TKOUT_OBJ_STRGE_SCRTY_KEY,
+				DTBX_FRME_STTUS_CD,
+				FN_CODE('DTBX_FRME_STTUS_CD' , DTBX_FRME_STTUS_CD ) DTBX_FRME_STTUS_NM 
+			FROM
+				TB_DTBX_FRME_CREAT_INF
+		   WHERE  DTBX_FRME_NM LIKE CONCAT('%' , #{dtbxFrmeNm} , '%')
+		<if test='dtbxFrmeSttusCd != null and !dtbxFrmeSttusCd.equals("") '>
+			AND DTBX_FRME_STTUS_CD= #{dtbxFrmeSttusCd}
+		</if>
+		
+	    ORDER BY 
+	        DTBX_FRME_NO DESC
+	</select>
+		
+		
+	<insert id="regDtbxFrmeCreatInf" parameterType="DtbxFrmeCreatInfDto" useGeneratedKeys="true" keyProperty="dtbxFrmeNo">
+		INSERT INTO TB_DTBX_FRME_CREAT_INF
+			       (
+					 DTBX_FRME_NM
+					,DTBX_FRME_CN
+					,MY_ADM_SVR_CO
+					,CMNUSE_NAS_CO
+					,TKOUT_OBJ_STRGE_ID
+					,TKOUT_OBJ_STRGE_ACCES_KEY
+					,TKOUT_OBJ_STRGE_SCRTY_KEY
+					,DTBX_FRME_STTUS_CD
+					,CREAT_USER_ID
+					,CREAT_DT
+					,UPDT_USER_ID
+					,UPDT_DT
+				    )
+			VALUES(
+					#{dtbxFrmeNm}          
+					,#{dtbxFrmeCn}          
+					,#{myAdmSvrCo}          
+					,#{cmnuseNasCo}         
+					,#{tkoutObjStrgeId}     
+					,#{tkoutObjStrgeAccesKey}
+					,#{tkoutObjStrgeScrtyKey}
+					,#{dtbxFrmeSttusCd}     
+			        ,#{creatUserId}
+					,DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+					,#{creatUserId}
+					,DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+					)
+	</insert>		
+	
+	<insert id="regDtbxFrmeAdmSvrInf" parameterType="DtbxFrmeCreatInfDto">
+		INSERT INTO TB_DTBX_FRME_ADM_SVR_INF
+			       (
+					 DTBX_FRME_NO
+					,ADM_SVR_TY_CD
+					,ADM_SVR_SPEC_CD
+					,ADM_SVR_QY
+					,CREAT_USER_ID
+					,CREAT_DT
+					,UPDT_USER_ID
+					,UPDT_DT
+				    )
+			VALUES(
+					#{dtbxFrmeNo}          
+					,#{admSvrTyCd}          
+					,#{admSvrSpecCd}          
+					,#{admSvrQy}         
+			        ,#{creatUserId}
+					,DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+					,#{creatUserId}
+					,DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+					)
+	</insert>	
+	
+			
+	
+	<insert id="regDtbxFrmeAdmSvrAcntInf" parameterType="DtbxFrmeCreatInfDto">
+		INSERT INTO TB_DTBX_FRME_ADM_SVR_ACNT_INF
+			       (
+					 DTBX_FRME_NO
+					,DTBX_FRME_ADM_HOST_NM
+					,DTBX_FRME_ADM_IP
+					,DTBX_FRME_ADM_ACNT_ID
+					,DTBX_FRME_ADM_ACNT_PASSWORD
+					,CREAT_USER_ID
+					,CREAT_DT
+					,UPDT_USER_ID
+					,UPDT_DT
+				    )
+			VALUES(
+					#{dtbxFrmeNo}          
+					,#{dtbxFrmeAdmHostNm}          
+					,#{dtbxFrmeAdmIp}          
+					,#{dtbxFrmeAdmAcntId}  
+					,#{dtbxFrmeAdmAcntPassword}         
+			        ,#{creatUserId}
+					,DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+					,#{creatUserId}
+					,DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+					)
+	</insert>
+	
+	
+	<insert id="regDtbxFrmeCmnuseDataInf" parameterType="DtbxFrmeCreatInfDto">
+		INSERT INTO TB_DTBX_FRME_CMNUSE_DATA_INF
+			       (
+					 DTBX_FRME_NO
+					,DTBX_FRME_CMNUSE_DATA_SN
+					,CMNUSE_DATA_CPCTY
+					,CMNUSE_DATA_QY
+					,CREAT_USER_ID
+					,CREAT_DT
+					,UPDT_USER_ID
+					,UPDT_DT
+				    )
+			VALUES(
+					#{dtbxFrmeNo}          
+					,#{dtbxFrmeCmnuseDataSn}          
+					,#{cmnuseDataCpcty}          
+					,#{cmnuseDataQy}  
+			        ,#{creatUserId}
+					,DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+					,#{creatUserId}
+					,DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+					)
+	</insert>	
+	
+	
+	
+	<select id="inqDtbxFrmeCreatInf" resultType="DtbxFrmeCreatInfDto" parameterType="Long">
+			SELECT
+				DTBX_FRME_NO,
+				DTBX_FRME_NM,
+				DTBX_FRME_CN,
+				MY_ADM_SVR_CO,
+				CMNUSE_NAS_CO,
+				TKOUT_OBJ_STRGE_ID,
+				TKOUT_OBJ_STRGE_ACCES_KEY,
+				TKOUT_OBJ_STRGE_SCRTY_KEY,
+				DTBX_FRME_STTUS_CD,
+				FN_CODE('DTBX_FRME_STTUS_CD' , DTBX_FRME_STTUS_CD ) DTBX_FRME_STTUS_NM 
+			FROM
+				TB_DTBX_FRME_CREAT_INF
+		   WHERE  DTBX_FRME_NO = #{dtbxFrmeNo}
+	</select>	
+	
+	
+	<select id="inqDtbxFrmeAdmSvrInf" resultType="DtbxFrmeAdmSvrInfDto" parameterType="Long">
+			SELECT
+				DTBX_FRME_NO
+				,ADM_SVR_SN
+				,ADM_SVR_TY_CD
+				,ADM_SVR_SPEC_CD
+				,ADM_SVR_QY
+				,CREAT_USER_ID
+				,CREAT_DT
+				,UPDT_USER_ID
+				,UPDT_DT
+			FROM
+				TB_DTBX_FRME_ADM_SVR_INF
+		   WHERE  DTBX_FRME_NO = #{dtbxFrmeNo}
+	</select>		
+				
+				
+	<select id="inqDtbxFrmeAdmSvrAcntInf" resultType="DtbxFrmeAdmSvrAcntInfDto" parameterType="Long">
+			SELECT
+				DTBX_FRME_NO
+				,DTBX_FRME_ACNT_NO
+				,DTBX_FRME_ADM_HOST_NM
+				,DTBX_FRME_ADM_IP
+				,DTBX_FRME_ADM_ACNT_ID
+				,DTBX_FRME_ADM_ACNT_PASSWORD
+				,CREAT_USER_ID
+				,CREAT_DT
+				,UPDT_USER_ID
+				,UPDT_DT
+			FROM
+				TB_DTBX_FRME_ADM_SVR_ACNT_INF
+		   WHERE  DTBX_FRME_NO = #{dtbxFrmeNo}
+	</select>		
+	
+	
+	<select id="inqDtbxFrmeCmnuseDataInf" resultType="DtbxFrmeCmnuseDataInfDto" parameterType="Long">
+			SELECT
+				DTBX_FRME_NO
+				,DTBX_FRME_CMNUSE_DATA_SN
+				,CMNUSE_DATA_CPCTY
+				,CMNUSE_DATA_QY
+				,CREAT_USER_ID
+				,CREAT_DT
+				,UPDT_USER_ID
+				,UPDT_DT
+			FROM
+				TB_DTBX_FRME_CMNUSE_DATA_INF
+		   WHERE  DTBX_FRME_NO = #{dtbxFrmeNo}
+	</select>	
+	
+	
+	<delete id="delDtbxFrmeAdmSvrInf" parameterType="Long">
+		DELETE FROM TB_DTBX_FRME_ADM_SVR_INF
+		 WHERE DTBX_FRME_NO = #{dtbxFrmeNo}
+	</delete>
+	
+	<delete id="delDtbxFrmeAdmSvrAcntInf" parameterType="Long">
+		DELETE FROM TB_DTBX_FRME_ADM_SVR_ACNT_INF
+		 WHERE DTBX_FRME_NO = #{dtbxFrmeNo}
+	</delete>	
+	
+	<delete id="delDtbxFrmeCmnuseDataInf" parameterType="Long">
+		DELETE FROM TB_DTBX_FRME_CMNUSE_DATA_INF
+		 WHERE DTBX_FRME_NO = #{dtbxFrmeNo}
+	</delete>			
+	
+	
+	<update id="updtDtbxFrmeCreatInf" parameterType="dtbxFrmeCreatInfDto">
+		UPDATE TB_DTBX_FRME_CREAT_INF
+		SET DTBX_FRME_NM = #{dtbxFrmeNm}
+		    ,DTBX_FRME_CN= #{dtbxFrmeCn} 
+		    ,MY_ADM_SVR_CO= #{myAdmSvrCo}
+		    ,CMNUSE_NAS_CO= #{cmnuseNasCo}
+		    ,UPDT_USER_ID= #{updtUserId}
+		    ,UPDT_DT= DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+		WHERE DTBX_FRME_NO = #{dtbxFrmeNo}
+
+
+
+
+	</update>				
+		
+</mapper>

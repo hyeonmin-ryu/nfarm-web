@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/defaultLayout">
+
+<th:block layout:fragment="css">
+
+</th:block>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/common/common.js}"></script>
+    <script th:src="@{/js/intro/guide.js}"></script>
+
+    <script>
+        const tabs = "[[${param.tab}]]";
+
+    </script>
+</th:block>
+
+<section class="member-container" layout:fragment="contents" >
+	<th:block th:replace="fragments/defaultSubHeader :: subHeaderFragment"></th:block>
+	
+    <div id="maincontentswrap">
+        <maincontents ref="maincontents"></maincontents>
+    </div>
+    
+    <script type="text/x-template" id="main-template" >
+    <section class="content guide-page">
+        <div class="sub-title-box">
+            <h2>사용가이드</h2>
+            <div class="path">
+           		<ul class="clearfix">
+                	<li><a href="/" class="home">홈</a></li>
+                    <li>연구 분석 브리지 소개</li>
+                    <li>사용가이드</li>                
+                </ul>
+            </div>
+        </div>
+
+        <section class="guidelinks-box">
+			<div class="common-inner">
+            	<a :class="['guidelinks' ,{'active' : tab1 === true}]" @click="onclickTab(1)">[질환데이터적재] 프로세스</a>
+            	<a :class="['guidelinks' ,{'active' : tab2 === true}]" @click="onclickTab(2)">[질환데이터제공] 프로세스</a>
+            	<a :class="['guidelinks' ,{'active' : tab3 === true}]" @click="onclickTab(3)">[연구분석데이터활용] 프로세스</a>
+			</div>
+        </section>
+
+        <!-- guide1 -->
+        <section class="contents-width guide-content" v-show="tab1">
+            <h3>[질환데이터적재] 프로세스</h3>
+            <div class="guide-circle-box clearfix">
+                <ul>
+                    <li class="li-4step"><span><img src="/images/guide1_icon1.png" />데이터저장소<br/>신청</span></li>
+                    <li class="li-4step"><span><img src="/images/guide1_icon2.png" />생성 알림<br/>메일 전달</span></li>
+                    <li class="li-4step"><span><img src="/images/guide1_icon3.png" />데이터뱅크에<br/>업로드</span></li>
+                    <li class="li-4step"><span><img src="/images/guide1_icon4.png" />수집 현황<br/>모티터링</span></li>
+                </ul>
+            </div>
+            <ul class="guide-info li4 mt-40 clearfix">
+                <li>
+                    <span>1</span>
+                    <h4>데이터저장소<br/>신청</h4>
+                    <p>데이터뱅크 내 저장하고자 하는 <br  class="pc-only"/> 질병의 데이터저장소 신청</p>
+                    <p class="txt-s">[연구분석 데이터 관리 > <br/>질병 데이터 저장 신청] 메뉴를 통해 신청</p>
+                </li>
+                <li>
+                    <span>2</span>
+                    <h4>생성 알림<br/>메일 전달</h4>
+                    <p>연구분석 포탈 관리자가 저장소신청 정보를 <br  class="pc-only"/>
+                        기반으로 클라우드의 데이터뱅크 내 <br  class="pc-only"/>
+                        데이터저장소 생성한 후 신청 병원에 <br  class="pc-only"/>
+                        알림 메일 전달</p>
+                </li>
+                <li><span>3</span>
+                    <h4>데이터뱅크에<br/>업로드</h4>
+                    <p>공통 플랫폼의 대량데이터업로더를<br  class="pc-only"/>
+                        통한 데이터를 PC > 클라우드 데이터뱅크의<br  class="pc-only"/>
+                        병원 질병의 데이터저장소 업로드</p>
+                </li>
+                <li>
+                    <span>4</span>
+                    <h4>수집 현황<br/>모니터링</h4>
+                    <p>데이터 수집 현황을 통해<br/>
+                        수집된 데이터량 모니터링</p>
+                </li>
+            </ul>
+        </section>
+
+        <!-- guide2 -->
+        <section class="contents-width guide-content" v-show="tab2">
+            <h3>[질환데이터제공] 프로세스</h3>
+            <div class="guide-circle-box clearfix">
+                <ul>
+                    <li class="li-5step"><span><img src="/images/guide2_icon1.png" />데이터<br/>공개 신청</span></li>
+                    <li class="li-5step"><span><img src="/images/guide2_icon2.png" />연구분석데이터<br/>등록</span></li>
+                    <li class="li-5step"><span><img src="/images/guide2_icon3.png" />연구분석데이터<br/>사용 신청</span></li>
+                    <li class="li-5step"><span><img src="/images/guide2_icon4.png" />승인여부<br/>선택</span></li>
+                    <li class="li-5step"><span><img src="/images/guide2_icon5.png" />질환데이터<br/>전달</span></li>
+                </ul>
+            </div>
+            <ul class="guide-info li5 mt-40 clearfix">
+                <li>
+                    <span>1</span>
+                    <h4>데이터<br/>공개 신청</h4>
+                    <p>데이터뱅크 또는 클라우드 내 <br class="pc-only" />
+                        데이터뱅크 외부의 데이터저장소의 <br class="pc-only" />
+                        데이터공개 신청</p>
+                    <p class="txt-s">[연구분석 데이터 관리 > <br/>
+                        질환 데이터 공개 신청] 메뉴를 통해 신청</p>
+                <li>
+                    <span>2</span>
+                    <h4>연구분석데이터<br/>등록</h4>
+                    <p>연구분석 포탈관리자가 연구분석 데이터<br class="pc-only" />
+                        등록 가능여부 체크 후<br class="pc-only" />
+                        연구분석 데이터 등록이 진행되며,<br class="pc-only" />
+                        등록된 화면은 전체 사용자가 <br class="pc-only" />
+                        조회 가능</p>
+                </li>
+                <li><span>3</span>
+                    <h4>연구분석데이터<br/>사용 신청</h4>
+                    <p>질환별 데이터를 조회 후<br class="pc-only" />
+                        연구분석 데이터 사용 신청</p>
+                </li>
+                <li>
+                    <span>4</span>
+                    <h4>승인 여부<br/>선택</h4>
+                    <p>연구분석데이터 사용 신청한 <br/>
+                        기업정보를 확인 한 후 기업의 <br class="pc-only" />
+                        신청에 대해 승인/거절</p>
+                    <p class="txt-s">[연구분석 데이터 관리 > <br/>
+                        연구분석 데이터 사용 승인]  또는<br class="pc-only" />
+                        [마이페이지 > 기업 요청 데이터 보기]<br class="pc-only" />
+                        메뉴를  통해 승인/거절</p>
+                </li>
+                <li>
+                    <span>5</span>
+                    <h4>질환데이터<br/>전달</h4>
+                    <p>승인된 연구분석 데이터 신청 정보를 <br class="pc-only" />
+                        기반으로 기업에게 독립된<br class="pc-only" />
+                        연구분석 데이터 저장소 공간을<br class="pc-only" />
+                        생성하여 질환 데이터를 전달</p>
+
+                </li>
+            </ul>
+        </section>
+
+        <!-- guide3 -->
+        <section class="contents-width guide-content" v-show="tab3">
+            <h3>[연구분석데이터활용] 프로세스</h3>
+            <div class="guide-circle-box clearfix">
+                <ul>
+                    <li class="li-4step"><span><img src="/images/guide3_icon1.png" />연구분석데이터<br/>사용 신청</span></li>
+                    <li class="li-4step"><span><img src="/images/guide3_icon2.png" />승인 여부<br/>확인</span></li>
+                    <li class="li-4step"><span><img src="/images/guide3_icon3.png" />질환데이터<br/>전달</span></li>
+                    <li class="li-4step"><span><img src="/images/guide3_icon4.png" />연구분석공간에서<br/>데이터 활용</span></li>
+                </ul>
+            </div>
+            <ul class="guide-info li4 mt-40 clearfix">
+                <li>
+                    <span>1</span>
+                    <h4>연구분석데이터<br/>사용 신청</h4>
+                    <p>질환별 데이터를 조회 후 <br/> 연구분석 데이터 사용 신청</p>
+
+                </li>
+                <li>
+                    <span>2</span>
+                    <h4>승인 여부<br/>확인</h4>
+                    <p>연구분석 데이터 사용 신청에 대해 데이터 <br class="pc-only" />
+                        제공 관리자의 승인/거절 여부 확인</p>
+                    <p class="txt-s">[연구분석 데이터 관리 > 연구분석 데이터 사용 신청] 또는<br class="pc-only" />
+                        [마이페이지 > 데이터 사용 신청] 메뉴를 통해 <br  class="pc-only"/>
+                        승인/거절 여부 확인</p>
+                </li>
+                <li><span>3</span>
+                    <h4>질환데이터<br/>전달</h4>
+                    <p>승인된 연구분석 데이터 신청 정보를 <br class="pc-only" />
+                        기반으로 기업에게 독립된 <br class="pc-only" />
+                        연구분석 데이터 저장소 공간을<br class="pc-only" />
+                        생성하여 질환 데이터를 전달</p>
+                </li>
+                <li>
+                    <span>4</span>
+                    <h4>연구분석공간에서 <br/>데이터 활용</h4>
+                    <p>연구분석공간 신청 또는 클라우드 내 연구분석서버를 <br class="pc-only" />
+                        구성하여 연구분석데이터저장소 연결하여<br class="pc-only" />
+                        데이터를 활용하여 연구분석함</p>
+                    <p class="txt-s">[연구분석 데이터 관리 > 연구분석 데이터 사용 신청] 또는 <br class="pc-only" />
+                        [마이페이지 > 데이터 사용 신청] 메뉴를<br/>
+                        통해 연결 요청</p>
+                </li>
+            </ul>
+        </section>
+
+        <section class="contents-width guide-down mt-80">
+            <ul class="clearfix">
+                <li>
+                    <h4>대량데이터전송업로더</h4>
+                    <span class="os window">윈도우</span>
+                    <span class="down-img"><img src="/images/guide_img_down.png" /></span>
+                    <a href="/files/dranswer-bulk-uploader-1.0-windows.zip" class="btn-down basic-btn main-color-line mt-60">[ 윈도우용 ] 대량데이터전송업로더 & 설치가이드</a>
+                    <p>버튼을 클릭하시면 첨부파일이 다운로드됩니다.</p>
+                </li>
+                <li>
+                    <h4>대량데이터전송업로더</h4>
+                    <span class="os linux">리눅스</span>
+                    <span class="down-img"><img src="/images/guide_img_down.png" /></span>
+                    <a href="/files/dranswer-bulk-uploader-1.0-linux.tar" class="btn-down basic-btn main-color-line mt-60">[ 리눅스용 ] 대량데이터전송업로더 & 설치가이드</a>
+                    <p>버튼을 클릭하시면 첨부파일이 다운로드됩니다.</p>
+                </li>
+            </ul>
+        </section>
+    </section>
+    </script>
+</section>
+
+
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+
+    <th:block layout:fragment="css"></th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/agency/agencyView.js}"></script>
+        <script>
+        	insttId ="[[${param.insttId}]]";
+        </script>
+    </th:block>
+
+    <section class="mypage-container"  layout:fragment="contents">
+        <div id="maincontentswrap" >
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+        
+        <!-- 데이터 업로더 팝업 -->
+	    <div id="detailcontentswrap">
+	        <detailcontents ref="detailcontents"></detailcontents>
+	    </div>
+
+        <script type="text/x-template" id="main-template" >
+            <section class="content">
+                <section class="mypage-content mt-40 common-inner">
+                    <h3>기관 정보 상세</h3> 
+
+        			<section class="join-cont-box clearfix mt-30">
+            			<ul class="com-ul">
+                			<li class="bdr-b">
+                    			<span class="join-input-group mr-40">
+                        			<label >기관명</label>
+                        			<p class="txt-data"><input type="text" class="w-100 a-l" v-model="agencyInfo.insttNm" ref="insttNm" maxlength="20"></p>
+                    			</span>
+                    			<span class="join-input-group">
+                        			<label >기관사업자번호</label>
+                        			<p class="txt-data"><input type="text" class="w-100 a-l" v-model="agencyInfo.bsnmNo" onKeyup="this.value=this.value.replace(/[^-0-9]/g,'');" ref="bsnmNo" maxlength="10"></p>
+                    			</span>
+                			</li>
+                			<li class="bdr-b">
+                    			<span class="join-input-group mr-40">
+                        			<label>기관타입</label>
+                        			<div class="custom-select" id="agencyTypeListDiv" name="agencyTypeListDiv" style="margin-top:16px;width:100%;">
+		                            	<select id="agencyType" ref="agencyType" v-model="agencyInfo.insttTyCd" onchange="selectChange()">
+        		                        	<option value="">기관 타입을 선택하세요.</option>
+                		                	<option v-for="(item, idx) in agencyTypeList"  v-bind:value="item.nm">{{item.dc}}</option>
+                        		    	</select>
+                        			</div>
+                    			</span>
+                    			<span class="join-input-group">
+                        			<label >기관대표자</label>
+                        			<p class="txt-data"><input type="text" class="w-100 a-l" v-model="agencyInfo.rprsntvNm" ref="ceoName" maxlength="10"></p>
+                    			</span>
+                			</li>
+            			</ul>
+        			</section>
+        	
+		        	<section class="btn-box a-c mt-60">
+        		    	<a href="#" class="btn btn-line-black btn-large" v-on:click="onclickCancel">목록</a>
+            			<a href="#" class="btn btn-basic btn-large ml-20" v-on:click="onclickAgencySave" v-if="MY_ROLE==='ROLE_ADMIN'">저장</a>
+            			<a href="#" class="btn btn-line-error btn-large ml-20" v-on:click="onclickAgencyDelete" v-if="agencySeq !== '' && MY_ROLE==='ROLE_ADMIN'">삭제</a>
+        			</section>
+				</section>
+			</section>
+        </script>
+    </div>
+</html>

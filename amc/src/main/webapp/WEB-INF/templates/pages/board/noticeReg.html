@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/defaultLayout">
+
+    <th:block layout:fragment="css">
+
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/board/noticeReg.js}"></script>
+        <script>
+            const noticeNo = "[[${param.noticeNo}]]";
+        </script>
+    </th:block>
+
+    <section class="member-container" layout:fragment="contents">
+    	
+    	<th:block th:replace="fragments/defaultSubHeader :: subHeaderFragment"></th:block>
+    	
+        <div id="maincontentswrap" >
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+        <section class="content" >
+            <div class="sub-title-box">
+                <h2>공지사항</h2>
+                <p class="eng">Notice</p>
+            </div>
+
+            <section class="contents-width join-cont-box mt-50">
+                <ul class="com-ul">
+                    <li>
+                        <span class="join-input-group w-100">
+                            <label>제목<span>*</span></label>
+                            <input v-if="noticeReg"type="text" ref="title" v-model="saveInfo.noticeSj" placeholder="제목을 입력해주세요" style="width: 100%;" />
+                            <input v-else type="text" ref="title" v-model="saveInfo.noticeSj" style="width: 100%;" />
+                        </span>
+                    </li>
+                    <li>
+                        <span class="join-input-group w-100">
+                            <label>중요여부<span>*</span></label>
+                            <span class="radio-wrap join-radio bdr-b">
+                                    <input type="radio" ref="importantY" id="imprtncY" v-model="saveInfo.imprtncYn" value="Y"/>
+                                    <label for="imprtncY"><span></span>예</label>
+                                    <input type="radio" ref="importantN" id="imprtncN" v-model="saveInfo.imprtncYn" value="N"/>
+                                    <label for="imprtncN"><span></span>아니오</label>
+                                </span>
+                        </span>
+                    </li>
+                    <li>
+                        <span class="join-input-group w-100">
+                            <label>내용<span>*</span></label>
+                            <textarea v-if="noticeReg" class="write-textarea" ref="contents" v-model="saveInfo.noticeCn" placeholder="내용을 입력해주세요"></textarea>
+                            <textarea v-else class="write-textarea" ref="contents" v-model="saveInfo.noticeCn"></textarea>
+                        </span>
+                    </li>
+                </ul>
+                <ul class="dpi">
+                    <li>
+                        <span class="join-input-group w-100">
+                            <label>첨부파일</label>
+                            <p v-for="(item, idx) in notice.noticeFiles" style="display: flex; margin-top: 10px;">
+                                <a href="#" class="btn btn-line-error" v-on:click="onClickOrgFileDelete(item.fileSn)">삭제</a>
+                                <input type="text" v-bind:value="item.fileNm" class="file-upload mr-30 ml-30" readonly />
+                            </p>
+                            <p v-for="idx in (maxFileCnt - noticeFiles.length)" style="display:flex; margin-top: 10px;">
+                                <a href="#" class="btn btn-line-error" v-on:click="onClickFileDelete(idx)">삭제</a>
+                                <input type="file" v-bind:id="['uploadFile' + idx]" ref="['uploadFile' + idx]" name="uploadFile" style="display: none;" @change="onChange($event, idx)">
+                                <input type="text" v-bind:id="['uploadText' + idx]" class="file-upload mr-30 ml-30" readonly />
+                                <a href="#" class="btn btn-line-black" v-on:click="document.getElementById('uploadFile' + idx).click();">파일찾기</a>
+                            </p>
+                        </span>
+                    </li>
+                </ul>
+
+            </section>
+
+			<div class="clear"></div>
+
+            <section class="contents-width a-c mt-60">
+                <a href="#" class="btn btn-line-black btn-large" v-on:click="onclickCancel">취소</a>
+				<a v-if="noticeReg" href="#" class="btn btn-basic btn-large ml-20" v-on:click="onclickSave">등록</a>
+                <a v-else href="#" class="btn btn-basic btn-large ml-20" v-on:click="onclickSave">수정</a>
+            </section>
+        </section>
+
+        </script>
+    </section>
+</html>

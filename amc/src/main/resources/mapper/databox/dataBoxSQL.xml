@@ -1,0 +1,558 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed May 11 15:49:51 KST 2016-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dataBoxDao">
+
+
+	<select id="inqReqStorageList" resultType="DtbxReqMstDto" parameterType="DataBoxSearchDto">
+	    select
+			 D.DTBX_REQ_NO
+			,D.DTBX_REQ_TY_CD
+			,FN_CODE('DTBX_REQ_TY_CD' , D.DTBX_REQ_TY_CD ) dtbxReqTyNm 
+			,D.DTBX_NM
+			,D.DTBX_MEMO
+			,D.REQ_USER_ID
+			,D.REQ_DT
+			,D.CANCL_DT
+			,D.RCEPT_DT
+			,D.PROCESS_DT
+			,D.REJECT_RESN
+			,D.DELETE_REQST_DT
+			,D.DELETE_CANCL_DT
+			,D.DELETE_RCEPT_DT
+			,D.DELETE_PROCESS_DT
+			,D.DELETE_REJECT_RESN
+			,D.DTBX_REQST_STTUS_CD
+			,FN_CODE('DTBX_REQST_STTUS_CD' , D.DTBX_REQST_STTUS_CD ) dtbxReqstSttusNm 
+			,D.DTBX_SN
+			,D.TRANSR_DTBX_REQST_STTUS_CD
+			,FN_CODE('DTBX_REQST_STTUS_CD' , D.TRANSR_DTBX_REQST_STTUS_CD ) transrDtbxReqstSttusNm 
+			,D.DTBX_FRME_NO
+			,D.CREAT_USER_ID
+			,D.CREAT_DT
+			,D.CREAT_APP_ID
+			,D.UPDT_USER_ID
+			,D.UPDT_DT
+			,D.UPDT_APP_ID
+	        ,U.CHARGER_NM
+	        ,A.INSTT_NM
+	        ,D.NASW_SIZE
+	    FROM
+	        TB_DTBX_REQ_MST D 
+	    INNER JOIN
+	        TB_USER_MST U 
+	            ON D.REQ_USER_ID = U.USER_ID  
+	    INNER JOIN
+	        TB_INSTT_MST A 
+	            ON U.INSTT_ID =A.INSTT_ID        
+	    WHERE
+	        (D.DTBX_NM LIKE CONCAT('%' , #{dtbxNm} , '%')
+	        OR A.INSTT_NM LIKE CONCAT('%' , #{dtbxNm} , '%')
+	        OR U.CHARGER_NM LIKE CONCAT('%' , #{dtbxNm} , '%'))
+		<if test='dtbxReqstSttusCd != null and !dtbxReqstSttusCd.equals("") '>
+			AND D.DTBX_REQST_STTUS_CD= #{dtbxReqstSttusCd}
+		</if>
+		
+	    <if test='userId != null and pageGubun.equals("mypage") '>
+			AND D.REQ_USER_ID= #{userId}
+		</if>
+	    ORDER BY 
+	        D.DTBX_REQ_NO DESC
+	</select>
+	
+	<select id="inqDataBox" resultType="DtbxReqMstDto" parameterType="Long">
+		SELECT 
+			   DTBX_REQ_NO
+			  ,FN_CODE('DTBX_REQ_TY_CD', DTBX_REQ_TY_CD) as dtbxReqTyCd
+			  ,DTBX_NM
+			  ,DTBX_MEMO
+			  ,REQ_USER_ID
+			  ,DTBX_SN
+		  FROM TB_DTBX_REQ_MST
+		 WHERE DTBX_SN = #{dtbxSn}
+	</select>
+	
+	
+	<select id="getUseStorageList" resultType="StrgeUseInfDto" parameterType="DataBoxSearchDto">
+		    SELECT
+		       O.OTHBC_DATA_NM
+		      ,R.BUCKET_ID 
+		      ,U.USE_STRGE_ID 
+		      ,B.BUCKET_SIZE 
+		    FROM
+		        TB_STRGE_USE_INF U 
+		    INNER JOIN
+		        TB_STRGE_OTHBC_REQST_INF O 
+		            ON U.OTHBC_REQST_ID=O.OTHBC_REQST_ID 
+		    INNER JOIN
+		        TB_STRGE_REQ_INF R 
+		            ON O.STORGE_REQST_ID=R.STORGE_REQST_ID 
+		    INNER JOIN
+		        TB_DTBX_BUCKET_MST B 
+		            ON R.BUCKET_ID=B.BUCKET_ID 
+		    WHERE
+		     1=1
+		        AND U.USE_REQST_STTUS_SECD='U_ACC'
+		        AND  O.OTHBC_DATA_NM LIKE CONCAT('%' , #{othbcDataNm} , '%')
+		    ORDER BY
+		        O.CREAT_DT DESC
+	</select>	
+	
+	
+	
+	<insert id="regDtbxMst" parameterType="DtbxReqMstDto" useGeneratedKeys="true" keyProperty="dtbxSn">
+		INSERT INTO TB_DTBX_MST
+			       (
+				     CREAT_USER_ID
+					,CREAT_DT
+				    ,UPDT_USER_ID
+					,UPDT_DT
+				    )
+			VALUES(
+			        #{creatUserId}
+					,DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+					,#{creatUserId}
+					,DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+					)
+	</insert>		
+	
+	<insert id="regDtbxReqMst" parameterType="DtbxReqMstDto" useGeneratedKeys="true" keyProperty="dtbxReqNo">
+		INSERT INTO TB_DTBX_REQ_MST
+			       (
+				    DTBX_NM,
+				    DTBX_MEMO,
+				    REQ_USER_ID,
+				    DTBX_REQST_STTUS_CD,
+					DTBX_REQ_TY_CD,
+					NASW_SIZE,
+				    REQ_DT,
+				    DTBX_SN,
+				    CREAT_USER_ID,
+					CREAT_DT,
+					UPDT_USER_ID,
+					UPDT_DT			    
+				    )
+			VALUES(
+					#{dtbxNm},
+					#{dtbxMemo},
+					#{reqUserId},
+					'REQUEST',
+					'USE',
+					#{naswSize},
+					DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s'),
+					#{dtbxSn},
+					#{creatUserId},
+					DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s'),
+					#{creatUserId},
+					DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+					)
+	</insert>		
+	
+	
+	
+	<insert id="regDtbxUserReqMst" parameterType="DtbxUserReqMstDto" useGeneratedKeys="true" keyProperty="userSn">
+		INSERT INTO TB_DTBX_USER_REQ_MST
+			       (
+				    DTBX_REQ_NO,
+				    DTBX_USER_NAME,
+				    DTBX_USER_MOBLPHON_NO,
+				    CREAT_USER_ID,
+					CREAT_DT,
+					UPDT_USER_ID,
+					UPDT_DT			    
+				    )
+			VALUES(
+					#{dtbxReqNo},
+					#{dtbxUserName},
+					#{dtbxUserMoblphonNo},
+					#{creatUserId},
+					DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s'),
+					#{creatUserId},
+					DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+					)
+	</insert>		
+	
+	
+	<insert id="regDtbxUserDtl" parameterType="DtbxUserReqMstDto">
+		INSERT INTO TB_DTBX_USER_DTL
+			       (
+					DTBX_SN,
+					USER_SN,
+				    CREAT_USER_ID,
+					CREAT_DT,
+					UPDT_USER_ID,
+					UPDT_DT			    
+				    )
+			VALUES(
+					#{dtbxSn},
+					#{userSn},
+					#{creatUserId},
+					DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s'),
+					#{creatUserId},
+					DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+					)
+	</insert>		
+	
+	
+	<insert id="regDtbxSvrReqMst" parameterType="DtbxSvrReqMstDto" useGeneratedKeys="true" keyProperty="svrSn">
+		INSERT INTO TB_DTBX_SVR_REQ_MST
+			       (
+					DTBX_REQ_NO
+					,IMAGE_GOODS_CD
+					,IMAGE_GOODS_NM
+					,SVR_GOODS_CD
+					,SVR_GOODS_NM
+					,CREAT_USER_ID
+					,CREAT_DT
+					,UPDT_USER_ID
+					,UPDT_DT		    
+				    )
+			VALUES(
+					#{dtbxReqNo},
+					#{imageGoodsCd},
+					#{imageGoodsNm},
+					#{svrGoodsCd},
+					#{svrGoodsNm},
+					#{creatUserId},
+					DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s'),
+					#{creatUserId},
+					DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+					)
+	</insert>		
+
+
+	<insert id="regDtbxSvrDtl" parameterType="DtbxSvrReqMstDto">
+		INSERT INTO TB_DTBX_SVR_DTL
+			       (
+					DTBX_SN,
+					SVR_SN,
+				    CREAT_USER_ID,
+					CREAT_DT,
+					UPDT_USER_ID,
+					UPDT_DT			    
+				    )
+			VALUES(
+					#{dtbxSn},
+					#{svrSn},
+					#{creatUserId},
+					DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s'),
+					#{creatUserId},
+					DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+					)
+	</insert>	
+	
+	
+	<insert id="regDtbxBlckStrgeReqMst" parameterType="DtbxBlckStrgeReqMstDto">
+		INSERT INTO TB_DTBX_BLCK_STRGE_REQ_MST
+			       (
+					DTBX_REQ_NO,
+					SVR_SN,
+					STRGE_TY_CD,
+					STRGE_SIZE,
+				    CREAT_USER_ID,
+					CREAT_DT,
+					UPDT_USER_ID,
+					UPDT_DT			    
+				    )
+			VALUES(
+					#{dtbxReqNo},
+					#{svrSn},
+					#{strgeTyCd},
+					#{strgeSize},
+					#{creatUserId},
+					DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s'),
+					#{creatUserId},
+					DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+					)
+	</insert>	
+	
+	<insert id="regDtbxDataReqMst" parameterType="dtbxDataReqMstDto">
+		INSERT INTO TB_DTBX_DATA_REQ_MST
+			       (
+					DTBX_REQ_NO,
+					USE_STRGE_ID,
+					BUCKET_ID,
+				    CREAT_USER_ID,
+					CREAT_DT,
+					UPDT_USER_ID,
+					UPDT_DT			    
+				    )
+			VALUES(
+					#{dtbxReqNo},
+					#{useStrgeId},
+					#{bucketId},
+					#{creatUserId},
+					DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s'),
+					#{creatUserId},
+					DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+					)
+	</insert>		
+	
+	
+	
+	<select id="inqDtbxReqMst" resultType="DtbxReqMstDto" parameterType="Long">
+			SELECT D.DTBX_REQ_NO 
+				  ,U.CHARGER_NM
+			      ,I.INSTT_NM 
+			      ,U.CHARGER_MOBLPHON_NO
+			      ,U.EMAIL 
+			      ,D.DTBX_REQ_TY_CD
+			      ,FN_CODE('DTBX_REQ_TY_CD' , D.DTBX_REQ_TY_CD ) DTBX_REQ_TY_NM 
+			      ,D.DTBX_REQST_STTUS_CD 
+			      ,FN_CODE('DTBX_REQST_STTUS_CD' , D.DTBX_REQST_STTUS_CD ) DTBX_REQST_STTUS_NM
+			      ,D.REQ_DT 
+			      ,D.DELETE_REQST_DT 
+			      ,D.RCEPT_DT 
+			      ,D.DELETE_RCEPT_DT 
+			      ,D.PROCESS_DT 
+			      ,D.DELETE_PROCESS_DT 
+			      ,D.CANCL_DT 
+			      ,D.DELETE_CANCL_DT 
+			      ,D.DTBX_SN
+			      ,D.DTBX_NM 
+			      ,D.NASW_SIZE
+			      ,D.TRANSR_DTBX_REQST_STTUS_CD
+			FROM TB_DTBX_REQ_MST D
+			INNER JOIN TB_USER_MST U 
+			   ON D.REQ_USER_ID = U.USER_ID  
+			INNER JOIN TB_INSTT_MST I 
+			   ON I.INSTT_ID  = U.INSTT_ID 
+		    WHERE DTBX_REQ_NO = #{dtbxReqNo} 
+	</select>		
+	
+	
+	<select id="inqDtbxReqMstAdm" resultType="DtbxReqMstDto" parameterType="Long">
+			SELECT D.DTBX_REQ_NO
+				  ,U.CHARGER_NM
+			      ,I.INSTT_NM 
+			      ,U.CHARGER_MOBLPHON_NO
+			      ,U.EMAIL 
+			      ,D.DTBX_REQ_TY_CD
+			      ,FN_CODE('DTBX_REQ_TY_CD' , D.DTBX_REQ_TY_CD ) DTBX_REQ_TY_NM 
+			      ,D.DTBX_REQST_STTUS_CD 
+			      ,FN_CODE('DTBX_REQST_STTUS_CD' , D.DTBX_REQST_STTUS_CD ) DTBX_REQST_STTUS_NM
+			      ,D.REQ_DT 
+			      ,D.DELETE_REQST_DT 
+			      ,D.RCEPT_DT 
+			      ,D.DELETE_RCEPT_DT 
+			      ,D.PROCESS_DT 
+			      ,D.DELETE_PROCESS_DT 
+			      ,D.CANCL_DT 
+			      ,D.DELETE_CANCL_DT 
+			      ,D.DTBX_SN
+			      ,D.DTBX_NM 
+			      ,D.NASW_SIZE
+				  ,DTBX_OPER_ACNT_ID
+				  ,MANAGE_SVR_IP_ADRES
+				  ,MANAGE_SVR_USER_ID
+				  ,MANAGE_SVR_USER_PASSWORD
+				  ,TRANSR_DTBX_REQST_STTUS_CD
+			FROM TB_DTBX_REQ_MST D
+			INNER JOIN TB_DTBX_MST M 
+			   ON D.DTBX_SN = M.DTBX_SN  			
+			INNER JOIN TB_USER_MST U 
+			   ON D.REQ_USER_ID = U.USER_ID  
+			INNER JOIN TB_INSTT_MST I 
+			   ON I.INSTT_ID  = U.INSTT_ID 
+		    WHERE DTBX_REQ_NO = #{dtbxReqNo} 
+	</select>		
+	
+	
+	<select id="inqDtbxUserReqMst" resultType="DtbxUserReqMstDto" parameterType="Long">
+			SELECT U.USER_SN
+			      ,U.DTBX_USER_NAME 
+			      ,U.DTBX_USER_MOBLPHON_NO 
+			      ,D.SSL_VPN_USER_ID 
+			      ,D.SSL_VPN_USER_PASSWORD 
+			      ,D.CNNC_SVR_IP_ADRES 
+			      ,D.CNNC_SVR_USER_ID 
+			      ,D.CNNC_SVR_USER_PASSWORD 
+			      ,DTBX_REQ_NO 
+			FROM TB_DTBX_USER_REQ_MST U
+			INNER JOIN TB_DTBX_USER_DTL D
+		       ON U.USER_SN  = D.USER_SN 
+		    WHERE DTBX_REQ_NO = #{dtbxReqNo} 
+	</select>		
+	
+	
+	<select id="inqDtbxSvrReqMst" resultType="DtbxSvrReqMstDto" parameterType="Long">
+			SELECT S.DTBX_REQ_NO 
+			      ,S.SVR_SN
+			      ,S.IMAGE_GOODS_CD 
+			      ,S.IMAGE_GOODS_NM 
+			      ,S.SVR_GOODS_CD 
+			      ,S.SVR_GOODS_NM 
+			      ,D.SVR_IP_ADRES 
+			      ,D.SVR_USER_ID 
+			      ,D.SVR_USER_PASSWORD 
+			FROM TB_DTBX_SVR_REQ_MST S
+			INNER JOIN TB_DTBX_SVR_DTL D
+		       ON S.SVR_SN  = D.SVR_SN 
+		    WHERE DTBX_REQ_NO = #{dtbxReqNo}
+	</select>
+	
+	
+	<select id="inqDtbxBlckStrgeReqMst" resultType="DtbxBlckStrgeReqMstDto" parameterType="dtbxSvrReqMstDto">
+		   SELECT A.BLCK_STRGE_REQ_SN 
+		         ,A.SVR_SN 
+		         ,A.STRGE_TY_CD 
+		         ,A.STRGE_SIZE 
+		   FROM TB_DTBX_BLCK_STRGE_REQ_MST A
+		   WHERE DTBX_REQ_NO =  #{dtbxReqNo}
+		     AND SVR_SN =  #{svrSn}
+	</select>	
+	
+	<select id="inqDtbxDataReqMst" resultType="DtbxDataReqMstDto" parameterType="Long">
+		  SELECT A.USE_STRGE_NO 
+		        ,A.USE_STRGE_ID 
+		        ,A.BUCKET_ID 
+		        ,B.BUCKET_DC 
+		        ,B.BUCKET_SIZE 
+		        ,B.OTHBC_USER_ID 
+		  FROM TB_DTBX_DATA_REQ_MST A
+		 	INNER JOIN TB_DTBX_BUCKET_MST B
+		       ON A.BUCKET_ID  = B.BUCKET_ID 
+		   	INNER JOIN TB_USER_MST  U
+		       ON B.OTHBC_USER_ID  = U.USER_ID        
+		  WHERE DTBX_REQ_NO = #{dtbxReqNo} 
+	</select>
+	
+	<select id="inqDtbxDataReqMstAdm" resultType="DtbxDataReqMstDto" parameterType="Long">
+		  SELECT A.USE_STRGE_NO 
+		        ,A.USE_STRGE_ID 
+		        ,A.BUCKET_ID 
+		        ,B.BUCKET_DC 
+		        ,B.BUCKET_SIZE 
+		        ,B.OTHBC_USER_ID 
+		        ,U.NCLOUD_ACCES_KEY 
+		        ,U.NCLOUD_SCRTY_KEY 
+		  FROM TB_DTBX_DATA_REQ_MST A
+		 	INNER JOIN TB_DTBX_BUCKET_MST B
+		       ON A.BUCKET_ID  = B.BUCKET_ID 
+		   	INNER JOIN TB_USER_MST  U
+		       ON B.OTHBC_USER_ID  = U.USER_ID        
+		  WHERE DTBX_REQ_NO = #{dtbxReqNo} 
+	</select>			
+	
+	
+	
+	<update id="updtDtbxReqMst" parameterType="DtbxReqMstDto">
+		UPDATE TB_DTBX_REQ_MST
+		SET UPDT_USER_ID= #{updtUserId}
+		  , UPDT_DT = DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+		  
+   		<if test='rceptDt != null and !rceptDt.equals("") '>
+			, RCEPT_DT = #{rceptDt}
+		</if>		
+		
+   		<if test='deleteRceptDt != null and !deleteRceptDt.equals("") '>
+			, DELETE_RCEPT_DT = #{deleteRceptDt}
+		</if>	
+		
+		
+   		<if test='processDt != null and !processDt.equals("") '>
+			, PROCESS_DT = #{processDt}
+		</if>		
+		
+   		<if test='deleteProcessDt != null and !deleteProcessDt.equals("") '>
+			, DELETE_PROCESS_DT = #{deleteProcessDt}
+		</if>			
+		
+
+		
+   		<if test='canclDt != null and !canclDt.equals("") '>
+			, CANCL_DT = #{canclDt}
+		</if>			
+		
+		<if test='deleteCanclDt != null and !deleteCanclDt.equals("") '>
+			, DELETE_CANCL_DT = #{deleteCanclDt}
+		</if>		
+			  
+		<if test='dtbxReqTyCd != null and !dtbxReqTyCd.equals("") '>
+			, DTBX_REQ_TY_CD = #{dtbxReqTyCd}
+		</if>	  
+			  
+
+		<if test='rejectResn != null and !rejectResn.equals("") '>
+			, REJECT_RESN = #{rejectResn}
+		</if>				  
+			  
+			  
+		<if test='dtbxReqstSttusCd != null and !dtbxReqstSttusCd.equals("") '>
+			, DTBX_REQST_STTUS_CD = #{dtbxReqstSttusCd}
+		</if>
+		  
+		WHERE DTBX_REQ_NO = #{dtbxReqNo}
+	</update>	
+	
+	
+	
+	<update id="updtDtbxReqMstDel" parameterType="DtbxReqMstDto">
+		UPDATE TB_DTBX_REQ_MST
+		SET UPDT_USER_ID= #{updtUserId}
+		  , UPDT_DT = DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+		  , DTBX_REQ_TY_CD = #{dtbxReqTyCd} 
+		  , DTBX_REQST_STTUS_CD = #{dtbxReqstSttusCd}
+		  , TRANSR_DTBX_REQST_STTUS_CD = #{transrDtbxReqstSttusCd}
+		  , DELETE_REQST_DT = #{deleteReqstDt}
+		  , DELETE_CANCL_DT = null
+		  , DELETE_RCEPT_DT = null
+		  , DELETE_PROCESS_DT = null
+		  , REJECT_RESN = null
+		WHERE DTBX_REQ_NO = #{dtbxReqNo}
+	</update>		
+	
+	
+	
+	<update id="updtDtbxMst" parameterType="DtbxReqMstDto">
+		UPDATE TB_DTBX_MST
+		SET DTBX_OPER_ACNT_ID = #{dtbxOperAcntId}
+			, DTBX_STTUS_CD = #{dtbxSttusCd}
+			, USE_BEGIN_DT = #{useBeginDt}
+			, USE_END_DT = #{useEndDt}
+			, MANAGE_SVR_IP_ADRES = #{manageSvrIpAdres}
+			, MANAGE_SVR_USER_ID = #{manageSvrUserId}
+			, MANAGE_SVR_USER_PASSWORD = #{manageSvrUserPassword}
+			, UPDT_USER_ID= #{updtUserId}
+		    , UPDT_DT = DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+		WHERE DTBX_SN = #{dtbxSn}
+	</update>		
+	
+	
+	<update id="updtDtbxUserDtl" parameterType="DtbxUserReqMstDto">
+		UPDATE TB_DTBX_USER_DTL
+		SET  SSL_VPN_USER_ID = #{sslVpnUserId}
+			, SSL_VPN_USER_PASSWORD = #{sslVpnUserPassword}
+			, CNNC_SVR_IP_ADRES = #{cnncSvrIpAdres}
+			, CNNC_SVR_USER_ID = #{cnncSvrUserId}
+		    , CNNC_SVR_USER_PASSWORD = #{cnncSvrUserPassword}
+			, UPDT_USER_ID= #{updtUserId}
+		    , UPDT_DT = DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+		WHERE USER_SN = #{userSn}
+	</update>			
+	
+
+	<update id="updtDtbxSvrDtl" parameterType="DtbxSvrReqMstDto">
+		UPDATE TB_DTBX_SVR_DTL
+		SET  SVR_IP_ADRES = #{svrIpAdres}
+			, SVR_USER_ID = #{svrUserId}
+			, SVR_USER_PASSWORD = #{svrUserPassword}
+			, UPDT_USER_ID= #{updtUserId}
+		    , UPDT_DT = DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+		WHERE SVR_SN = #{svrSn}
+	</update>		
+	
+	
+	<update id="regDtbxHst" parameterType="Long">
+			INSERT INTO TB_DTBX_REQ_HST
+			(DTBX_REQ_NO, DTBX_REQ_TY_CD, DTBX_NM, DTBX_MEMO, REQ_USER_ID, REQ_DT, CANCL_DT, RCEPT_DT, PROCESS_DT, REJECT_RESN, DELETE_REQST_DT, DELETE_CANCL_DT, DELETE_RCEPT_DT, DELETE_PROCESS_DT, DELETE_REJECT_RESN, DTBX_REQST_STTUS_CD, DTBX_SN, TRANSR_DTBX_REQST_STTUS_CD, DTBX_FRME_NO, CREAT_USER_ID, CREAT_DT, CREAT_APP_ID, UPDT_USER_ID, UPDT_DT, UPDT_APP_ID, NASW_SIZE)
+			SELECT * FROM TB_DTBX_REQ_MST WHERE DTBX_REQ_NO = #{dtbxReqNo} 
+
+	</update>	
+	
+	
+	
+	
+	
+		
+</mapper>

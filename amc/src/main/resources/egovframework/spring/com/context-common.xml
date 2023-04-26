@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+		 http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd">
+	
+	<bean id="ModelMapper" class="org.modelmapper.ModelMapper"/>
+	
+	<context:component-scan base-package="kr.re.amc">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+	
+	<context:annotation-config/>
+ 
+     <mvc:cors>
+   	   <mvc:mapping path="/**" />
+	</mvc:cors>
+		<!-- resouces 매핑-->
+	<mvc:resources mapping="/static/**" location="/static/" />
+	<mvc:resources mapping="/css/**" location="/static/css/" />
+	<mvc:resources mapping="/js/**" location="/static/js/" />
+	<mvc:resources mapping="/fonts/**" location="/static/fonts" />
+	<mvc:resources mapping="/external/**" location="/static/external/" />
+	<mvc:resources mapping="/images/**" location="/static/images/" />
+	<mvc:resources mapping="/element-ui/**" location="/static/element-ui" />
+	
+	<!-- 국제화 Message 설정 -->
+	<bean id="messageSource" class="kr.re.amc.util.EgovWildcardReloadableResourceBundleMessageSource">
+		<property name="egovBasenames">
+			<list>
+                <value>classpath:/egovframework/message/com/message-common</value>
+                <value>classpath:/org/egovframe/rte/fdl/idgnr/messages/idgnr</value>
+                <value>classpath:/org/egovframe/rte/fdl/property/messages/properties</value>
+			</list>
+		</property>
+		
+<!-- 		<property name="cacheSeconds"> -->
+<!-- 			<value>60</value> -->
+<!-- 		</property> -->
+	</bean>
+
+    <bean id="egovMessageSource" class="kr.re.amc.util.EgovMessageSource">
+        <property name="reloadableResourceBundleMessageSource">
+            <ref bean="messageSource" />
+        </property>
+    </bean>
+    
+	<!-- 실행환경에서 빈 이름 참조(AbstractServiceImpl) -->
+	<bean id="leaveaTrace" class="org.egovframe.rte.fdl.cmmn.trace.LeaveaTrace">
+		<property name="traceHandlerServices">
+			<list>
+				<ref bean="egov.traceHandlerService" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="egov.traceHandlerService" class="org.egovframe.rte.fdl.cmmn.trace.manager.DefaultTraceHandleManager">
+		<property name="reqExpMatcher">
+			<ref bean="egov.antPathMater" />
+		</property>
+		<property name="patterns">
+			<list>
+				<value>*</value>
+			</list>
+		</property>
+		<property name="handlers">
+			<list>
+				<ref bean="egov.defaultTraceHandler" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="egov.antPathMater" class="org.springframework.util.AntPathMatcher" />
+
+	<bean id="egov.defaultTraceHandler" class="org.egovframe.rte.fdl.cmmn.trace.handler.DefaultTraceHandler" />
+
+
+    <!-- MULTIPART RESOLVERS -->
+    <!-- regular spring resolver -->
+    <bean id="spring.RegularCommonsMultipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="50000000" />
+        <property name="maxInMemorySize" value="100000000" />
+    </bean>
+
+
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="UTF-8" /> <!-- 인코딩 -->
+		<property name="maxUploadSize" value="10000000" /> <!-- 최대 사이즈 -->
+	</bean>
+
+	<!-- 타임리프 Bean -->
+	<bean id="templateResolver" class="org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver">
+		<property name="prefix" value="/WEB-INF/templates/" />
+		<property name="suffix" value=".html" />
+		<property name="templateMode" value="HTML" />
+		<property name="cacheable" value="true" />
+	</bean>
+	
+	<bean id="emailTemplateResolver" class="org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver">
+	  <property name="prefix" value="/WEB-INF/templates/" />
+	  <property name="suffix" value=".html" />
+	  <property name="templateMode" value="HTML" />
+	  <property name="characterEncoding" value="UTF-8" />
+	  <property name="cacheable" value="false" />
+	</bean>
+	
+	
+
+	<bean id="templateEngine" class="org.thymeleaf.spring4.SpringTemplateEngine">
+	    <property name="templateResolvers">
+            <set>
+                <ref bean="templateResolver"/>
+                <ref bean="emailTemplateResolver"/>
+            </set>
+        </property>
+	  <property name="additionalDialects">
+	    <set>
+	      <bean class="nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect"/>
+	      <bean class="org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect" />
+	      
+	    </set>
+	  </property>
+	</bean>
+
+	<bean id="viewResolver"
+		class="org.thymeleaf.spring4.view.ThymeleafViewResolver">
+		<property name="templateEngine" ref="templateEngine" />
+		<property name="characterEncoding" value="UTF-8" />
+	</bean>
+	
+	<bean id="emailTemplateEngine"
+		class="org.thymeleaf.spring4.SpringTemplateEngine">
+		<property name="templateResolver" ref="emailTemplateResolver" />
+	</bean>
+	
+	<!-- 메일발송 Bean -->
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+	     <property name="host" value="${spring.mail.host}" />
+	     <property name="port" value="${spring.mail.port}" />
+	     <property name="username" value="${spring.mail.username}" />
+	     <property name="password" value="${spring.mail.password}" />
+	     <property name="defaultEncoding" value="UTF-8" />
+	
+	     <property name="javaMailProperties">
+	        <props>
+	            <prop key="mail.transport.protocol">${spring.mail.transport.protocol}</prop>
+	            <prop key="mail.smtp.auth">true</prop>
+	            <prop key="mail.smtp.starttls.enable">true</prop>
+	            <prop key="mail.smtps.ssl.checkserveridentity">true</prop>
+	            <prop key="mail.smtps.ssl.trust">*</prop>
+	             <prop key="mail.debug">true</prop>
+	            <prop key="mail.smtp.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>
+	        </props>
+	     </property>
+	</bean>
+
+</beans>

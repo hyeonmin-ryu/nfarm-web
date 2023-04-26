@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/defaultLayout">
+
+<th:block layout:fragment="css">
+</th:block>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/common/common.js}"></script>
+    <script th:src="@{/js/board/inquiryReply.js}"></script>
+    <script>
+        const inqryNo = "[[${param.inqryNo}]]";
+    </script>
+</th:block>
+
+<section class="member-container" layout:fragment="contents">
+	<th:block th:replace="fragments/defaultSubHeader :: subHeaderFragment"></th:block>
+
+    <div id="maincontentswrap" >
+        <maincontents ref="maincontents"></maincontents>
+    </div>
+
+    <script type="text/x-template" id="main-template" >
+        <section class="content" >
+            <div class="sub-title-box">
+                <h2>문의하기</h2>
+                <p class="eng">inquiry</p>
+            </div>
+
+            <table class="contents-width table-list table-view mt-50">
+                <colgroup>
+                    <col style="width:4%" />
+                    <col style="width:12%" />
+                    <col/>
+                    <col style="width:10%" />
+                    <col style="width:10%" />
+                    <col style="width:10%" />
+                    <col style="width:10%" />
+                </colgroup>
+                <thead>
+                <tr>
+                    <th scope="col">번호</th>
+                    <th scope="col">문의유형</th>
+                    <th scope="col" class="a-l pl-20">제목</th>
+                    <th scope="col">공개</th>
+                    <th scope="col">답변여부</th>
+                    <th scope="col">작성자</th>
+                    <th scope="col">등록일</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>{{inquiry.inqryNo}}</td>
+                    <td>{{inquiry.inqryTycd}}</td>
+                    <td class="a-l t-w700 t-20">{{inquiry.inqrySj}}</td>
+                    <td>{{inquiry.othbcYn}}</td>
+                    <td>{{inquiry.answerYn}}</td>
+                    <td>{{inquiry.chargerNm}}</td>
+                    <td v-if="inquiry.creatDt === null" align="center">-</td>
+                    <td v-else>{{inquiry.creatDt}}</td>
+                </tr>
+                <tr>
+                    <td colspan="7" class="table-td-cont">
+                        <textarea class="write-textarea" ref="contents" v-bind:value="inquiry.inqryCn" readonly></textarea>
+                        <!-- 첨부파일 영역 -->
+                        <ul v-if="inquiry.inquiryFiles.length > 0">
+                            <span class="join-input-group w-100">
+                                <label>첨부파일</label>
+                            </span>
+                        </ul>
+                        <ul class="join-cont-box" v-if="inquiry.inquiryFiles.length > 0" style="overflow:auto;height:100px;width:100%;background:#fff;">
+                            <li v-for="(item, idx) in inquiry.inquiryFiles">
+                                <label><a href="#" v-on:click="onclickDownload(item)">{{item.fileNm}}</a></label>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <table class="contents-width table-list table-view">
+                <tbody>
+                <tr>
+                    <td colspan="7" class="table-td-cont">
+                        <textarea class="write-textarea"  ref="contents" v-model="replyInfo.inqryCn" placeholder="답변내용을 입력해주세요"></textarea>
+                       <!-- 첨부파일 영역 -->
+                        <ul>
+                            <li>
+                            <span class="join-input-group w-100">
+                            <label>첨부파일</label>
+                            <p v-for="(item, idx) in replyFiles" style="display: flex; margin-top: 10px;">
+                                <a href="#" class="btn btn-line-error" v-on:click="onClickOrgFileDelete(item.fileSn)">삭제</a>
+                                <input type="text" v-bind:value="item.fileNm" class="file-upload mr-30 ml-30" style="width:80%;height:30px;display: inline-block;vertical-align:middle;" readonly>
+                            </p>
+                            <p v-for="idx in (maxFileCnt - replyFiles.length)" style="display: flex; margin-top: 10px;">
+                                <a href="#" class="btn btn-line-error" v-on:click="onClickFileDelete(idx)">삭제</a>
+                                <input type="file" v-bind:id="['uploadFile' + idx]" ref="['uploadFile' + idx]" name="uploadFile" style="display: none;" @change="onChange($event, idx)">
+                                <input type="text" v-bind:id="['uploadText' + idx]" class="file-upload mr-30 ml-30" readonly>
+                                <a href="#" class="btn btn-line-black" v-on:click="document.getElementById('uploadFile' + idx).click();">파일찾기</a>
+                            </p>
+                        </span>
+                            </li>
+                        </ul>
+
+
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+
+			<section class="contents-width a-c mt-60">
+            <!--<div v-if="isAdmin" class="btn-box a-r mt-80">-->
+                <a href="#" class="btn btn-line-black btn-large" v-on:click="onclickCancel">취소</a>
+                <a href="#" class="btn btn-basic btn-large ml-20" v-on:click="onclickSave">저장</a>
+            <!--</div>-->
+			</section>
+
+
+        </section>
+
+    </script>
+</section>
+</html>

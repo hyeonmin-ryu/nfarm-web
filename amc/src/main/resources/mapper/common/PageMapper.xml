@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed May 11 15:49:52 KST 2016-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PaginationMapper">
+	<sql id="header">
+		WITH
+			SEARCH
+		AS
+		(
+	</sql>
+	
+	<sql id="footer">
+		),
+			TOTAL_COUNT <!-- [총건수] -->
+		AS
+		(
+			SELECT COUNT(1) AS TOT_CNT
+			FROM   SEARCH A1 <!-- [조회원본] -->
+		)
+		SELECT *
+		FROM (
+			SELECT ROWNUM AS RN
+			     , A1.*
+			     , B1.TOT_CNT
+			FROM SEARCH      AS A1
+			   , TOTAL_COUNT AS B1
+			<if test='sidx!=""'>
+				ORDER BY ${sidx} ${sord}
+			</if>
+		)
+<![CDATA[ WHERE RN >= ((#{page} - 1) * #{rows} + 1) AND RN <= (#{page} * #{rows}) ]]>
+<!-- 		OFFSET (#{page} - 1) * #{rows} -->
+<!-- 		FETCH NEXT #{rows} ROWS ONLY -->
+	</sql>
+</mapper>

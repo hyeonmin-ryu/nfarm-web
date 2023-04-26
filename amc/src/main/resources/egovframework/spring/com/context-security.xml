@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:egov-security="http://maven.egovframe.go.kr/schema/egov-security"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+		http://maven.egovframe.go.kr/schema/egov-security http://maven.egovframe.go.kr/schema/egov-security/egov-security-4.0.0.xsd">
+
+	
+	<!-- resources폴더 security none -->
+	<security:http pattern="/static/**" 		security="none"/>
+	<security:http pattern="/favicon.ico"       security="none"/>
+	<security:http pattern="/robots.txt"        security="none"/>
+	<security:http pattern="/ckeditor/**"       security="none"/>
+	
+
+	<security:http auto-config="true" use-expressions="true" authentication-manager-ref="authenticationManager"  access-decision-manager-ref="accessDecisionManager" >
+		<security:csrf disabled="true" />
+		<!-- <security:cors disabled="true" /> -->
+	
+  		<!-- 로그인 -->
+		<security:form-login 
+		    username-parameter="email"
+		    password-parameter="password"		
+		    login-page="/login"
+			login-processing-url="/login/secu"
+			authentication-failure-handler-ref="amcAuthenticationHandler"
+			authentication-success-handler-ref="amcAuthenticationHandler"
+		 />
+		 
+		 
+		 
+		 <!-- 로그아웃 -->
+		 <security:logout
+		    logout-url="/logout"
+		    logout-success-url="/"
+		    invalidate-session="true"
+		    delete-cookies="JSESSIONID"
+		 />
+
+		<!-- PUT,DLELETE,OPTION METHOTH DenyAll -->
+		<security:intercept-url pattern="/**" method="PUT" 		access="denyAll" />
+		<security:intercept-url pattern="/**" method="DELETE" 	access="denyAll" />
+		<security:intercept-url pattern="/**" method="OPTIONS" 	access="denyAll" />
+
+
+
+		<security:intercept-url pattern="/" 	       			access="permitAll" />
+		<security:intercept-url pattern="/login/**" 		    access="permitAll" />
+ 	    <security:intercept-url pattern="/api/**"		        access="permitAll" />
+ 	    <security:intercept-url pattern="/publish/**"           access="permitAll" />
+ 	    <security:intercept-url pattern="/cmmn/**"              access="permitAll" />
+ 	    
+ 	    
+ 	    
+ 	    <!-- 마이페이지는 로그인 사용자만 허용 -->
+	    <security:intercept-url pattern="/my/**"                access="myPageCheck" />
+	    <security:intercept-url pattern="/my/**/**"             access="myPageCheck" />
+
+
+	    <security:intercept-url pattern="/common/**"             access="commonCheck" />
+	    
+ 	    <!-- URL접속여부 판단. amcVoter에서 인증여부 판단 -->
+	    <security:intercept-url pattern="/intro/**"             access="urlCheck" />
+	    <security:intercept-url pattern="/lndata/**"            access="urlCheck" />
+	    <security:intercept-url pattern="/data/**"              access="urlCheck" />
+        
+       <security:session-management>
+            <security:concurrency-control max-sessions="1" expired-url="/"/>
+        </security:session-management>
+        
+        
+	</security:http>
+	
+    <!--  로그인 인증처리 -->
+    <security:authentication-manager alias="authenticationManager">
+        <security:authentication-provider ref="amcAuthProvider"  />
+    </security:authentication-manager>
+    
+    <bean id="amcAuthProvider" 			class="kr.re.amc.security.AmcAuthProvider" />
+	<bean id="amcAuthenticationHandler" class="kr.re.amc.security.AmcAuthenticationHandler" /> 
+    
+    
+	<!--AffirmativeBased Custom voter -->
+    <beans:bean id="accessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+        <beans:constructor-arg>
+            <beans:list>
+                <beans:bean class="kr.re.amc.security.AmcVoter"/>
+            </beans:list>
+        </beans:constructor-arg>
+        <beans:property name="allowIfAllAbstainDecisions" value="false" />
+    </beans:bean>
+	<beans:bean id="roleBasedVoter" class="kr.re.amc.security.AmcVoter"/>
+
+ 
+</beans>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+
+    <th:block layout:fragment="css"></th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/demand/adminDemandView.js}"></script>
+        <script>
+			agencySeq ="[[${param.agencySeq}]]";
+			loginId ="[[${param.loginId}]]";
+			myMenuId ="[[${param.menuId}]]";
+			agencyName ="[[${param.agencyName}]]";
+        </script>
+    </th:block>
+
+    <div class="mypage-container"  layout:fragment="contents">
+        <div id="maincontentswrap" >
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+        
+        <!-- 데이터 업로더 팝업 -->
+	    <div id="detailcontentswrap">
+	        <detailcontents ref="detailcontents"></detailcontents>
+	    </div>
+	    <script type="text/x-template" id="detail-template" >
+	        <div id="detailModal" class="common-popup">
+	            <div class="common-popup-content" style="width:850px;">
+	                <h3 class="no-line">상세 이용 내역 -<!-- {{demandMonth.substr(0,4)}}년 {{demandMonth.substr(4,2)}}월--></h3>
+	                
+	                <table class="table-list f14">
+	                    <colgroup>
+	                        <col style="width:15%;"/>
+	                        <col style="width:35%;"/>
+	                        <col style="width:15%;"/>
+	                        <col style="width:35%;"/>
+	                    </colgroup>
+	                    <thead class="a-c">
+		                    <tr class="max-h-30 a-c">
+		                        <th colspan="4" class="max-h-30 a-c">공급자</th>
+		                    </tr>
+	                    </thead>
+	                    <tbody>
+		                    <tr class="tr-link max-h-30">
+		                        <th scope="col" class="max-h-30 a-l">상호명</th>
+		                        <td class="max-h-30 a-r">{{popResult.supOrgName}}</td>
+		                        <th scope="col" class="max-h-30 a-c">대표자</th>
+		                        <td class="max-h-30 a-r">{{popResult.supOrgCeo}}</td>
+		                    </tr>
+		                    <tr class="tr-link max-h-30">
+		                        <th scope="col" class="max-h-30 a-l">등록번호</th>
+		                        <td class="max-h-30 a-r">{{replaceBlNumber(popResult.supOrgBlNumber)}}</td>
+		                        <th scope="col" class="max-h-30 a-l"></th>
+		                        <td class="max-h-30 a-r"></td>
+		                    </tr>
+	                    </tbody>
+	                </table>
+	                
+	                <table class="table-list f14 mt-30">
+	                    <colgroup>
+	                        <col style="width:15%;"/>
+	                        <col style="width:35%;"/>
+	                        <col style="width:15%;"/>
+	                        <col style="width:35%;"/>
+	                    </colgroup>
+	                    <thead class="a-c">
+		                    <tr class="max-h-30 a-c">
+		                        <th colspan="4" class="max-h-30 a-c">수신자</th>
+		                    </tr>
+	                    </thead>
+	                    <tbody>
+		                    <tr class="tr-link max-h-30">
+		                        <th scope="col" class="max-h-30 a-l">상호명</th>
+		                        <td class="max-h-30 a-r">{{popResult.demOrgName}}</td>
+		                        <th scope="col" class="max-h-30 a-c">대표자</th>
+		                        <td class="max-h-30 a-r">{{popResult.demOrgCeo}}</td>
+		                    </tr>
+		                    <tr class="tr-link max-h-30">
+		                        <th scope="col" class="max-h-30 a-l">등록번호</th>
+		                        <td class="max-h-30 a-r">{{replaceBlNumber(popResult.demOrgBlNumber)}}</td>
+		                        <th scope="col" class="max-h-30 a-l"></th>
+		                        <td class="max-h-30 a-r"></td>
+		                    </tr>
+	                    </tbody>
+	                </table>
+	                
+	                <table class="table-list f14 mt-30">
+	                    <colgroup>
+	                        <col style="width:15%;"/>
+	                        <col style="width:25%;"/>
+	                        <col style="width:10%;"/>
+	                        <col style="width:10%;"/>
+	                        <col style="width:10%;"/>
+	                        <col style="width:10%;"/>
+	                        <col style="width:10%;"/>
+	                        <col style="width:10%;"/>
+	                    </colgroup>
+	                    <thead>
+	                    <tr>
+	                        <th scope="col" class="max-h-30 a-c" colspan="2" rowspan="2">구분</th>
+	                        <th scope="col" class="max-h-30 a-c" rowspan="2">이용금액</th>
+	                        <th scope="col" class="max-h-30 a-c" colspan="3">할인금액</th>
+	                        <th scope="col" class="max-h-30 a-c" rowspan="2">상품할인</th>
+	                        <th scope="col" class="max-h-30 a-c" rowspan="2">당월이용금액</th>
+	                    </tr>
+	                    <tr>
+	                        <th scope="col" class="max-h-30 a-c">프로모션</th>
+	                        <th scope="col" class="max-h-30 a-c">약정</th>
+	                        <th scope="col" class="max-h-30 a-c">기타</th>
+	                    </tr>
+	                    </thead>
+	                    <tbody>
+	                    <tr class="tr-link max-h-30" v-for="(item, idx) in popResult.productDemandCostList">
+	                    	<td class="max-h-30 a-l" v-if="item.loginId === 'TOTAL' || item.loginId === 'TOT05'">{{item.demandAttributeCodeName}}</td>
+	                        <td class="max-h-30 a-l" v-else-if="idx == (listLength - 5) && (item.loginId === 'TOT01' || item.loginId === 'TOT02' || item.loginId === 'TOT03' || item.loginId === 'TOT04')" rowspan="4">당월 청구금액</td>
+	                        <td class="max-h-30 a-l" v-else-if="idx == 0 && item.loginId !== 'TOT01' && item.loginId !== 'TOT02' && item.loginId !== 'TOT03' && item.loginId !== 'TOT04'" :rowspan="popResult.productDemandCostList.length-6">상품</td>
+	                        
+	                        <td class="max-h-30 a-l" v-if="item.loginId === 'TOTAL' || item.loginId === 'TOT05'"></td>
+	                        <td class="max-h-30 a-l" style="padding-left:20px;" v-else>{{item.demandAttributeCodeName}}</td>
+	                        
+	                        <td class="max-h-30 a-r">{{replaceComma(item.useAmount)}}</td>
+	                        <td class="max-h-30 a-r" v-if="item.loginId === 'TOT01' || item.loginId === 'TOT02' || item.loginId === 'TOT03' || item.loginId === 'TOT04' || item.loginId === 'TOT05'"></td>
+	                        <td class="max-h-30 a-r" v-else>{{replaceComma(item.promotionDiscountAmount)}}</td>
+	                        <td class="max-h-30 a-r" v-if="item.loginId === 'TOT01' || item.loginId === 'TOT02' || item.loginId === 'TOT03' || item.loginId === 'TOT04' || item.loginId === 'TOT05'"></td>
+	                        <td class="max-h-30 a-r" v-else>{{replaceComma(item.promiseDiscountAmount)}}</td>
+	                        <td class="max-h-30 a-r" v-if="item.loginId === 'TOT01' || item.loginId === 'TOT02' || item.loginId === 'TOT03' || item.loginId === 'TOT04' || item.loginId === 'TOT05'"></td>
+	                        <td class="max-h-30 a-r" v-else>{{replaceComma(item.etcDiscountAmount)}}</td>
+	                        <td class="max-h-30 a-r" v-if="item.loginId === 'TOT01' || item.loginId === 'TOT02' || item.loginId === 'TOT03' || item.loginId === 'TOT04' || item.loginId === 'TOT05'"></td>
+	                        <td class="max-h-30 a-r" v-else>{{replaceComma(item.productDiscountAmount)}}</td>
+	                        <td class="max-h-30 a-r" v-if="item.loginId === 'TOT01' || item.loginId === 'TOT02' || item.loginId === 'TOT03' || item.loginId === 'TOT04' || item.loginId === 'TOT05'"></td>
+	                        <td class="max-h-30 a-r" v-else>{{replaceComma(item.thisMonthAmount)}}</td>
+	                    </tr>
+	                    </tbody>
+	                </table>
+	                <div class="btn-box a-c no-line">
+	                    <a href="javascript:;" class="btn btn-basic btn-large" @click="onclickDownload">다운로드</a>
+	                    <a href="javascript:;" class="btn btn-line btn-large ml-10" @click="onclickSendMail">메일발송</a>
+	                    <a href="javascript:;" class="btn btn-basic btn-line-black btn-large ml-10" onclick="fnClosePopup('detailModal')">닫기</a>
+	                </div>
+	            </div>
+	        </div>
+	    </script>
+	    
+	    <div id="mailcontentswrap">
+	        <detailmailcontents ref="detailmailcontents"></detailmailcontents>
+	    </div>
+	    <script type="text/x-template" id="detailMail-template" >
+	        <div id="mailModal" class="common-popup">
+	            <div class="common-popup-content" style="width:50%;">
+	                <textarea id="mailText" v-model="mailText" placeholder="메일 내용을 입력해주세요." style="height:300px;"></textarea>
+	
+	                <div class="btn-box a-c mt-30">
+	                    <a href="javascript:;" class="btn btn-line btn-large" @click="onclickSendMail">메일발송</a>
+	                    <a href="javascript:;" class="btn btn-line-black btn-large ml-10" onclick="fnClosePopup('mailModal')">닫기</a>
+	                </div>
+	            </div>
+	        </div>
+	    </script>
+
+        <script type="text/x-template" id="main-template" >
+        <div class="content" >
+            <div class="mypage-content  contents-width mt-40">
+                <h3>상세 이용 내역</h3>
+					<h2 class="a-c">{{agencyName}}</h2>
+            <div class="list-search-wrap a-r mt-30">
+		        <!--label>Search</label-->
+		        <div class="custom-select search-select mr-10" style="width: 150px;">
+		            <select v-model="cond.monthType" ref="monthType" onchange="selectedChange(id)" id="monthType">
+		                <option v-for="option in monthTypeList" v-bind:value="option.name">{{option.desc}}</option>
+		            </select>
+		        </div>
+		        <input type="month" id="startMonth" style="width:170px;" disabled>
+	            <input type="month" id="endMonth" style="width:170px;" disabled>
+		        <a href="#" class="btn btn-basic ml-10" v-on:click="onclickSearch">검색</a>
+		    </div>
+
+            <table class="table-list">
+                <colgroup>
+                    <col style="width:15%" />
+                    <col style="width:15%" />
+                    <col style="width:10%" />
+                    <col style="width:10%" />
+                    <col style="width:20%" />
+                    <col style="width:10%" />
+                    <col style="width:10%" />
+                    <col style="width:10%" />
+                </colgroup>
+                <thead>
+                <tr>
+                    <th scope="col">네이버클라우드계정</th>
+                    <th scope="col">기관명</th>
+                    <th scope="col">사용자명</th>
+                    <th scope="col">데이터박스명</th>
+                    <th scope="col">이용기간</th>
+                    <th scope="col">이용금액</th>
+                    <th scope="col">네이버클라우드 제공할인</th>
+                    <th scope="col">공급가액</th>
+                </tr>
+                </thead>
+                <tbody v-if="productDemandList.length == 0">
+                <tr>
+                    <td colspan="8" style="text-align: center">
+                        데이터가 없습니다.
+                    </td>
+                </tr>
+                </tbody>
+                <tbody v-if="productDemandList.length > 0">
+                    <tr v-for="(item, idx) in productDemandList">
+                        <td><a href="javascript:void(0);" v-on:click="onclickUploderPop(item.ncloudId,item.rqestYm,item.userSeq);">{{item.ncloudId}}</a></td>
+                        <td><a href="javascript:void(0);" v-on:click="onclickUploderPop(item.ncloudId,item.rqestYm,item.userSeq);">{{item.insttNm}}</a></td>
+                        <td><a href="javascript:void(0);" v-on:click="onclickUploderPop(item.ncloudId,item.rqestYm,item.userSeq);">{{item.chargerNm}}</a></td>
+                        <td><a href="javascript:void(0);" v-on:click="onclickUploderPop(item.ncloudId,item.rqestYm,item.userSeq);">{{item.dataBoxName}}</a></td>
+                        <td>{{item.monBet}}</td>
+                        <td>{{replaceComma(item.useAmount)}}</td>
+                        <td>{{replaceComma(item.naverCloudDiscountAmount)}}</td>
+                        <td>{{replaceComma(item.totalDemandAmount)}}</td>
+                    </tr>
+                </tbody>
+                </table>
+
+            <!-- 페이징 --> 
+            <div class="btn-box mt-40">
+                <div class="pagination fl-l">
+                    <a href="#" v-on:click="onclickPage(pageInfo.prev)"><span class="next"></span></a>
+                    <a href="#" v-for="(page, idx) in pageInfo.pages" v-on:click="onclickPage(page)" v-bind:class="{active:pageInfo.curr==page}">
+                        {{page}}
+                    </a>
+                    <a href="#" v-on:click="onclickPage(pageInfo.next)"><span class="prev"></span></a>
+				</div>
+				<a href="#" class="btn btn-basic btn-large fl-r" v-on:click="onclickList">목록</a>
+			</div>
+			</div>
+        </div>
+        </script>
+    </div>
+</html>

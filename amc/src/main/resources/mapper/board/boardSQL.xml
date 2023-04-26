@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed May 11 15:49:51 KST 2016-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="boardDao">
+
+ 	<select id="inqNoticeList" resultType="NoticeDto" parameterType="BoardSearchDto" >
+			SELECT 
+			       NOTICE_NO	
+			      ,NOTICE_CN
+			      ,IMPRTNC_YN	
+			      ,INQIRE_CO	
+			      ,NOTICE_SJ 
+			      ,DATE_FORMAT(CREAT_DT, '%Y-%m-%d') as CREAT_DT
+			  FROM TB_NOTICE_MST 	
+			 WHERE NOTICE_SJ like CONCAT('%' , #{keyword} , '%') 
+		  ORDER BY IMPRTNC_YN desc 
+ 		     	  ,CREAT_DT desc
+ 	</select>
+ 	
+ 	<select id="inqInquiryList" resultType="InquiryDto" parameterType="BoardSearchDto">
+ 		SELECT 
+ 		       INQRY_NO
+ 			  ,ANSWER_YN
+ 			  ,INQRY_CN
+ 			  ,FN_CODE('INQRY_TYCD', INQRY_TYCD) as inqryTycd
+ 			  ,OTHBC_YN
+ 			  ,INQRY_SJ
+ 			  ,DATE_FORMAT(i.CREAT_DT, '%Y-%m-%d') as creatDt
+ 			  ,i.CREAT_USER_ID
+ 			  ,u.USER_ID
+ 			  ,u.CHARGER_NM 
+ 		  FROM TB_INQRY_MST i
+    INNER JOIN TB_USER_MST u
+ 	        ON i.CREAT_USER_ID = u.USER_ID
+ 		 WHERE INQRY_SJ like CONCAT('%' , #{keyword} , '%')
+ 	  ORDER BY INQRY_NO desc
+ 	</select>
+ 	
+ 	<select id="inqFaqList" resultType="FaqDto" parameterType= "BoardSearchDto">
+ 		SELECT 
+ 		       QUEST_NO
+ 			  ,QUEST_RSPNS_CN
+ 			  ,QUEST_RSPNS_SJ
+ 			  ,FN_CODE('INQRY_TYCD', QUEST_RSPNS_TYCD) as questRspnsTycd
+ 		  FROM TB_QUEST_RSPNS_MST
+ 		 WHERE QUEST_RSPNS_SJ like CONCAT('%' , #{keyword} , '%')
+ 		 <if test='questRspnsTycd != null and !questRspnsTycd.equals("") '>
+			AND QUEST_RSPNS_TYCD = #{questRspnsTycd}
+		</if>
+ 	  ORDER BY QUEST_NO desc
+ 	</select>
+ 	
+ 	<select id="inqNoticeSeq" resultType="NoticeDto" parameterType= "Long" >
+ 		SELECT 
+ 		       NOTICE_NO
+ 			  ,NOTICE_CN
+ 			  ,INQIRE_CO
+ 			  ,NOTICE_SJ
+ 			  ,IMPRTNC_YN
+ 			  ,DATE_FORMAT(CREAT_DT, '%Y-%m-%d') as CREAT_DT
+ 		  FROM TB_NOTICE_MST
+ 		 WHERE NOTICE_NO=#{noticeNo}
+ 	</select>
+ 	
+ 	<select id="inqNoticeFileList" resultType = "NoticeFileDto" parameterType="Long">
+ 		SELECT 
+ 			   FILE_SN
+ 			  ,CREAT_USER_ID
+ 			  ,CREAT_DT
+ 			  ,UPDT_USER_ID
+ 			  ,UPDT_DT
+ 			  ,FILE_NM
+ 			  ,FILE_COURS
+ 			  ,NOTICE_NO
+ 		  FROM TB_NOTICE_ATCH_FILE_DTL
+ 	     WHERE NOTICE_NO = #{noticeNo}
+ 	</select>
+ 	<select id="inqInquirySeq" resultType="InquiryDto" parameterType= "Long" >
+ 		SELECT 
+ 		       INQRY_NO
+ 			  ,INQRY_CN
+ 			  ,INQRY_SJ
+ 			  ,FN_CODE('INQRY_TYCD', INQRY_TYCD) as INQRY_TYCD
+ 			  ,INQRY_TYCD as inquiryTypeCode
+ 			  ,OTHBC_YN
+ 			  ,ANSWER_YN
+ 			  ,u.CHARGER_NM
+ 			  ,i.CREAT_USER_ID
+ 			  ,u.USER_ID
+ 			  ,ORGINL_INQRY_NO
+ 			  ,DATE_FORMAT(i.CREAT_DT, '%Y-%m-%d') as CREAT_DT
+ 		  FROM TB_INQRY_MST i
+ 	INNER JOIN TB_USER_MST u
+ 			ON i.CREAT_USER_ID = u.USER_ID
+ 		 WHERE INQRY_NO=#{inqryNo}
+ 	</select>
+ 	
+ 	<select id="inqInquiryFileList" resultType = "InquiryFileDto" parameterType="Long">
+ 		SELECT 
+ 			   FILE_SN
+ 			  ,CREAT_USER_ID
+ 			  ,CREAT_DT
+ 			  ,UPDT_USER_ID
+ 			  ,UPDT_DT
+ 			  ,FILE_NM
+ 			  ,FILE_COURS
+ 			  ,INQRY_NO
+ 		  FROM TB_INQRY_ATCH_FILE_DTL
+ 	     WHERE INQRY_NO = #{inqryNo}
+ 	</select>
+ 	
+ 	
+ 	<select id ="inqInquiryReplyList" resultType="InquiryDto" parameterType = "Long">
+ 		SELECT 
+ 			   INQRY_NO
+ 			  ,ORGINL_INQRY_NO
+ 			  ,INQRY_CN
+ 			  ,CREAT_DT
+ 			  ,UPDT_DT
+ 		  FROM TB_INQRY_MST
+ 		 WHERE ORGINL_INQRY_NO = #{inqryNo}
+ 	</select>
+ 	
+ 	<select id ="inqInquiryReplySeq" resultType="InquiryDto" parameterType = "Long">
+ 		SELECT 
+ 			   INQRY_NO
+ 			  ,ORGINL_INQRY_NO
+ 			  ,INQRY_CN
+ 			  ,CREAT_DT
+ 			  ,UPDT_DT
+ 		  FROM TB_INQRY_MST
+ 		 WHERE ORGINL_INQRY_NO = #{inqryNo}
+ 	</select>
+ 	
+ 	
+ 	<select id="inqFaqSeq" resultType="FaqDto" parameterType= "Long" >
+ 		SELECT 
+ 		       QUEST_NO
+ 			  ,QUEST_RSPNS_CN
+ 			  ,QUEST_RSPNS_SJ
+ 			  ,FN_CODE('INQRY_TYCD', QUEST_RSPNS_TYCD) as questRspnsTycd
+ 			  ,QUEST_RSPNS_TYCD as questionTypeCode
+ 		  FROM TB_QUEST_RSPNS_MST
+ 		 WHERE QUEST_NO=#{questNo}
+ 	</select>
+ 	
+ 	<insert id="regNotice" parameterType="NoticeDto" useGeneratedKeys="true" keyProperty="noticeNo">
+ 		INSERT
+ 		  INTO TB_NOTICE_MST
+ 			  (
+ 			   NOTICE_SJ
+ 			  ,NOTICE_CN
+ 			  ,IMPRTNC_YN
+ 			  ,CREAT_DT
+ 			  ,CREAT_USER_ID
+ 			  ,INQIRE_CO
+ 			  )
+ 		VALUES
+ 		     (
+ 		      #{noticeSj}
+ 		     ,#{noticeCn}
+ 		     ,#{imprtncYn}
+ 		     ,now(6)
+ 		     ,#{inqireCo}
+ 		     ,-1
+ 		     )
+ 	</insert>
+ 	
+ 	<insert id="regInquiry" parameterType="InquiryDto" useGeneratedKeys="true" keyProperty="inqryNo">
+ 		INSERT 
+ 		  INTO TB_INQRY_MST
+ 			  (
+ 			   INQRY_SJ
+ 			  ,INQRY_TYCD
+ 			  ,INQRY_CN
+ 			  ,OTHBC_YN
+ 			  ,ANSWER_YN
+ 			  ,CREAT_DT
+ 			  ,CREAT_USER_ID
+ 			  ,ORGINL_INQRY_NO
+ 			  )
+ 		VALUES
+ 		     (
+ 		      #{inqrySj}
+ 		     ,#{inqryTycd}
+ 		     ,#{inqryCn}
+ 		     ,#{othbcYn}
+ 		     ,'N'
+ 		     ,now(6)
+ 		     ,#{creatUserId}
+ 		     ,#{orginlInqryNo}
+ 		     )
+ 	</insert>
+ 	
+ 	<insert id="regFaq" parameterType="FaqDto" useGeneratedKeys="true" keyProperty="questNo">
+ 		INSERT
+ 		  INTO TB_QUEST_RSPNS_MST
+ 			  (
+ 			   QUEST_RSPNS_SJ
+ 			  ,QUEST_RSPNS_CN
+ 			  ,CREAT_DT
+ 			  ,CREAT_USER_ID
+ 			  ,QUEST_RSPNS_TYCD
+ 			  )
+ 		VALUES
+ 		     (
+ 		      #{questRspnsSj}
+ 		     ,#{questRspnsCn}
+ 		     ,now(6)
+ 		     ,#{creatUserId}
+ 		     ,#{questRspnsTycd}
+ 		     )
+ 	</insert>
+ 	
+ 	<insert id="regNoticeFile" parameterType="NoticeFileDto" useGeneratedKeys="true" keyProperty="fileSn">
+ 		INSERT 
+ 		  INTO TB_NOTICE_ATCH_FILE_DTL
+ 		      (
+ 		       FILE_SN
+ 		      ,CREAT_USER_ID
+ 		      ,CREAT_DT
+ 		      ,FILE_NM
+ 		      ,FILE_COURS
+ 		      ,NOTICE_NO)
+ 		VALUES
+ 		     (
+ 		       #{fileSn}
+ 		      ,#{creatUserId}
+ 		      ,now(6)
+ 		      ,#{fileNm}
+ 		      ,#{fileCours}
+ 		      ,#{noticeNo}
+ 		     )
+ 	</insert>
+ 	
+ 	<insert id="regInquiryFile" parameterType="InquiryFileDto" useGeneratedKeys="true" keyProperty="fileSn">
+ 		INSERT 
+ 		  INTO TB_INQRY_ATCH_FILE_DTL
+ 		      (
+ 		       FILE_SN
+ 		      ,CREAT_USER_ID
+ 		      ,CREAT_DT
+ 		      ,FILE_NM
+ 		      ,FILE_COURS
+ 		      ,INQRY_NO)
+ 		VALUES
+ 		     (
+ 		       #{fileSn}
+ 		      ,#{creatUserId}
+ 		      ,now(6)
+ 		      ,#{fileNm}
+ 		      ,#{fileCours}
+ 		      ,#{inqryNo}
+ 		     )
+ 	</insert>
+ 	
+ 	<update id="NoticeCount" parameterType="NoticeDto">
+ 		UPDATE 
+ 		       TB_NOTICE_MST
+ 		   SET INQIRE_CO = #{inqireCo}
+ 		 WHERE NOTICE_NO = #{noticeNo}
+ 	</update>
+ 	<update id="updtNotice" parameterType="NoticeDto">
+ 		UPDATE
+ 		       TB_NOTICE_MST
+ 		   SET NOTICE_SJ =#{noticeSj}
+ 		      ,NOTICE_CN =#{noticeCn}
+ 		      ,IMPRTNC_YN=#{imprtncYn}
+ 		      ,UPDT_DT = now(6)
+ 		      ,UPDT_USER_ID = #{updtUserId}
+ 		 WHERE NOTICE_NO = #{noticeNo}
+ 	</update>
+ 	
+ 	<update id="updtInquiry" parameterType="InquiryDto">
+ 		UPDATE 
+ 		       TB_INQRY_MST
+ 		   SET INQRY_SJ =#{inqrySj}
+ 		      ,INQRY_CN =#{inqryCn}
+ 		      ,OTHBC_YN=#{othbcYn}
+ 		      ,UPDT_DT = now(6)
+ 		      ,UPDT_USER_ID = #{updtUserId}
+ 		      ,INQRY_TYCD = #{inqryTycd}
+ 		 WHERE INQRY_NO = #{inqryNo}
+ 	</update>
+ 	
+ 	<update id="updtAnswerN" parameterType = "InquiryDto">
+ 		UPDATE
+ 			   TB_INQRY_MST
+ 		   SET OTHBC_YN = 'N'
+ 		 WHERE INQRY_NO = #{orginlInqryNo}
+ 	</update>
+ 	
+ 	<update id="updtAnswerY" parameterType = "InquiryDto">
+ 		UPDATE
+ 			   TB_INQRY_MST
+ 		   SET OTHBC_YN = 'Y'
+ 		 WHERE INQRY_NO = #{orginlInqryNo}
+ 	</update>
+ 	<update id="updtFaq" parameterType="FaqDto">
+ 		UPDATE
+ 		       TB_QUEST_RSPNS_MST
+ 		   SET QUEST_RSPNS_SJ =#{questRspnsSj}
+ 		      ,QUEST_RSPNS_CN =#{questRspnsCn}
+ 		      ,UPDT_DT = now(6)
+ 		      ,UPDT_USER_ID = #{updtUserId}
+ 		      ,QUEST_RSPNS_TYCD = #{questRspnsTycd}
+ 		 WHERE QUEST_NO = #{questNo}
+ 	</update>
+ 	
+ 	<delete id="delNotice" parameterType="Long">
+		DELETE 
+		  FROM TB_NOTICE_MST
+		 WHERE NOTICE_NO = #{noticeNo}	
+ 	</delete>
+ 	
+ 	<delete id = "delNoticeFile" parameterType="Long">
+ 		DELETE
+ 		  FROM TB_NOTICE_ATCH_FILE_DTL
+ 		 WHERE FILE_SN = #{fileSn}
+ 	</delete>
+ 	
+ 	<delete id = "delInquiryFile" parameterType="Long">
+ 		DELETE
+ 		  FROM TB_INQRY_ATCH_FILE_DTL
+ 		 WHERE FILE_SN = #{fileSn}
+ 	</delete>
+ 	
+ 	<delete id="delInquiry" parameterType="Long">
+		DELETE 
+		  FROM TB_INQRY_MST
+		 WHERE INQRY_NO = #{inqryNo}	
+ 	</delete>
+ 	
+ 	<delete id="delFaq" parameterType="Long" >
+		DELETE 
+		  FROM TB_QUEST_RSPNS_MST
+		 WHERE QUEST_NO = #{questNo}	
+ 	</delete>
+ 	
+ 	<select id="NoticeDetailPrev" resultType="NoticeDto" parameterType="Long">
+ 		SELECT
+ 		       NOTICE_NO
+ 			  ,NOTICE_SJ
+ 		  FROM TB_NOTICE_MST
+ 		 WHERE NOTICE_NO &lt; #{noticeNo}
+ 	  ORDER BY IMPRTNC_YN desc
+ 		      ,CREAT_DT desc
+ 		 LIMIT 1
+ 	</select>
+ 	
+ 	<select id="NoticeDetailNext" resultType="NoticeDto" parameterType="Long">
+ 		SELECT
+ 		       NOTICE_NO
+ 			  ,NOTICE_SJ
+ 		  FROM TB_NOTICE_MST
+ 		 WHERE NOTICE_NO &gt; #{noticeNo}
+ 	  ORDER BY IMPRTNC_YN desc
+ 			  ,CREAT_DT desc
+ 		 LIMIT 1
+ 	</select>
+ 	
+ 	<select id="FaqDetailPrev" resultType="FaqDto" parameterType="Long">
+ 		SELECT
+ 		       QUEST_NO
+ 			  ,QUEST_RSPNS_SJ
+ 		  FROM TB_QUEST_RSPNS_MST
+ 		 WHERE QUEST_NO &lt; #{questNo}
+ 	  ORDER BY QUEST_NO desc
+ 		 LIMIT 1
+ 	</select>
+ 	
+ 	<select id="FaqDetailNext" resultType="FaqDto" parameterType="Long">
+ 		SELECT
+ 		       QUEST_NO
+ 			  ,QUEST_RSPNS_SJ
+ 		  FROM TB_QUEST_RSPNS_MST
+ 		 WHERE QUEST_NO &gt; #{questNo}
+ 	  ORDER BY QUEST_NO desc
+ 		 LIMIT 1
+ 	</select>
+</mapper>

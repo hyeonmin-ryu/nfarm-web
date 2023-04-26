@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+
+    <th:block layout:fragment="css">
+
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/user/myMember.js}"></script>
+        <script>
+
+            userSeq ="[[${param.userSeq}]]";
+
+        </script>
+    </th:block>
+    
+    <section class="mypage-container" layout:fragment="contents">
+        <div id="maincontentswrap">
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+            <section class="content">
+                <section class="mypage-content mt-40 common-inner">
+                    <h3>회원 정보 상세</h3>
+
+                    <section class="join-cont-box mt-30">
+                        <ul class="com-ul">
+                            <li class=" bdr-b">
+                                <span class="join-input-group mr-40">
+                                    <label >회원구분</label>
+                                    <p class="txt-data">{{info.insttTyCd}}</p>
+                                </span>
+                                <span class="join-input-group">
+                                    <label >가입처리상태</label>
+                                    <p class="txt-data">{{info.sbscrbSttusCd}}</p>
+                                </span>
+                            </li>
+                            <li class=" bdr-b">
+                                <span class="join-input-group mr-40">
+                                    <label >기관명</label>
+                                    <p class="txt-data">{{info.insttNm}}</p>
+                                </span>
+                                <span class="join-input-group">
+                                    <label >이메일</label>
+                                    <p class="txt-data">{{info.email}}</p>
+                                </span>
+                            </li>
+                            <li class=" bdr-b">
+                                <span class="join-input-group mr-40">
+                                    <label >담당자 이름</label>
+                                    <p class="txt-data">{{info.chargerNm}}</p>
+                                </span>
+                                <span class="join-input-group">
+                                    <label >담당자휴대전화</label>
+                                    <p class="txt-data">{{info.chargerMoblphonNo}}</p>
+                                </span>
+                            </li>
+                            <li class=" bdr-b">
+                                <span class="join-input-group mr-40">
+                                    <label >대표자명</label>
+                                    <p class="txt-data">{{info.rprsntvNm}}</p>
+                                </span>
+                                <span class="join-input-group">
+                                    <label >사업자번호</label>
+                                    <p class="txt-data">{{info.bsnmNO}}</p>
+                                </span>
+                            </li>
+                            <li v-show="showYn" class=" bdr-b">
+                                <span class="join-input-group mr-40">
+                                    <label >질병명</label>
+                                    <p class="txt-data">{{info.dissNm}}</p>
+                                </span>
+                                <span class="join-input-group">
+                                    <label >질병책임자여부</label>
+                                    <p class="txt-data">{{info.diseaseManagerName}}</p>
+                                </span>
+                            </li>
+                            <li class=" bdr-b">
+                                <span class="join-input-group mr-40">
+                                    <label >네이버클라우드 아이디</label>
+                                    <p class="txt-data">{{info.ncloudId}}</p>
+                                </span>
+                                <span class="join-input-group">
+                                    <label >오브젝트 스토리지 아이디</label>
+                                    <p class="txt-data">{{info.ncloudObjStrgeId}}</p>
+                                </span>
+                            </li>
+                            <li class=" bdr-b">
+                                <span class="join-input-group mr-40">
+                                    <label >네이버클라우드 액세스키</label>
+                                    <p class="txt-data">{{info.ncloudAccesKey}}</p>
+                                </span>
+                                <span class="join-input-group">
+                                    <label >네이버클라우드 시크릿키</label>
+                                    <p class="txt-data">{{info.ncloudScrtyKey}}</p>
+                                </span>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <div class="btn-box mt-60 a-c">
+                        <a href="javascript:;" class="btn btn-line-black btn-large" v-on:click="onclickBack()">목록</a>
+                        <a href="javascript:;" class="btn btn-basic btn-large ml-20" v-show="acceptYn" v-on:click="onclickAccept();">승인</a>
+                        <a href="javascript:;" class="btn btn-line-error btn-large ml-20" v-show="rejectYn" v-on:click="onclickReject();">거절</a>
+                    </div>
+                </section>
+            </section>
+        </script>
+    </div>
+</html>

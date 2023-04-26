@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+
+    <th:block layout:fragment="css">
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/menu/menuList.js}"></script>
+        <script th:src="@{/static/element-ui/lib/index.js}"></script>
+        <link rel="stylesheet" href="">
+        
+    </th:block>
+
+    <section class="mypage-container" layout:fragment="contents">
+        <div id="maincontentswrap" >
+            <maincontents ref="maincontents"></maincontents>
+		</div>
+		
+		<script type="text/x-template" id="main-template">
+			<section class="content contents-width">
+				<section class="mypage-content">
+					<!--<h3>메뉴 관리</h3>-->
+
+					<section class="code-page clearfix">
+						<section class="join-cont-box">
+							<h4>메뉴 정보</h4>
+
+			                <div class="clearfix mt-400">
+			                        <div class="upload-box-l-inner">
+			                           <el-tree 
+			                                :data="treeData" 
+			                                :props="defaultProps" 
+			                                :current-node-key="0" 
+			                                 node-key="id" 
+			                                 highlight-current default-expand-all
+			                                 @node-click="nodeClick"
+			                                 :expand-on-click-node="false"
+			                                 >
+			                    </div>
+
+						</section>
+
+						<section class="join-cont-box" >
+							<h4>메뉴 상세정보</h4>
+							<div>
+								<button href="javascript:void(0);" class="btn btn-line btn-hmiddle mr-10" v-on:click="onclickReg()">메뉴등록</button>
+								<button href="javascript:void(0);" class="btn btn-line-error btn-hmiddle" v-on:click="onclickDel()">메뉴삭제</button>
+							</div>	
+							
+								
+							<div class="input-div">
+								<p class="th">메뉴ID </p><input type="text" ref="menuId" id="menuId" v-model="condMenu.menuId" maxlength="20" readonly>
+								<p class="th">메뉴명</p><input type="text" ref="menuNm" id="menuNm" v-model="condMenu.menuNm" maxlength="">
+								<p class="th">메뉴설명</p><input type="text" ref="menuDc" id="menuDc" v-model="condMenu.menuDc" maxlength="">
+								<p class="th">메뉴URL</p><input type="text" ref="menuUrl" id="menuUrl" v-model="condMenu.menuUrl" maxlength="">
+								<p class="th">정렬순서</p><input type="text" ref="menuIndictOrdr" id="menuIndictOrdr" v-model="condMenu.menuIndictOrdr" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" maxlength="2">
+								<p class="th">부모메뉴ID</p><input type="text" ref="parntsMenuId" id="parntsMenuId" v-model="condMenu.parntsMenuId" readonly>
+								<p class="th">사용여부</p>
+								<span class="radio-wrap join-radio bdr-b">
+                                <input type="radio" ref="menuUseYnY" id="menuUseYnY" v-model="condMenu.menuUseYn" v-bind:checked="condMenu.menuUseYn === 'Y'" value="Y"/>
+                                <label for="menuUseYnY"><span></span>사용</label>
+                                <input type="radio" ref="menuUseYnN" id="menuUseYnN" v-model="condMenu.menuUseYn" v-bind:checked="condMenu.menuUseYn === 'N'"  value="N"/>
+                                <label for="menuUseYnN"><span></span>미사용</label>
+                            </span>
+							</div>		
+							<button href="javascript:void(0);" class="btn btn-basic w-100 mt-20" v-on:click="onclickMod()">메뉴수정</a>
+						</section>						
+					</section>
+				</section>
+			</section>
+		</script>
+	</section>
+</html>

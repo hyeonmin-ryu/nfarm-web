@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+
+    <th:block layout:fragment="css">
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/user/myUserPasswd.js}"></script>
+        <script>
+            const userId="[[${#authentication.principal.userId}]]";
+
+            console.log(userId);
+        </script>
+
+    </th:block>
+
+
+    <section class="mypage-container" layout:fragment="contents">
+        <div id="maincontentswrap">
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+            <section class="content">
+                <section class="mypage-content mt-60">
+                    <h3>비밀번호 변경</h3>
+
+                    <section class="login-wrap passwd-chg mt-20">
+                            <div class="login-input-group">
+                                <label >현재 비밀번호</label>
+                                <input type="password" ref="inputOldPw" v-model="info.inputOldPw" maxlength="15" autocomplete="off"  placeholder="현재 비밀번호를 입력해주세요"/>
+                            </div>
+                            <div class="login-input-group">
+                                <span class="text-alert" v-text="message1"></span>
+                                <label >새로운 비밀번호</label>
+                                <input type="password" ref="password1" v-model="password1" maxlength="15" autocomplete="off" placeholder="새로운 비밀번호를 입력해주세요(10~15자 이내의 영문,숫자,특수문자를 조합)" v-on:blur="onblurPassChk1();"/>
+                            </div>
+                            <div class="login-input-group">
+                                <span class="text-alert" v-text="message2"></span>
+                                <label>새로운 비밀번호 확인</label>
+                                <input type="password" ref="password2" v-model="password2" maxlength="15" autocomplete="off" placeholder="새로운 비밀번호를 다시 입력해주세요" v-on:blur="onblurPassChk2();"/>
+                            </div>
+
+                            <a href="javascript:void(0);" class="btn btn-basic btn-100 mt-10" v-on:click="onclickSave();">수정</a>
+                            <a href="javascript:void(0);" class="btn btn-line-black btn-100 mt-20" v-on:click="onclickBack();">이전</a>
+                    </section>
+                </section>
+            </section>
+        </script>
+
+    </section>
+</html>

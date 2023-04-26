@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/defaultLayout">
+
+    <th:block layout:fragment="css">
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/storage/storageStatus.js}"></script>
+        <script>
+            //const openStorageStatCode = "[[${param.openStorageStatCode}]]";
+        </script>
+    </th:block>
+
+    <section class="member-container" layout:fragment="contents">
+    	
+    	<th:block th:replace="fragments/defaultSubHeader :: subHeaderFragment"></th:block>
+    	
+        <div id="maincontentswrap" >
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+            <section class="content" >
+                <div class="sub-title-box">
+                    <h2>질환데이터 적재현황</h2>
+	            	<div class="path">
+    	            	<ul class="clearfix">
+	                        <li><a href="/" class="home">홈</a></li>
+    	      	            <li>서비스 현황</li>
+        	       	        <li>질환데이터 적재현황</li>                
+            	   		</ul>
+               		</div>
+                </div>
+
+				<section class="contents-width">
+                	<section class="join-cont-box clearfix">
+                    	<h3>질환별 적재현황 (누적)</h3>
+                        	<p align="center">
+                            	<span class="catebox catelinks-box" align="center">
+                                	<a :class="['catelinks' ,{'active' : diseaseCate1 === true}]" v-on:click="onclickCate('diseaseCate1')"></a>
+                                	<a v-show="storageUsedSummary2.length > 0" :class="['catelinks' ,{'active' : diseaseCate2 === true}]" v-on:click="onclickCate('diseaseCate2')"></a>
+                            	</span>
+                        	</p>
+
+                    	<ul class="ul-stack mt-20" v-show="diseaseCate1">
+                        	<li v-for="(item,idx) in storageUsedSummary1">
+                            	<span class="volume"><span class="volume-num">{{fileSize(item.bucketSize)}}</span></span>
+                            	<label>{{item.dissNm}}</label>
+                        	</li>
+                    	</ul>
+
+                    	<!-- v1.0 질환 추가 예정-->
+                    	<ul class="ul-stack mt-20" v-show="diseaseCate2">
+                        	<li v-for="(item,idx) in storageUsedSummary2">
+                            	<span class="volume"><span class="volume-num">{{fileSize(item.bucketSize)}}</span></span>
+                            	<label>{{item.dissNm}}</label>
+                        	</li>
+                    	</ul>
+                	</section>
+				</section>
+
+				<section class="contents-width">
+                	<h3 class="mt-70">기관/질환별 수집 현황</h3>
+                	<section class="list-search-wrap a-r mt-20">
+                    	<div class="custom-select search-select"  style="width:250px;" >
+                        	<select  ref="agencySeq" v-model="cond.insttId" >
+                            	<option value="">병원을 선택하세요</option>
+                            	<option v-for="agency in hospitalList" v-bind:value="agency.insttId">{{agency.insttNm}}</option>
+                        	</select>
+                    	</div>
+                    	<div class="custom-select search-select ml-10"  style="width:250px;" >
+                        	<select  ref="diseaseCode" v-model="cond.dissCd" >
+                            	<option value="">질환을 선택하세요</option>
+                            	<option v-for="(item, idx) in diseaseCdList" v-bind:value="item.nm">{{item.dc}}</option>
+                        	</select>
+                    	</div>
+                    	<a href="#" class="btn btn-basic btn-tiny ml-10" v-on:click="onclickSearch">검색</a>
+                	</section>
+					
+
+                	<table class="table-list">
+                    <colgroup>
+                        <col style="width:30%" />
+                        <col style="width:20%" />
+                        <col style="width:30%" />
+                        <col style="width:20%" />
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th scope="col">기관</th>
+                        <th scope="col">데이터책임자</th>
+                        <th scope="col">질환</th>
+                        <th scope="col">누적용량</th>
+                    </tr>
+                    </thead>
+                    
+
+                    <tbody v-if="storageUsedList.length > 0">
+                    <tr v-for="(item, idx) in storageUsedList">
+                        <td>{{item.insttNm}}</td>
+                        <td>{{item.chargerNm}}</td>
+                        <td>{{item.dissCd}}</td>
+                        <td>{{fileSize(item.bucketSize)}}</td>
+                    </tr>
+                    </tbody>
+
+					<tbody v-else>
+                    <tr>
+                        <td colspan="4" style="text-align: center">
+                            데이터가 없습니다.
+                        </td>
+                    </tr>
+                    </tbody>
+	                </table>
+				</section>
+
+                <!-- 페이징 -->
+                <section class="contents-width mt-40">
+                    <div class="pagination fl-l">
+                        <a href="#" v-on:click="onclickPage(pageInfo.prev)"><span class="next"></span></a>
+                        <a href="#" v-for="(page, idx) in pageInfo.pages" v-on:click="onclickPage(page)" v-bind:class="{active:pageInfo.curr==page}">
+                            {{page}}
+                        </a>
+                        <a href="#" v-on:click="onclickPage(pageInfo.next)"><span class="prev"></span></a>
+                    </div>
+                </section>
+
+        </section>
+        </script>
+    </section>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/defaultLayout">
+
+    <th:block layout:fragment="css">
+
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/user/join.js}"></script>
+    </th:block>
+
+    <section class="member-container" layout:fragment="contents">
+    	<th:block th:replace="fragments/defaultSubHeader :: subHeaderFragment"></th:block>
+    	
+        <div id="maincontentswrap">
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+        
+        <script type="text/x-template" id="main-template" >
+        <form name="frm" v-bind:method="form.method" v-bind:action="form.action" v-on:submit.prevent="onSubmit" ref>
+            <section class="content">
+                <div class="sub-title-box">
+                    <h2>회원가입</h2>
+                    <p class="eng">MEMBER REGISTER</p>
+                </div>
+
+				<div class="contents-width">
+                	<div class="join-step">
+	                    <div class="step1 active"><span>1</span>약관동의</div>
+    	                <div class="step2"><span>2</span>회원정보 입력</div>
+        	            <div class="step3"><span>3</span>가입완료</div>
+            	    </div>
+
+	                <section class="join-cont-box">
+    	                <h3>회원이용약관 동의</h3>
+        	            <label class="checkbox-container2">
+            	            <input type="checkbox" id="agree1Y" name="agree1" value="Y" v-model="join.agree1"><label for="agree1Y"></label>
+                	        <span class="checkmark2"></span>
+	                    </label>
+
+    	                <div class="term-iframe">
+        		            <th:block th:insert="pages/user/term.html"></th:block>
+                    	</div>
+                	</section>
+
+	                <section class="join-cont-box">
+    	                <h3>개인정보 취급방침 동의</h3>
+        	            <label class="checkbox-container2">
+            	            <input type="checkbox" id="agree2Y" name="agree2" value="Y" v-model="join.agree2"><label for="agree2Y"></label>
+                	        <span class="checkmark2"></span>
+	                    </label>
+	                    <div class="term-iframe">
+    	                    <th:block th:insert="pages/user/private_policy.html"></th:block>
+        	            </div>
+            	    </section>
+
+	                <section class="btn-box a-c mt-60">
+    	                <a href="javascript:void(0);" class="btn btn-line-black btn-large" @click="onclickBack();">취소</a>
+        	            <a href="javascript:void(0);" class="btn btn-basic btn-large ml-20" @click="onclickNext();">확인</a>
+            	    </section>
+				</div>
+
+            </section>
+        </form>
+        </script>
+
+    </section>
+
+</html>

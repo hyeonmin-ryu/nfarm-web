@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/defaultLayout">
+
+    <th:block layout:fragment="css">
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/storage/openReq.js}"></script>
+
+    </th:block>
+
+    <section class="member-container" layout:fragment="contents">
+    	<th:block th:replace="fragments/defaultSubHeader :: subHeaderFragment"></th:block>
+    	
+        <div id="maincontentswrap" >
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+        <section class="content">
+            <div class="sub-title-box">
+                <h2>질환데이터 공개신청</h2>
+	            <div class="path">
+    	            <ul class="clearfix">
+        	            <li><a href="/" class="home">홈</a></li>
+            	        <li>연구분석 데이터 관리</li>
+                        <li>질환데이터 공개신청</li>                
+                 	</ul>
+                </div>
+            </div>
+
+			<section class="content-body common-inner">	
+            	<div class="join-cont-box clearfix">
+                	<h3>신청자 정보</h3>
+                	<ul class="com-ul">
+                    	<li>
+                        	<span class="join-input-group mr-40">
+	                            <label >신청자명</label>
+    	                        <input type="text" v-bind:value="userInfo.chargerNm" readonly>
+        	                </span>
+            	            <span class="join-input-group">
+                	            <label >병원명</label>
+                    	        <input type="text" v-bind:value="userInfo.insttNm" readonly>
+	                        </span>
+    	                </li>
+        	            <li>
+            	            <span class="join-input-group mr-40">
+                	            <label>연락처</label>
+                    	        <input type="text" v-bind:value="userInfo.chargerMoblphonNo" readonly>
+                        	</span>
+                        	<span class="join-input-group">
+                            	<label >관리하는 질병</label>
+                            	<input type="text" v-bind:value="userInfo.dissNm" readonly>
+                        	</span>
+                    	</li>
+                    	<li>
+	                        <span class="join-input-group ">
+    	                        <label >이메일</label>
+        	                    <input type="text" v-bind:value="userInfo.email" readonly>
+            	            </span>
+                	    </li>
+                	</ul>
+            	</div>
+
+            	<div class="join-cont-box">
+	                <h3>저장소 정보<span class="join-txt-red ml-10">기존 저장소 선택 시, 새 버킷 정보를 입력할 수 없습니다.</span></h3>
+
+    	            <div class="join-btn-box a-r">
+        	            <a href="#" class="btn btn-line btn-large" v-on:click="openStorageModalPop">기존 저장소 불러오기</a>
+            	        <a href="#" class="btn btn-line-black btn-large ml-20" v-on:click="onclickReset">신청정보 초기화</a>
+                	</div>
+
+	                <ul class="com-ul">
+    	                <li>
+        	                <span class="join-input-group w-100">
+            	                <label>저장소명<span>*</span></label>
+                	            <input class="w-100" type="text" v-model="saveInfo.bucketId" placeholder="" readonly>
+                    	    </span>
+                    	</li>
+                    	<li>
+	                        <span class="join-input-group w-100">
+    	                        <label>저장소요청ID<span>*</span></label>
+        	                    <input class="w-100" type="text" v-bind:value="saveInfo.storgeReqstId" readonly>
+            	            </span>
+                		</li>
+                    	<li>
+	                        <span class="join-input-group w-100">
+    	                        <label>공개데이터명<span>*</span></label>
+        	                    <input class="w-100" type="text" v-model="saveInfo.othbcDataNm" ref="othbcDataNm" placeholder="">
+            	            </span>
+                	    </li>
+                	</ul>
+            	</div>
+
+            	<section class="contents-width a-c mt-60">
+	                <a href="#" class="btn btn-line-black btn-large" v-on:click="onclickCancel">취소</a>
+    	            <a href="#" class="btn btn-basic btn-large ml-20" v-on:click="onclickReqSave">신청</a>
+        	    </section>
+        	</section>
+		</section>
+        </script>
+    </section>
+</html>

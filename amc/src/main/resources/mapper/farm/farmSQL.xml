@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed May 11 15:49:51 KST 2016-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace ="FarmDto">
+
+	<select id = "FarmList" resultType="FarmDto" parameterType="FarmSearchDto">
+	 	SELECT FARM_ID,
+	 		   FARM_NM,
+	 		   FMHS_NO,
+	 		   FMHS_ADDR,
+	 		   FRMR_TELNO,
+	 		   EXMN_INST_MNGR_ID,
+	 		   CRT_USR_ID,
+	 		   CRT_DT,
+	 		   CHG_USR_ID,
+	 		   CHG_DT
+	 	  FROM TB_FARM_MST
+	 	-- WHERE FARM_NM LIKE CONCAT('%', #{dataName}, '%') 
+	</select>
+	
+</mapper>

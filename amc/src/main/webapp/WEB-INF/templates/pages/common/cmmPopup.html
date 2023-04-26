@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<div th:fragment="popupFragment">
+
+    <script th:src="@{/js/common/cmmPopup.js}"></script>
+
+    <div id="popupagencywrap" >
+        <popupagencycontents ref="popupagencycontents"></popupagencycontents>
+    </div>
+    <div id="popupstoragewrap" >
+        <popupstoragecontents ref="popupstoragecontents"></popupstoragecontents>
+    </div>
+    <div id="popupbucketwrap" >
+        <popupbucketcontents ref="popupbucketcontents"></popupbucketcontents>
+    </div>
+    <div id="popupexportwrap" >
+        <popupexportcontents ref="popupexportcontents"></popupexportcontents>
+    </div>
+    <div id="popupdownloadwrap" >
+        <popupdownloadcontents ref="popupdownloadcontents"></popupdownloadcontents>
+    </div>
+    <div id="popupmenuloadwrap" >
+        <popupmenucontents ref="popupmenucontents"></popupmenucontents>
+    </div>    
+    
+    <script type="text/x-template" id="popup-template" >
+        <section>
+          <section id="agencyModal" class="common-popup">
+
+            	<section class="common-popup-content">
+                	<h3>병원/기관명 검색</h3>
+
+                	<div id="search1" class="search-content" style="display: block;">
+                    	<div class="hosp-search-wrap mt-20">
+	                        <input type="text" v-model="cond.insttNm" @keyup="onKeyup" placeholder="병원/기관명을 입력해주세요">
+    	                    <a href="javascript:void(0);" class="btn btn-basic btn-small ml-10" @click="onclickSearch()">검색</a>
+        	            </div>
+            	        <ul class="ul-hosp-result mt-20" v-if="agencyList.length == 0">
+                	        <li class="title">
+                    	        <span>병원/기관명</span>
+                        	    <a>선택</a>
+                        	</li>
+                        	<li>
+                            	<span>데이타가 없습니다.</span>
+	                        </li>
+    	                </ul>
+        	            <ul class="ul-hosp-result mt-20" v-if="agencyList.length > 0">
+	                        <li class="title">
+    	                        <span>병원/기관명</span>
+        	                    <a>선택</a>
+            	            </li>
+                	        <li v-for="(agency, idx) in agencyList">
+                        	    <span>{{agency.insttNm}}</span>
+                    	        <a href="javascript:void(0);" @click="selectAgency(agency)">선택</a>
+                        	</li>
+                    	</ul>
+
+	                    <div class="pagination mb-20 mt-20 a-l">
+    	                    <a href="javascript:;" v-on:click="onclickPage(pageInfo.prev)" ><span class="next"></span></a>
+        	                <a href="javascript:;" v-for="(page, idx) in pageInfo.pages" v-on:click="onclickPage(page)" v-bind:class="{active:pageInfo.curr==page}">{{page}}</a>
+            	            <a href="javascript:;" v-on:click="onclickPage(pageInfo.next)"><span class="prev"></span></a>
+                	    </div>
+                	</div>
+
+                	<div class="btn-box mt-20 no-line a-c">
+                    	<a href="#" class="btn btn-line-black modal-btn" onclick="fnClosePopup('agencyModal')">닫기</a>
+                	</div>
+					<button class="modal-close-btn" id="" @click="fnClosePopup('agencyModal')"></button>
+            	</section>
+        	</section>
+
+	        <section id="alertMsgModal" class="common-popup" style="z-index:601">
+        	    <div class="common-popup-content">
+    	            <h3>알림</h3>
+
+            	    <div class="alert-box">
+                	    <p>{{alertMsg}}</p>
+                	</div>
+
+                	<div class="btn-box a-c">
+	                    <a href="#" class="btn btn-line-black modal-btn" id="btnClose" @click="alertMsgClose()">닫기</a>
+    	            </div>
+    	            
+        	        <button class="modal-close-btn" id="btnClosePop" @click="alertMsgClose()"></button>
+	            </div>
+    	    </section>
+
+            <section id="confirmModal" class="common-popup">
+                <div class="common-popup-content">
+                    <h3>확인</h3>
+
+                    <div class="alert-box">
+                        <p>{{confirmMsg}}</p>
+                    </div>
+
+                    <div class="btn-box mt-20 a-c">
+                        <a href="#" class="btn btn-basic modal-btn" id="btnConfirmOk">확인</a>
+                        <a href="#" class="btn btn-line-black modal-btn" @click="confirmMsgClose()">취소</a>
+                    </div>
+					<button class="modal-close-btn" id="" @click="confirmMsgClose()"></button>
+                </div>
+            </section>
+        </section>
+    </script>
+
+    <script type="text/x-template" id="popup-template-storage" >
+        <div>
+            <!-- 저장소 정보 검색-->
+            <div id="storageModal" class="common-popup">
+                <div class="common-popup-content">
+                    <h3>저장소 정보 검색</h3>
+
+                    <div class="search-content" style="display: block;">
+                        <div class="hosp-search-wrap mt-20 a-c">
+                            <input type="text" v-model="cond.storgeNm" @keyup="onKeyup" placeholder="저장데이터명을 입력해주세요" style="width: 400px">
+                            <a href="javascript:void(0);" class="btn btn-basic btn-small ml-10" @click="onclickSearch()">검색</a>
+                        </div>
+
+                        <ul class="ul-hosp-result mt-20" v-if="storageList.length == 0">
+                            <li class="title">
+                                <span>저장데이터명</span>
+                                <a>선택</a>
+                            </li>
+                            <li style="text-align: center">
+                                <span>데이터가 없습니다.</span>
+                            </li>
+                        </ul>
+
+                        <ul class="ul-hosp-result mt-20" v-if="storageList.length > 0">
+                            <li class="title">
+                                <span>저장데이터명</span>
+                                <a>선택</a>
+                            </li>
+                            <li v-for="(storage, idx) in storageList">
+                                <span>{{storage.storgeNm}}</span>
+                                <a href="javascript:void(0);" @click="selectStorage(storage)">선택</a>
+                            </li>
+                        </ul>
+
+                        <div class="pagination mb-20 mt-20 a-l">
+                            <a href="#" v-on:click="onclickPage(pageInfo.prev)"><span class="next"></span></a>
+                            <a href="#" v-for="(page, idx) in pageInfo.pages" v-on:click="onclickPage(page)">
+                                {{page}}
+                            </a>
+                            <a href="#" v-on:click="onclickPage(pageInfo.next)"><span class="prev"></span></a>
+                        </div>
+                    </div>
+
+                    <div class="btn-box a-c no-line">
+                        <a href="#" class="btn btn-line-black modal-btn" onclick="fnClosePopup('storageModal')">닫기</a>
+                    </div>
+					<button class="modal-close-btn" id="" @click="fnClosePopup('storageModal')"></button>
+                </div>
+            </div>
+        </div>
+    </script>
+    
+    <script type="text/x-template" id="popup-template-bucket" >
+        <section>
+            <!-- 연구분석데이터 선택 검색-->
+            <section id="bucketModal" class="common-popup">
+                <section class="common-popup-content" style="width:800px;">
+                    <h3>연구분석데이터 선택</h3>
+
+                    <div class="search-content" style="display: block;">
+                        <div class="hosp-search-wrap mt-20 a-c">
+                            <input type="text" v-model="cond.keyword" @keyup="onKeyup" placeholder="공개데이터명을 입력해주세요" style="width: 400px">
+                            <a href="javascript:void(0);" class="btn btn-basic btn-small ml-10" @click="onclickSearch()">검색</a>
+                        </div>
+                        <ul class="ul-hosp-result mt-20" v-if="bucketList.length == 0">
+                            <li class="title">
+                                <span>공개데이터명</span>
+                                <a>선택</a>
+                            </li>
+                            <li style="text-align: center">
+                                <span>데이터가 없습니다.</span>
+                            </li>
+                        </ul>
+                        <ul class="ul-hosp-result mt-20" v-if="bucketList.length > 0">
+                            <li class="title">
+                                <span>공개데이터명</span>
+                                <a>선택</a>
+                            </li>
+                            <li v-for="(bucket, idx) in bucketList">
+                                <span>{{bucket.othbcDataNm}}</span>
+                                <label class="checkbox-container checkbox-container2 large" style="top: 17px;">
+                                	<input type="checkbox" :checked="bucket.checked == true" @change="bucketSelect(idx)">
+	                                <span class="checkmark2"></span>
+	                            </label>
+                            </li>
+                        </ul>
+                        <div class="pagination mb-20 mt-20 a-l">
+                            <a href="javascript:;" v-on:click="onclickPage(pageInfo.prev)"><span class="next"></span></a>
+                            <a href="javascript:;" v-for="(page, idx) in pageInfo.pages" v-on:click="onclickPage(page)" v-bind:class="{active:pageInfo.curr==page}">
+                                {{page}}
+                            </a>
+                            <a href="javascript:;" v-on:click="onclickPage(pageInfo.next)"><span class="prev"></span></a>
+                        </div>
+                    </div>
+
+                    <div class="btn-box a-c mt-20 no-line">
+		                <a href="javascript:;" class="btn btn-line-black modal-btn" onclick="fnClosePopup('bucketModal')">닫기</a>
+                        <a href="javascript:;" class="btn btn-basic modal-btn" v-on:click="selectBucket()">완료</a>
+		            </div>
+					<button class="modal-close-btn" id="" @click="fnClosePopup('bucketModal')"></button>
+                </section>
+            </section>
+        </section>
+    </script>
+    
+    <script type="text/x-template" id="popup-template-export" >
+        <div>
+            <!-- 연구분석데이터 선택 검색-->
+            <div id="exportModal" class="common-popup">
+                <div class="common-popup-content" style="width:800px;">
+                    <h3>데이터박스 선택</h3>
+                    
+                    <div class="search-content" style="display: block;">
+                        <div class="hosp-search-wrap mt-40 a-c">
+                            <input type="text" v-model="cond.keyword" @keyup="onKeyup" placeholder="데이터박스명을 입력해주세요" style="width: 400px">
+                            <a href="javascript:void(0);" class="btn btn-basic btn-small ml-10" @click="onclickSearch()">검색</a>
+                        </div>
+                        <!--<ul class="ul-hosp-result mt-20" v-if="dataBoxList.length == 0">
+                            <li class="title">
+                                <span class="a-c" style="margin-right:176px;">데이터박스번호</span>
+                                <span class="a-c">데이터박스명</span>
+                                <a>선택</a>
+                            </li>
+                            <li style="text-align: center">
+                                <span>데이터가 없습니다.</span>
+                            </li>
+                        </ul>-->
+                        <ul class="ul-hosp-result mt-20" >
+                            <li class="title">
+                            	<span class="a-c" style="margin-right:176px;">데이터박스번호</span>
+                                <span class="a-c">데이터박스명</span>
+                                <a>선택</a>
+                            </li>
+                            <li v-for="(dataBox, idx) in dataBoxList">
+                                <span class="a-c" style="margin-right:267px;">{{dataBox.dtbxReqNo}}</span>
+                                <span class="a-c">{{dataBox.dtbxNm}}</span>
+	                                <a href="javascript:void(0);" @click="dataBoxSelect(idx)">선택</a>
+                            </li>
+                        </ul>
+                        <div class="pagination mb-20 mt-20 a-l">
+                            <a href="javascript:;" v-on:click="onclickPage(pageInfo.prev)"><span class="next"></span></a>
+                            <a href="javascript:;" v-for="(page, idx) in pageInfo.pages" v-on:click="onclickPage(page)" v-bind:class="{active:pageInfo.curr==page}">
+                                {{page}}
+                            </a>
+                            <a href="javascript:;" v-on:click="onclickPage(pageInfo.next)"><span class="prev"></span></a>
+                        </div>
+                    </div>
+
+                    <div class="btn-box a-c mt-20 no-line">
+		                <a href="javascript:;" class="btn btn-line-black modal-btn" onclick="fnClosePopup('exportModal')">닫기</a>
+		            </div>
+					<button class="modal-close-btn" id="" @click="fnClosePopup('exportModal')"></button>
+                </div>
+            </div>
+        </div>
+    </script>
+    
+    
+     <script type="text/x-template" id="popup-template-menu" >
+        <div>
+        
+                    <!-- 연구분석데이터 선택 검색-->
+            <div id="menuModal" class="common-popup">
+                 <div class="common-popup-content" style="width:1000px;">
+                    <h3>메뉴 정보</h3>
+
+						<div>
+							<p>메뉴ID </p><input type="text" ref="menuId" id="menuIdPop"  class="ml-10" maxlength="20">
+							
+							<p>메뉴명</p><input type="text" ref="menuNm" id="menuNmPop"  class="ml-10" maxlength="">
+							<p>메뉴설명</p><input type="text" ref="menuDc" id="menuDcPop" class="ml-10" maxlength="">
+							<p>메뉴URL</p><input type="text" ref="menuUrl" id="menuUrlPop" class="ml-10" maxlength="">
+							<p>정렬순서</p><input type="text" ref="menuIndictOrdr" id="menuIndictOrdrPop" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"  class="ml-10" maxlength="2">
+							<p>부모메뉴ID</p><input type="text" ref="parntsMenuId" id="parntsMenuIdPop" v-model="condMenu.menuId" class="ml-10" readonly>
+							<p>사용여부</p>
+							<span class="radio-wrap join-radio bdr-b">
+                            <input type="radio" ref="menuUseYnYPop" id="menuUseYnYPop" v-model="condMenu.menuUseYn" value="Y" checked/>
+                            <label for="menuUseYnYPop"><span></span>사용</label>
+                            <input type="radio" ref="menuUseYnNPop" id="menuUseYnNPop" v-model="condMenu.menuUseYn"  value="N"/>
+                            <label for="menuUseYnNPop"><span></span>미사용</label>
+						</div>	
+
+
+                    <div class="btn-box a-c mt-20">
+		                  <a href="javascript:;" class="btn btn-line-black modal-btn" onclick="fnClosePopup('menuModal')">닫기</a>
+					 	  <a href="javascript:;" class="btn btn-basic modal-btn" v-on:click="onclickReg()">등록</a>
+		            </div>
+      
+      					  <button class="modal-close-btn" id="" @click="fnClosePopup('menuModal')"></button>
+      					
+                </div>
+            </div>
+        </div>
+    </script>     
+    
+</div>

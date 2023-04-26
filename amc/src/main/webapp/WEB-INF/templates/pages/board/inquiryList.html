@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/defaultLayout">
+
+    <th:block layout:fragment="css">
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/board/inquiryList.js}"></script>
+    </th:block>
+
+    <section class="member-container"  layout:fragment="contents">
+    	<th:block th:replace="fragments/defaultSubHeader :: subHeaderFragment"></th:block>
+    
+        <div id="maincontentswrap" >
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+        <section class="content" >
+            <section class="sub-title-box">
+                <h2>문의하기</h2>
+                <p class="eng">inquiry</p>
+            </section>
+
+            <section class="board-list-search-wrap a-c">
+                <label>
+                	<input type="text" v-model="cond.keyword" @keyup="onKeyup" placeholder="검색어를 입력하세요(제목)">
+				</label>
+                <a href="#" class="btn btn-basic btn-small ml-10" v-on:click="onclickSearch">검색</a>
+            </section>
+
+            <table class="contents-width table-list mt-50">
+                <colgroup>
+                    <col style="width:4%" />
+                    <col style="width:12%" />
+                    <col/>
+                    <col style="width:10%" />
+                    <col style="width:10%" />
+                    <col style="width:10%" />
+                    <col style="width:10%" />
+                </colgroup>
+                <thead>
+                <tr>
+                    <th scope="col">번호</th>
+                    <th scope="col">문의유형</th>
+                    <th scope="col" class="a-l pl-20">제목</th>
+                    <th scope="col">공개</th>
+                    <th scope="col">답변여부</th>
+                    <th scope="col">작성자</th>
+                    <th scope="col">등록일</th>
+                </tr>
+                </thead>
+                <tbody v-if="inquiryList.length == 0">
+                <tr>
+                    <td colspan="7" style="text-align: center">
+                        데이터가 없습니다.
+                    </td>
+                </tr>
+                </tbody>
+
+                <tbody v-if="inquiryList.length > 0">
+                    <tr v-for="(item, idx) in inquiryList" class="tr-link" v-on:click="onclickView(item.inqryNo)">
+                        <td>{{item.inqryNo}}</td>
+                        <td>{{item.inqryTycd}}</td>
+                        <td class="a-l"><a href="javascript:void(0);" v-on:click="onclickView(item.inqryNo)">{{item.inqrySj}}</a></td>
+                        <td>{{item.othbcYn}}</td>
+                        <td>{{item.answerYn}}</td>
+                        <td>{{item.chargerNm}}</td>
+                        <td>{{item.creatDt}}</td>
+                    </tr>
+                </tbody>
+                </table>
+
+            <!-- 페이징 -->
+            <section class="contents-width mt-40">
+                <div class="pagination fl-l">
+                    <a href="#" v-on:click="onclickPage(pageInfo.prev)"><span class="next"></span></a>
+                    <a href="#" v-for="(page, idx) in pageInfo.pages" v-on:click="onclickPage(page)" v-bind:class="{active:pageInfo.curr==page}">
+                        {{page}}
+                    </a>
+                    <a href="#" v-on:click="onclickPage(pageInfo.next)"><span class="prev"></span></a>
+                </div>
+              	<a href="#" class="btn btn-basic btn-large fl-r" v-on:click="onclickReg" sec:authorize="isAuthenticated()">문의하기</a>
+            </section>
+
+        </section>
+        </script>
+    </section>
+</html>

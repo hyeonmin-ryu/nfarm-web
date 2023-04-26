@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/defaultLayout">
+
+    <th:block layout:fragment="css"></th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/databox/dataBoxReq.js}"></script>
+    </th:block>
+
+    <section class="member-container" layout:fragment="contents">
+    	<th:block th:replace="fragments/defaultSubHeader :: subHeaderFragment"></th:block>
+    	
+        <div id="maincontentswrap" >
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+        	<div class="content" >
+            	<div class="sub-title-box">
+                	<h2>데이터박스 사용신청</h2>
+	           		<div class="path">
+    	            	<ul class="clearfix">
+                        	<li><a href="/" class="home">홈</a></li>
+          	            	<li>연구분석 환경 관리</li>
+               	        	<li>데이터박스 사용 신청</li>                
+               			</ul>
+               		</div>
+            	</div>
+
+            	<section class="contents-width join-cont-box clearfix mt-60">
+                	<h3>신청자 정보</h3>
+                	<ul class="com-ul">
+                    	<li>
+                        	<span class="join-input-group mr-40">
+                            	<label >신청자명</label>
+                            	<input type="text" v-bind:value="userInfo.chargerNm" readonly>
+                        	</span>
+                        	<span class="join-input-group">
+                            	<label >기업명</label>
+                            	<input type="text" v-bind:value="userInfo.insttNm" readonly>
+                        	</span>
+                    	</li>
+                    	<li>
+                        	<span class="join-input-group mr-40">
+                            	<label>연락처</label>
+                            	<input type="tel" v-bind:value="userInfo.chargerMoblphonNo" readonly>
+                        	</span>
+                        	<span class="join-input-group">
+                            	<label >이메일</label>
+                            	<input type="email" v-bind:value="userInfo.email" readonly>
+                        	</span>
+                    	</li>
+                	</ul>
+            	</section>
+
+            	<section class="contents-width join-cont-box clearfix mt-60">
+                	<h3>신청 정보</h3>
+                	<span class="join-txt-caution">* 필수 입력 항목</span>
+                	<ul class="com-ul">
+                    	<li>
+                        	<span class="join-input-group w-100">
+                            	<label>데이터박스명<span>*</span></label>
+                            	<input class="w-100" type="text" ref="dtbxNm" v-model="saveInfo.dtbxNm" placeholder="데이터박스명을 입력해 주세요. (최대 50자)" maxlength="50">
+                        	</span>
+                    	</li>
+                    	
+                    	<li class="mt-30 bdr-t">
+                        	<span class="join-input-group w-100">
+                            	<label>데이터박스 동시 접속자<span>*</span>&nbsp;&nbsp;&nbsp;&nbsp;( 입력 후 추가를 눌러주세요 )</label>
+                            	<span class="env-input-group mr-10" style="width: calc((100% - 104px) / 2);">
+	                            	<label></label>
+	                            	<input type="text" class="w-100" ref="dataBoxUserName" v-model="userData.dtbxUserName" placeholder="이름을 입력해 주세요." maxlength="10">
+	                        	</span>
+	                        	<span class="env-input-group mr-10"  style="width: calc((100% - 104px) / 2);">
+	                            	<label></label>
+	                            	 <!-- @blur="test()" -->
+	                            	<input type="text" class="w-100" ref="dataBoxUserContact" v-model="userData.dtbxUserMoblphonNo" onKeyup="this.value=this.value.replace(/[^-0-9]/g,'');" placeholder="휴대전화 번호를 입력해 주세요." maxlength="11">
+	                        	</span>
+	                        	<span class="env-input-group" style="width: 84px;">
+	                        		<label></label>
+	                            	<a href="javascript:void(0);" v-on:click="onclickUserAdd();" class="btn btn-basic btn-tiny">추가</a>
+	                        	</span>
+                        	</span>
+                    	</li>
+                    	
+                    	<!-- 데이터박스 동시 접속자 추가영역 -->
+                    	<li v-for="(item, idx) in userConList">
+                    		<span class="env-input-group mr-10 w-67">
+                            	<label></label>
+                            	<input type="text" class="w-67" v-bind:value="idx+1" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10" style="width: calc((100% - 260px) / 2);">
+                            	<label></label>
+                            	<input type="text" class="w-100" v-bind:value="item.dtbxUserName" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10" style="width: calc((100% - 104px) / 2);">
+                            	<label></label>
+                            	<input type="text" class="w-100" v-bind:value="item.dtbxUserMoblphonNo" readonly>
+                        	</span>
+                        	<span class="env-input-group w-84">
+                            	<label></label>
+                            	<a href="javascript:void(0);" v-on:click="onclickUserDel(idx);" class="btn btn-line-error btn-tiny">삭제</a>
+                        	</span>
+                    	</li>
+                    	<!-- 데이터박스 동시 접속자 추가영역 End-->
+                    	
+                    	<li class="mt-30 bdr-t">
+                        	<span class="join-input-group w-100">
+                            	<label>서버 신청<span>*</span>&nbsp;&nbsp;&nbsp;&nbsp;( 선택 후 추가를 눌러주세요 )</label>
+                            	<span  class="join-input-group  mr-10"  style="width: calc((100% - 104px) / 2);">
+			                    	<div class="custom-select w-100" id="imageGoodsCdDiv" name="imageGoodsCdDiv">
+                                    	<select id="imageGoodsCd" ref="imageGoodsCd" v-model="serverData.imageGoodsCd" onchange="selectedChange(id);">
+	                                    	<option value="">서버 이미지를 선택하세요</option>
+	                                    	<option v-for="(item, idx) in imageCodeList"  v-bind:value="item.productCode">{{item.productDescription}}</option>
+                                    	</select>
+                                	</div>
+	                        	</span>
+	                        	<span class="join-input-group  mr-10" style="width: calc((100% - 104px) / 2);">
+                                	<div class="custom-select  w-100" id="svrGoodsCdDiv" name="svrGoodsCdDiv">
+                                    	<select id="svrGoodsCd"  ref="svrGoodsCd" v-model="serverData.svrGoodsCd" onchange="selectedProductChange(id);">
+	                                    	<option value="">서버 타입을 선택하세요</option>
+	                                    	<option v-for="(item, idx) in serverCodeList" v-bind:value="item.productCode">{{item.productDescription}}</option>
+                                    	</select>
+                                	</div>
+                            	</span>
+                            	<span class="env-input-group" style="width: 84px; padding:0;">
+	                        		<label></label>
+	                            	<a href="javascript:void(0);" v-on:click="onclickServerAdd();" class="btn btn-basic btn-tiny">추가</a>
+	                        	</span>
+                        	</span>
+                    	</li>
+                    	
+                    	<li style="padding-bottom:10px;">
+							<div class="fl-l mr-10" style="width: calc((100% - 104px) / 2);">
+                    			<span class="join-input-group" style="width:200px;">
+		                        	<label style="margin-top:0px;">서버신청 - 블록스토리지</label>
+		                        </span>
+	    	                    <span class="radio-wrap" v-for="(agency, idx) in radioList"  style="margin-left:35px;">
+		    	                	<input type="radio" v-bind:id="['rdo' + idx]" v-bind:ref="['rdo' + idx]" v-bind:value="agency.name" v-model="storageData.strgeTyCd" disabled>
+		        	            	<label v-bind:for="['rdo' + idx]" style="margin-right: 0"><span></span>{{agency.desc}}</label>
+		            	    	</span>
+							</div>
+		            		<input type="text" class="fl-l mr-10" style="width: calc((100% - 104px) / 2);" v-model="storageData.strgeSize" onKeyup="this.value=this.value.replace(/[^-0-9]/g,'');" v-on:blur="setBlockStorageNum(event)" placeholder="용량을 10단위로 입력해주세요.(최소10GB ~ 최대 2000GB)" maxlength="15">
+		            		<a href="javascript:void(0);" v-on:click="onclickStorageAdd();" class="btn btn-basic btn-tiny fl-l">추가</a>
+                    	</li>
+                    
+                    	<!--서버신청 - 블록스토리지 추가영역 START-->
+                    	<li v-for="(item, idx) in storageList">
+                    		<span class="env-input-group mr-10 w-67">
+                            	<label></label>
+                            	<input type="text" class="w-67" v-bind:value="idx+1" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10"  style="width: calc((100% - 260px) / 2);">
+                            	<label></label>
+                            	<input type="text" class="w-100" v-bind:value="item.strgeTyCd" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10" style="width: calc((100% - 104px) / 2);">
+                            	<label></label>
+                            	<input type="text" class="w-100" v-bind:value="item.strgeSize" readonly>
+                        	</span>
+                        	<span class="env-input-group w-84">
+                            	<label></label>
+                            	<a href="javascript:void(0);" v-on:click="onclickStorageDel(idx);" class="btn btn-line-error btn-tiny">삭제</a>
+                        	</span>
+                    	</li>
+                    	<!-- 서버신청 - 블록스토리지 추가영역 END-->
+                    	
+                    	<!-- 서버신청 추가영역 START-->
+                    	<li v-if="serverList.length != 0">
+                    		<span class="join-input-group" style="width:200px;">
+	                        	<label style="margin-bottom:0px;">서버신청 추가목록</label>
+	                        </span>
+                    	</li>
+                    	<li v-for="(item, idx) in serverList">
+                    		<span class="env-input-group mr-10 w-67">
+                            	<label></label>
+                            	<input type="text" class="w-67" v-bind:value="idx+1" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10" style="width: calc((100% - 260px) / 2);">
+                            	<label></label>
+                            	<input type="text" class="w-100" v-bind:value="item.imageGoodsNm" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10" style="width: calc((100% - 104px) / 2);">
+                            	<label></label>
+                            	<input type="text" class="w-100" v-bind:value="item.svrGoodsNm" readonly>
+                        	</span>
+                        	<span class="env-input-group mr-10 w-150" v-for="(item2, idx2) in item.storageList">
+                            	<label></label>
+                            	<input type="text" class="w-150" v-bind:value="item2.strgeTyCd +'(' + item2.strgeSize + 'GB)'" readonly>
+                        	</span>
+                        	<span class="env-input-group w-84">
+                            	<label></label>
+                            	<a href="javascript:void(0);" v-on:click="onclickServerDel(idx);" class="btn btn-line-error btn-tiny">삭제</a>
+                        	</span>
+                    	</li>
+                    	<!-- 서버신청 추가영역 END-->
+                    	
+                    	<li class="mt-30 bdr-t">
+                        	<span class="join-input-group w-100">
+                            	<label>NAS-W 신청<span>*</span></label>
+                            	<input class="w-100" type="text" ref="naswSize" v-model="saveInfo.naswSize" placeholder="용량을 100단위로 입력해주세요.(최소 500GB ~ 최대 20000GB)" min="0" onKeyup="this.value=this.value.replace(/[^-0-9]/g,'');" v-on:blur="setNaswNum(event)" maxlength="15">
+                        	</span>
+                    	</li>
+                    	<li class="mt-30 bdr-t">
+                        	<span class="contents-width join-input-group fl-l">
+                            	<label style="margin: 20px 0 5px;">연구분석데이터 신청<span>*</span></label>
+                        	</span>
+                        	<span class="contents-width join-input-group fl-r mt-10">
+                        		<a href="javascript:void(0);" v-on:click="onclickBucketAdd();" ref="bucketBtn" class="fl-r btn btn-line btn-hmiddle btn-tiny">추가</a>
+                        	</span>
+                        	<span class="clearfix join-input-group w-100" style="padding-top:0px;">    
+                            	<table class="table-list">
+				                	<colgroup>
+				                		<col style="width:10%" />
+				                    	<col style="width:35%" />
+				                    	<col style="width:35%" />
+				                    	<col style="width:10%" />
+				                    	<col style="width:10%" />
+				                	</colgroup>
+				                	<thead>
+				                	<tr>
+				                		<th scope="col" class="a-c">순번</th>
+				                    	<th scope="col" class="a-c">공개데이터명</th>
+				                    	<th scope="col" class="a-c">버킷ID</th>
+				                    	<th scope="col" class="a-c">용량(GB)</th>
+				                    	<th scope="col" class="a-c">삭제</th>
+				                	</tr>
+				                	</thead>
+				                	<tbody v-if="bucketListMain.length == 0">
+				                		<tr>
+				                    		<td colspan="7" style="text-align: center">데이터가 없습니다.</td>
+				                		</tr>
+				                	</tbody>
+				                	<tbody v-if="bucketListMain.length > 0">
+				                    	<tr v-for="(bucket, idx) in bucketListMain">
+				                    		<td class="a-c">{{idx+1}}</td>
+				                        	<td class="a-l">{{bucket.othbcDataNm}}</td>
+				                        	<td class="a-c">{{bucket.bucketId}}</td>
+				                        	<td class="a-c">{{bucket.bucketSize}}</td>
+				                        	<td class="a-c"><a href="javascript:void(0);" v-on:click="onclickBucketDel(idx);" class="btn btn-line-error a-c btn-hmiddle">삭제</a></td>
+				                    	</tr>
+				                	</tbody>
+			                	</table>
+                        	</span>
+                    	</li>
+                	</ul>
+            	</section>
+
+            	<section class="contents-width a-c mt-60">
+                	<a href="#" class="btn btn-line-black btn-large" v-on:click="onclickCancel">목록</a>
+                	<a href="#" class="btn btn-basic btn-large ml-20" v-on:click="onclickReqSave">신청</a>
+            	</section>
+        	</section>
+        </script>
+    </section>

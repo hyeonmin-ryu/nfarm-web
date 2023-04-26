@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+
+    <th:block layout:fragment="css">
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/storage/myStorageMngList.js}"></script>
+        <script>
+            const reqStorageStatCode = "[[${param.reqStorageStatCode}]]";
+            const diseaseCode = "[[${param.diseaseCode}]]";
+        </script>
+    </th:block>
+
+    <section class="mypage-container" layout:fragment="contents">
+        <div id="maincontentswrap" >
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+            <section class="content" >
+                <section class="mypage-content">
+
+                    <section class="mypage-content">
+                        <!--<h3>저장소 관리</h3>-->
+
+                        <section class="list-search-wrap a-r">
+                            <div class="custom-select search-select" style="width: 150px">
+                                <select v-model="selected" id="selected"  data-value="" onchange="selectChange()" >
+                                    <option v-for="select in selectList" v-bind:value="select.name">
+                                        {{select.desc}}
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div v-show="selected =='disease'" class="custom-select search-select"  style="width:250px;" >
+                                <select ref="selectedDisease" v-model="cond.dissCd" >
+                                    <option value="">전체</option>
+                                    <option v-for="(item, idx) in diseaseCdList" v-bind:value="item.nm">{{item.dc}}</option>
+                                </select>
+                            </div>
+
+                            <input v-show="selected !=='disease'" type="text" v-model="searchVal" @keyup="onKeyup" class="ml-10" placeholder="검색어를 입력하세요.">
+
+                            <a href="#" class="btn btn-basic btn-small ml-10" v-on:click="onclickSearch">검색</a>
+                        </section>
+
+                        <table class="contents-width table-list mt-50">
+                            <colgroup>
+                                <col style="width:18%" />
+                                <col style="width:10%" />
+                                <col style="width:16%" />
+                                <col style="width:33%" />
+                                <col style="width:13%" />
+                                <col style="width:10%" />
+                            </colgroup>
+                            <thead>
+                            <tr>
+                                <th scope="col">기관명</th>
+                                <th scope="col">질환명</th>
+                                <th scope="col">데이타명</th>
+                                <th scope="col">저장소명</th>
+                                <th scope="col">신청자</th>
+                                <th scope="col">신청일자</th>
+                            </tr>
+                            </thead>
+
+                            <tbody v-if="storageList.length == 0">
+                            <tr>
+                                <td colspan="6" style="text-align: center">
+                                    데이터가 없습니다.
+                                </td>
+                            </tr>
+                            </tbody>
+
+                            <tbody v-if="storageList.length > 0">
+                            <tr v-for="(item, idx) in storageList" class="tr-link" v-on:click="onclickView(item.storgeReqstId)">
+                                <td><a href="javascript:void(0);" v-on:click="onclickView(item.storgeReqstId)">{{item.insttNm}}</a></td>
+                                <td><a href="javascript:void(0);" v-on:click="onclickView(item.storgeReqstId)">{{item.dissNm}}</a></td>
+                                <td><a href="javascript:void(0);" v-on:click="onclickView(item.storgeReqstId)">{{item.storgeNm}}</a></td>
+                                <td align="center">{{item.storgeReqstId === null ? "-" : item.storgeReqstId}}</td>
+                                <td>{{item.chargerNm}}</td>
+                                <td>{{item.creatDt}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- 페이징 -->
+                        <section class="contents-width a-c mt-40">
+                            <div class="pagination fl-l">
+                                <a href="#" v-on:click="onclickPage(pageInfo.prev)"><span class="next"></span></a>
+                                <a href="#" v-for="(page, idx) in pageInfo.pages" v-on:click="onclickPage(page)" v-bind:class="{active:pageInfo.curr==page}">
+                                    {{page}}
+                                </a>
+                                <a href="#" v-on:click="onclickPage(pageInfo.next)"><span class="prev"></span></a>
+                            </div>
+                        </section>
+
+                    </section>
+            	</section>
+        	</section>
+        </script>
+    </section>
+</html>

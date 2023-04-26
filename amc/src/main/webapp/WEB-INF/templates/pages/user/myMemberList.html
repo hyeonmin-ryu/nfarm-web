@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+
+    <th:block layout:fragment="css">
+
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/user/myMember.js}"></script>
+
+    </th:block>
+
+    <section class="mypage-container" layout:fragment="contents">
+        <div id="maincontentswrap">
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+            <section class="content">
+                <section class="mypage-content">
+                    <!--<h3>회원목록</h3>-->
+
+                    <section class="list-search-wrap">
+                        <div class="select-group">
+                            <div class="custom-select search-select">
+                                <select id="userType" data-value="" v-model="search.userType" onchange="selectChange(id)"  style="width: 200px;">
+                                    <option value="">회원구분 전체</option>
+                                    <option v-for="(item, idx) in userTypeCdList" v-bind:value="item.nm">
+                                        {{item.dc}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- agency 전체 콤보 -->
+                        <div v-show="search.userType === '' || search.userType === 'ADMIN'" class="select-group ml-10">
+                            <div class="custom-select search-select">
+                                <select id="agency"  data-value="" v-model="search.insttId"  style="width: 250px;">
+                                    <option value="">기관 전체</option>
+                                    <option v-for="(item,idx) in agencyList" v-bind:value="item.insttId">
+                                        {{item.insttNm}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- 병원 콤보 -->
+                        <div v-show="search.userType === '03'" class="select-group ml-10">
+                            <div class="custom-select search-select">
+                                <select  id="hospital" data-value="" v-model="search.insttId"  style="width: 250px;">
+                                    <option value="">병원 전체</option>
+                                    <option v-for="option in hospList" v-bind:value="option.insttId">
+                                        {{option.insttNm}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- 기업 콤보 -->
+                        <div v-show="search.userType === '02'" class="select-group ml-10">
+                            <div  class="custom-select search-select">
+                                <select  id="company" data-value="" v-model="search.insttId"  style="width: 250px;">
+                                    <option value="">기업 전체</option>
+                                    <option v-for="option in compList" v-bind:value="option.insttId">
+                                        {{option.insttNm}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- 질환 콤보 -->
+                        <div class="select-group ml-10">
+                            <div class="custom-select search-select">
+  	                           <select id="dissCd" data-value="" v-model="search.dissCd" style="width:200px;">
+    	                            <option value="">질병 전체</option>
+        	                        <option v-for="(item, idx) in diseaseCdList" v-bind:value="item.nm">{{item.dc}}</option>
+            	               </select>
+                	        </div>
+                        </div>
+                        <div class="select-group ml-10">
+                            <div class="custom-select search-select">
+                                <select id="sbscrbSttusCd" data-value="" v-model="search.sbscrbSttusCd" style="width:200px;">
+                                    <option value="">처리상태 전체</option>
+                                    <option v-for="(item, idx) in joinStatCode" v-bind:value="item.nm">
+                                        {{item.dc}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <input type="text" v-model="search.chargerNm" @keyup="onKeyup" placeholder="회원명을 입력하세요" class="ml-10"  style="width: 200px;">
+                        <a href="javascript:;" class="btn btn-basic btn-small ml-10" @click="onclickSearch">검색</a>
+                    </section>
+
+					<section class="common-inner mt-50 pad-scroll-box">
+						<div class="scroll-div">
+	                    	<table class="table-list">
+    	                    	<colgroup>
+	    	                        <col style="width:5%;" />
+    	    	                    <col style="width:8%;"/>
+        	    	                <col style="width:10%;"/>
+            	    	            <col style="width:10%;"/>
+                	    	        <col style="width:10%;"/>
+                    	    	    <col style="width:12%;"/>
+                        			<col style="width:10%;"/>
+		                            <col style="width:8%;"/>
+    		                        <col style="width:10%;"/>
+        		                    <col style="width:8%;"/>
+            		            </colgroup>
+                		        <thead>
+                    		    <tr>
+	                    	        <th scope="col">신청번호</th>
+    	                        	<th scope="col">이름</th>
+	        	                    <th scope="col">회원구분</th>
+    	        	                <th scope="col">기관명</th>
+        	        	            <th scope="col">질병명</th>
+            	        	        <th scope="col">전화번호</th>
+                	        	    <th scope="col">이메일</th>
+	                	            <th scope="col">가입처리상태</th>
+    	                	        <th scope="col">신청일자</th>
+        	                	    <th scope="col">처리일자</th>
+		            	            </tr>
+        	        	        </thead>
+	        	                <tbody v-if="list.length == 0">
+            		            <tr class="tr-link" >
+    	        			        <td colspan="10" class="a-c">데이타가 없습니다.</td>
+        	            	    </tr>
+		                        </tbody>
+    		                    <tbody v-else>
+        		                <tr class="tr-link" v-for="(item, idx) in list" v-on:click="onclickDetail(item.userId);">
+            		                <td>{{item.userId}}</td>
+                		            <td class="a-c"><a href="javascript:void(0);" v-on:click="onclickDetail(item.userId);">{{item.chargerNm}}</a></td>
+                    		        <td class="a-c">{{item.userRoleSecd}}</td>
+	                    	        <td class="a-c">{{item.insttNm}}</td>
+	    	                        <td class="a-c">
+    	    	                        <span v-if="item.dissCd === null">-</span>
+        	    	                    <span v-else>{{item.dissCd}}</span>
+            	    	            </td>
+                	    	        <td class="a-c">{{item.chargerMoblphonNo}}</td>
+                    	    	    <td class="a-c">{{item.email}}</td>
+                        	    	<td class="a-c">{{item.sbscrbSttusCd}}</td>
+                            		<td class="a-c">{{item.creatDt}}</td>
+		                            <td class="a-c">{{item.updtDt}}</td>
+    		                    </tr>
+        		                </tbody>
+            		        </table>
+						</div>
+	
+    	                <!-- 페이징 -->
+        	            <div class="btn-box mt-30">
+            	            <div class="pagination fl-l">
+                	            <a href="javascript:;" v-on:click="onclickPage(pageInfo.prev)" ><span class="next"></span></a>
+                    	        <a href="javascript:;" v-for="(page, idx) in pageInfo.pages" v-on:click="onclickPage(page)" v-bind:class="{active:pageInfo.curr==page}">{{page}}</a>
+                        	    <a href="javascript:;" v-on:click="onclickPage(pageInfo.next)"><span class="prev"></span></a>
+	                        </div>
+    	                </div>
+        	        </section>
+				</section>	
+            </section>
+        </script>
+    </section>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+
+    <th:block layout:fragment="css">
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/code/codeList.js}"></script>
+    </th:block>
+
+    <section class="mypage-container" layout:fragment="contents">
+        <div id="maincontentswrap" >
+            <maincontents ref="maincontents"></maincontents>
+		</div>
+		
+		<script type="text/x-template" id="main-template">
+			<section class="content contents-width">
+				<section class="mypage-content">
+					<!--<h3>코드 관리</h3>-->
+
+					<section class="code-page clearfix">
+						<section class="join-cont-box">
+							<h4>코드 그룹 정보</h4>
+								<!--<div class="upload-box-r-inner2">
+									<table class="table-list-s">
+		
+									<colgroup>
+										<col style="width:30%" />
+										<col style="width:50%" />
+										<col style="width:20%" />
+									</colgroup>
+									<thead>
+										<tr>
+											<th scope="col" style="text-align: left;">코드 그룹 명</th>
+											<th scope="col" style="text-align: left;">코드</th>
+											<th scope="col" style="text-align: left;">선택</th>
+										</tr>
+									</thead>
+
+									<tbody>
+										<tr v-for="(codeGroup, idx) in codeGroupList" :key ="idx">
+											<td :for="codeGroup.key" style="text-align: left;"> {{codeGroup.dc}}</td>
+											<td :for="codeGroup.key" style="text-align: left;"> {{codeGroup.nm}}</td>
+											<td>
+												<input type="checkbox" v-model="cond.codeGroup">
+											</td>
+										</tr>
+									</tbody>
+								</div>
+		
+							<ul class="ul-hosp-result" style="padding-right:30px;overflow:auto;height:500px;min-width: 420px;width: calc(45% - 30px);">
+								<li class="title">
+									<span style="width: 135px; display: inline-block;">코드 그룹 명</span>
+									<span style="width: 200px; display: inline-block;">코드</span>
+									<a>선택</a>
+								</li>
+								<li>
+									<input type="text" v-model="groupCode.dc" style="height:50px;width: 100px;" placeholder="추가할 코드 명" maxlength="20">
+									<input type="text" v-model="groupCode.nm" style="height:50px;width: 150px; margin-left:30px;" placeholder="추가할 코드 명" maxlength="20">
+									<button href="javascript:void(0);" style="width:40px;height:50px;margin-left:60px;" v-on:click="onclickGroupReg()">추가</a>
+								</li>
+								<li v-for="(codeGroup, idx) in codeGroupList" :key ="idx">
+									<span style="width: 135px; display: inline-block;" :for="codeGroup.key">{{codeGroup.dc}}</span>
+									<span style="width: 200px; display: inline-block;" :for="codeGroup.key">{{codeGroup.nm}}</span>
+									<label class="checkbox-container2">
+									<input type="radio" id="codeGroup.key" v-model="cond.codeGroup" :value="codeGroup.nm">
+									<span class="checkmark2"></span></label>
+								</li>
+							</ul>-->
+
+							<div class="input-area clearfix">
+								<input type="text" v-model="groupCode.dc" placeholder="추가할 코드 그룹 명" maxlength="20">
+								<input type="text" v-model="groupCode.nm" class="ml-10" placeholder="추가할 코드" maxlength="20">
+								<button href="javascript:void(0);" class="btn btn-basic h-45 ml-10" v-on:click="onclickGroupReg()">추가</a>
+							</div>
+							<table class="table-list mt-10">
+                        		<colgroup>
+                            		<col style="width:40%" />
+                            		<col style="width:40%" />
+									<col style="width:20%" />
+                        		</colgroup>
+                        		<thead>
+                        		<tr>
+                            		<th scope="col">코드 그룹 명</th>
+                            		<th scope="col">코드</th>
+                            		<th scope="col">선택</th>
+		                        </tr>
+                        		</thead>
+							</table>
+							<div class="table-wrap">
+								<table class="table-list">
+    	                    		<colgroup>
+        	                    		<col style="width:40%" />
+            	                		<col style="width:40%" />
+										<col style="width:20%" />
+                    	    		</colgroup>
+		                	        <tbody>
+        			        	        <tr  v-for="(codeGroup, idx) in codeGroupList" :key ="idx">
+            	        			        <td>{{codeGroup.dc}}</td>
+			    	                	    <td>{{codeGroup.nm}}</td>
+											<td>
+												<label class="checkbox-container large">
+													<input type="radio" id="codeGroup.key" v-model="cond.codeGroup" :value="codeGroup.nm">
+													<span class="checkmark">✔</span>
+												</label>
+											</td>
+			        	                </tr>
+                    			    </tbody>
+								</table>
+							</div>
+
+							<section class="btn-box mt-20 a-l">
+								<a href="#" class="btn btn-line btn-middle" v-on:click="onclickSearch">검색</a>
+								<a href="#" class="btn btn-line-error btn-middle ml-20" v-on:click="onclickGroupDelete">제거</a>
+							</section>
+						</section>
+
+						<section class="join-cont-box" >
+							<h4>코드 정보</h4>
+							<div class="input-area clearfix">
+								<input type="text" v-model="cond.dc" placeholder="추가할 코드 명" maxlength="20">
+								<input type="text" v-model="cond.nm" class="ml-10" placeholder="추가할 코드" maxlength="20">
+								<button href="javascript:void(0);" class="btn btn-basic ml-10" v-on:click="onclickReg()">추가</a>
+							</div>
+							<table class="table-list mt-10">
+                        		<colgroup>
+                            		<col style="width:40%" />
+                            		<col style="width:40%" />
+									<col style="width:20%" />
+                        		</colgroup>
+                        		<thead>
+                        		<tr>
+                            		<th scope="col">코드명</th>
+                            		<th scope="col">코드</th>
+                            		<th scope="col">제거</th>
+		                        </tr>
+                        		</thead>
+							</table>
+							<div class="table-wrap">
+								<table class="table-list">
+                        			<colgroup>
+	                            		<col style="width:40%" />
+    	                        		<col style="width:40%" />
+										<col style="width:20%" />
+            	            		</colgroup>
+			                        <tbody>
+    	    			                <tr v-for="(code, idx) in codeList">
+        	    	        		        <td>{{code.dc}}</td>
+				    	                    <td>{{code.nm}}</td>
+											<td><a href="javascript:void(0);"  class="btn btn-line-error btn-hsmall" v-on:click="onclickDelete(idx)">제거</a></td>
+			        	                </tr>
+                    			    </tbody>
+								</table>
+							</div>		
+						</section>						
+					</section>
+				</section>
+			</section>
+		</script>
+	</section>
+</html>

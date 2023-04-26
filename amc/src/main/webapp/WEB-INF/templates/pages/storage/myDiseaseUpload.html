@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+
+    <th:block layout:fragment="css">
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/storage/myDiseaseUpload.js}"></script>
+    </th:block>
+
+    <section class="mypage-container" layout:fragment="contents">
+
+        <div id="maincontentswrap" >
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+        <section class="content">
+            <section class="mypage-content contents-width a-c">
+                <section class="clearfix mt-60">
+                    <section class="upload-box-l">
+                        <h4>저장소</h4>
+
+                        <section class="upload-box-l-inner">
+                            <ul class="" v-if="myStorageBucketList.length == 0">
+                                <li>
+                                    데이터가 없습니다.
+                                </li>
+                            </ul>
+                            <ul class="" v-if="myStorageBucketList.length > 0">
+                                <li v-for="(bucket, idx) in myStorageBucketList">
+                                    <label class="checkbox-container2"><a href="#" v-on:click="onclickBucket(bucket.bucketId,idx)">
+                                        <input type="checkbox" v-model="bucketChecked" v-bind:value="idx" @change="bucketSelect(idx,$event.target.checked)">
+                                        <span class="checkmark2"></span>
+                                    </a>
+                                    </label>
+                                    {{bucket.storgeNm}}
+                                </li>
+                            </ul>
+                        </section>
+                    </section>
+
+                    <section class="upload-box-r">
+                        <p class="a-l"><label style="width: 50px;">- 저장소  </label> {{cond.bucketId}}</p>
+                        <p class="a-l">
+							<label style="width: 50px;">- Path   </label>
+                            <lo v-for="(pathName, idx) in path">
+                            	<span v-on:click="onclickPath(idx)" style="cursor: pointer;">{{pathName}}</span>
+                            </lo>
+						</p>
+
+                        <section class="upload-box-r-inner">
+                            <table class="table-list-s">
+                                <colgroup>
+                                    <col style="width:10%" />
+                                    <col style="width:50%" />
+                                    <col style="width:20%" />
+                                    <col style="width:20%" />
+                                </colgroup>
+                                <thead>
+                                <tr>
+                                    <th scope="col">삭제</th>
+                                    <th scope="col" style="text-align: left;">파일명</th>
+                                    <th scope="col" style="text-align: left;">크기</th>
+                                    <th scope="col" style="text-align: left;">최종수정일시</th>
+                                </tr>
+                                </thead>
+                                <tbody v-if="myStorageObjectList.length == 0">
+                                <tr v-if="path.length > 1">
+                                    <td></td>
+                                    <td v-on:click="onclickPath(path.length-2)" style="cursor:pointer;text-align: left;">...</td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr v-else>
+                                    <td colspan="4" style="text-align: center">
+                                        데이터가 없습니다.
+                                    </td>
+                                </tr>
+                                </tbody>
+                                <tbody v-if="myStorageObjectList.length > 0">
+                                <tr v-if="path.length > 1">
+                                    <td></td>
+                                    <td v-on:click="onclickPath(path.length-2)" style="cursor:pointer;text-align: left;">...</td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr v-for="(object, idx) in myStorageObjectList">
+		
+                                    <td >
+									<label class="checkbox-container">
+                                        <input type="checkbox" v-model="delChecked[idx]">
+										<span class="checkmark">✔</span>
+                                   </label>
+                                    </td>
+
+                                    <td v-on:click="onclickObject(object.name, object.etag)" style="cursor: pointer;text-align: left;">
+                                    	 <img v-if="object.etag === ''" src="/images/folder.svg" class="mr-5">
+                                        {{object.name}}
+                                    </td>
+                                    <td v-if="object.etag === ''">
+                                    </td>
+                                    <td v-else align="right" style="text-align: left;">
+                                        {{fileSize(object.size)}}
+                                    </td>
+                                    <td style="text-align: left;">
+                                        {{object.lastModified}}
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </section>
+
+                        <section class="upload-btn-box mt-20 a-l">
+                            <input type="file" id="uploadFile" @change="onchangeUpload"  ref="multipartFile" multiple style="display: none;" :disabled="cond.bucketName < 1">
+                            <input type="file" id="uploadFoler" @change="onchangeUploadFolder" ref="multipartFolder" webkitdirectory multiple style="display: none;" :disabled="cond.bucketName < 1">
+                                <a href="#">
+                                    <img src="/images/upload_icon1.png" @click="document.getElementById('uploadFile').click();"/>파일 업로드
+                                </a>
+                            <a href="#">
+                                <img src="/images/upload_icon2.png" @click="document.getElementById('uploadFoler').click();"/>폴더 업로드
+                            </a>
+                            <a href="#"><img src="/images/upload_icon3.png" @click="onclickDelete"/>삭제</a>
+                            <a href="#"><img src="/images/upload_icon4.png" @click="onclickReload"/>새로고침</a>
+                        </section>
+                    </section>
+                </section>
+
+
+    <!--                <ul style="border: 0px;">-->
+    <!--                    <li style="display:inline-block;padding: 10px;">-->
+    <!--                        <label for="uploadFile"><span class="cusor">파일업로드</span></label>-->
+    <!--                        <input type="file" id="uploadFile" @change="onchangeUpload" @click="onclickUpload" ref="multipartFile" multiple style="display: none;" :disabled="cond.bucketName < 1">-->
+    <!--                    </li>-->
+
+    <!--                    <li style="display:inline-block;padding: 10px;">-->
+    <!--                        <label for="uploadFoler"><span class="cusor">폴더업로드</span></label>-->
+    <!--                        <input type="file" id="uploadFoler" @change="onchangeUploadFolder" @click="onclickUpload" ref="multipartFolder" webkitdirectory multiple style="display: none;" :disabled="cond.bucketName < 1">-->
+    <!--                    </li>-->
+    <!--                    <li style="display:inline-block;padding: 10px;">-->
+    <!--                        <button class="btn" @click="onclickDelete" :disabled="cond.bucketName < 1">삭제</button>-->
+    <!--                    </li>-->
+    <!--                    <li style="display:inline-block;padding: 10px;">-->
+    <!--                        <button class="btn" @click="onclickReload" :disabled="cond.bucketName < 1">새로고침</button>-->
+    <!--                    </li>-->
+    <!--                </ul>-->
+                </hr>
+
+                <section class="" style="overflow:auto;height:300px;width:100%;">
+                	
+					<table class="table-list mt-30">
+                    <colgroup>
+                        <col />
+                        <col style="width:20%" />
+                        <col style="width:20%" />
+                        <col style="width:20%" />
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th scope="col">파일명</th>
+                        <th scope="col">크기</th>
+                        <th scope="col">처리 (%)</th>
+                        <th scope="col">처리결과</th>
+                    </tr>
+                    </thead>
+                    <tbody v-if="myObjectResult.length > 0">
+                    <tr v-for="(result, idx) in myObjectResult">
+                        <td>{{result.task}}</td>
+                        <td align="right">{{fileSize(result.size)}}</td>
+                        <td align="center">{{result.progress}} %</td>
+                        <td align="center">{{result.result}}</td>
+                    </tr>
+                    </tbody>
+                    <tbody v-else>
+                    <tr>
+                        <td colspan="4"></td>
+                    </tr>
+                    </tbody>
+                	</table>
+                </section>
+                <br/>
+            </section>
+        </section>
+
+        </script>
+
+    </section>
+</html>

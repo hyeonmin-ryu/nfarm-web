@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+
+<div th:fragment="mypageFragment">
+
+    <script th:src="@{/js/common/mypage.js}"></script>
+    <script>
+        const role = "[[${#authentication.authorities[0]}]]";
+        myMenuId = "[[${param.menuId}]]";
+    </script>
+
+<!-- 마이페이지 메뉴 -->
+    <div id="mypagemenuswrap" >
+        <th:block th:replace="fragments/defaultSubHeader :: subHeaderFragment"></th:block>
+        
+        <mypagemenus ref="mypagemenus"></mypagemenus>
+    </div>
+    <script type="text/x-template" id="mypage-template" >
+        <div class="wrapper" >
+            <div class="mypage-menu">
+                <div class="content">
+                    <div class="sub-title-box">
+                		<h2>{{currentPage?.name}}</h2>
+               			<div class="path">
+                    		<ul class="clearfix">
+                        		<li><a href="/" class="home">홈</a></li>
+                        		<li>마이페이지</li>
+                        		<li>{{currentPage?.name}}</li>                
+                   			</ul>
+                		</div>
+                    	<div class="mypage-name" v-if="role=='ROLE_MANAGER'"><span>병원관리자</span> 님</div>
+                    	<div class="mypage-name" v-if="role=='ROLE_UPLOADER'"><span>병원업로더</span> 님</div>
+                    	<div class="mypage-name" v-if="role=='ROLE_ADMIN'"><span>관리자</span> 님</div>
+                    	<div class="mypage-name" v-if="role=='ROLE_USER'"><span>기업</span> 님</div>
+                    </div>
+
+                    <div class="mypagelinks-box" v-if="role=='ROLE_MANAGER'">
+						<div class="common-inner">
+                        	<a href="javascript:void(0);" v-if="menu.use" v-on:click="onclickMenu(menu, key)" v-for="(menu,key) in menus_manager" v-bind:class="{active:myMenuId==key}">{{menu.name}}</a>
+                        </div>
+                    </div>
+                    <div class="mypagelinks-box" v-if="role=='ROLE_UPLOADER'">
+						<div class="common-inner">
+                        	<a href="javascript:void(0);" v-if="menu.use" v-on:click="onclickMenu(menu, key)" v-for="(menu,key) in menus_uploader" v-bind:class="{active:myMenuId==key}">{{menu.name}}</a>
+						</div>
+                    </div>
+                    <div class="mypagelinks-box" v-if="role=='ROLE_ADMIN'">
+						<div class="common-inner">
+                        	<a href="javascript:void(0);" v-if="menu.use" v-on:click="onclickMenu(menu, key)" v-for="(menu,key) in menus_admin" v-bind:class="[{mypagelinks:true},{active:myMenuId==key}]">{{menu.name}}</a>
+						</div>
+                    </div>
+                    <div class="mypagelinks-box" v-if="role=='ROLE_USER'">
+						<div class="common-inner">
+                        	<a href="javascript:void(0);" v-if="menu.use" v-on:click="onclickMenu(menu, key)" v-for="(menu,key) in menus_user" v-bind:class="{active:myMenuId==key}">{{menu.name}}</a>
+						</div>
+                    </div>
+                </div>
+            </div>
+
+
+<!--                <div v-for="(menu, key) in menus_manager">-->
+<!--                    <div v-if="menu.use" class="menu">-->
+<!--                        <div v-if="menu.use && menuId==key" class="menu">-->
+<!--                            <a href="javascript:void(0);" class="on"> <div v-on:click="onclickMenu(menu, key)" class="parent">{{menu.name}}</div></a>-->
+<!--                        </div>-->
+<!--                        <div class="menu" v-else>-->
+<!--                            <a href="javascript:void(0);"> <div v-on:click="onclickMenu(menu, key)" class="parent">{{menu.name}}</div></a>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--            <div class="tab_menu" v-if="role=='ROLE_UPLOADER'">-->
+<!--                <div v-for="(menu, key) in menus_manager">-->
+<!--                    <div v-if="menu.use" class="menu">-->
+<!--                        <div v-if="menu.use && menuId==key" class="menu">-->
+<!--                            <a href="javascript:void(0);" class="on"> <div v-on:click="onclickMenu(menu, key)" class="parent">{{menu.name}}</div></a>-->
+<!--                        </div>-->
+<!--                        <div class="menu" v-else>-->
+<!--                            <a href="javascript:void(0);"> <div v-on:click="onclickMenu(menu, key)" class="parent">{{menu.name}}</div></a>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="tab_menu tab_admin" v-else-if="role=='ROLE_ADMIN'">-->
+<!--                <div v-for="(menu, key) in menus_admin">-->
+<!--                    <div v-if="menu.use && menuId==key" class="menu">-->
+<!--                        <a href="javascript:void(0);" class="on"> <div v-on:click="onclickMenu(menu, key)" class="parent">{{menu.name}}</div></a>-->
+<!--                    </div>-->
+<!--                    <div class="menu" v-else>-->
+<!--                        <a href="javascript:void(0);"> <div v-on:click="onclickMenu(menu, key)" class="parent">{{menu.name}}</div></a>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="tab_menu" v-else-if="role=='ROLE_USER'">-->
+<!--                <div v-for="(menu, key) in menus_user">-->
+<!--                    <div v-if="menu.use" class="menu">-->
+<!--                        <div v-if="menu.use && menuId==key" class="menu">-->
+<!--                            <a href="javascript:void(0);" class="on"> <div v-on:click="onclickMenu(menu, key)" class="parent">{{menu.name}}</div></a>-->
+<!--                        </div>-->
+<!--                        <div class="menu" v-else>-->
+<!--                            <a href="javascript:void(0);"> <div v-on:click="onclickMenu(menu, key)" class="parent">{{menu.name}}</div></a>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+        </div>
+    </script>
+<!-- 마이페이지 메뉴 끝 -->
+
+</div>
+</html>

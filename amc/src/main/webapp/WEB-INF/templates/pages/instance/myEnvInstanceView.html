@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+
+    <th:block layout:fragment="css"></th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/instance/myEnvInstanceView.js}"></script>
+        <script>
+            const reqSeq = "[[${param.reqSeq}]]";
+        </script>
+    </th:block>
+
+    <div class="mypage-container" layout:fragment="contents">
+        <div id="maincontentswrap">
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+            <div class="content">
+                <div class="mypage-content mt-40">
+                    <h3>연구분석환경 사용신청 상세</h3>
+                    <div class="join-cont-box mt-30">
+                        <h4>신청 정보</h4>
+                        <ul class="com-ul">
+                            <li class=" bdr-b">
+                                <span class="join-input-group mr-40">
+                                    <label>운영체제</label>
+                                    <p class="txt-data">{{envInstanceInfo.osImageType.desc}}</p>
+                                </span>
+                                <span class="join-input-group">
+                                    <label>서버타입</label>
+                                    <p class="txt-data">{{envInstanceInfo.productType.desc}}</p>
+                                </span>
+                            </li>
+                            <li class=" bdr-b">
+                                <span class="join-input-group mr-40">
+                                    <label>스토리지</label>
+                                    <p class="txt-data">{{envInstanceInfo.storageType}}</p>
+                                </span>
+                                <span class="join-input-group">
+                                    <label>서버스펙</label>
+                                    <p class="txt-data">{{envInstanceInfo.productCode}}</p>
+                                </span>
+                            </li>
+                            <li class=" bdr-b">
+                                <span class="join-input-group mr-40">
+                                    <label>서버설명</label>
+                                    <p class="txt-data">{{envInstanceInfo.serverDescription}}</p>
+                                </span>
+                                <span class="join-input-group">
+                                    <label>사용일수</label>
+                                    <p class="txt-data">{{envInstanceInfo.usingDays === 0 ? "무기한" : envInstanceInfo.usingDays}}</p>
+                                </span>
+                            </li>
+                            <li class="bdr-b">
+                                <span class="join-input-group mr-40">
+                                    <label>공인IP</label>
+                                    <p class="txt-data">{{envInstanceInfo.publicIp === null ? "-" : envInstanceInfo.publicIp}}</p>
+                               </span>
+                                <span class="join-input-group">
+                                    <label>처리상태</label>
+<!--                                    <p class="txt-data">{{envInstanceInfo.approveStatus.desc}}</p>-->
+                                    <span class="join-input-group mr-10"  style="width:300px">
+                                        <p class="txt-data">{{envInstanceInfo.approveStatus.desc}}</p>
+                                    </span>
+                                    <span v-if="role === 'ROLE_ADMIN' && (approveStatusCode ==='CREATED' || approveStatusCode ==='EXPIRED')" class="join-input-group mr-10" style="width:228px">
+                                        <div class="btn-box" style="width: 228px;">
+                                        <a href="javascript:;" v-on:click="onclickEnd" class="com-btn btn-w-228">서버반납</a>
+                                        </div>
+                                    </span>
+                               </span>
+                            </li>
+                            <li class=" bdr-b">
+                               <span class="join-input-group mr-40">
+                                    <label>신청일자</label>
+                                    <p class="txt-data">{{envInstanceInfo.createdDate}}</p>
+                               </span>
+                               <span class="join-input-group">
+                                    <label>처리일자</label>
+                                    <p class="txt-data">{{envInstanceInfo.modifiedDate}}</p>
+                               </span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div v-if="approveStatusCode === 'CREATED'" class="join-cont-box mt-30">
+                        <h4>서버 정보</h4>
+                        <ul class="com-ul">
+                            <li class=" bdr-b">
+                                <span class="join-input-group w-100">
+                                    <label>서버명</label>
+                                    <span class="join-input-group mr-10"  style="width:300px">
+                                        <p class="txt-data">{{envInstanceInfo.serverName}}</p>
+                                    </span>
+                                    <span v-if="role === 'ROLE_USER'" class="join-input-group mr-10" style="width:228px">
+                                        <div class="btn-box" style="width: 228px;">
+                                        <a href="javascript:;" v-on:click="onclickPrivateKey" class="com-btn btn-w-228">인증키 내려받기</a>
+                                        </div>
+                                    </span>
+                                    <span v-if="role === 'ROLE_USER'" class="join-input-group"  style="width:228px">
+                                        <div class="btn-box" style="width: 228px;">
+                                        <a href="javascript:;" v-on:click="onclickRootPassword" class="com-btn btn-w-228">root 비밀번호 찾기</a>
+                                        </div>
+                                    </span>
+                                </span>
+
+
+                            </li>
+                        </ul>
+                    </div>
+                    <div v-show="cancelDiv" class="join-cont-box mt-30">
+                        <h4>취소 정보</h4>
+                        <ul class="com-ul">
+                            <li>
+                                <span class="join-input-group mr-40  w-100">
+                                    <label>취소사유<span>*</span></label>
+                                    <input  v-if="(this.approveStatusCode === 'REQUEST' || this.approveStatusCode === 'ACCEPT' || this.approveStatusCode === 'CREATED')" class="w-100"  type="text" ref="cancelReason" v-model="saveInfo.cancelReason" placeholder="취소사유를 입력하세요">
+                                    <input  v-else class="w-100"  type="text" v-model="envInstanceInfo.cancelReason" readonly>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div v-show="rejectDiv" class="join-cont-box mt-30">
+                        <h4>거절 정보</h4>
+                        <ul class="com-ul">
+                            <li>
+                                <span class="join-input-group mr-40  w-100">
+                                    <label>거절사유</label>
+                                    <input  v-if="approveStatusCode === 'REQUEST' || approveStatusCode === 'REQ_CANCEL'" class="w-100"  type="text" ref="rejectReason" v-model="saveInfo.rejectReason" placeholder="거절사유를 입력하세요">
+                                    <input  v-else class="w-100"  type="text"  v-model="envInstanceInfo.rejectReason" readonly>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="btn-box mt-70 a-r">
+                        <a href="javascript:;" class="com-btn btn-line-bl btn-w-332" v-on:click="onclickList">목록</a>
+                        <a v-if="cancelBtn"  href="#" class="com-btn btn-w-332" v-on:click="onclickCancel">취소신청</a>
+                        <a v-if="role === 'ROLE_ADMIN' && (approveStatusCode === 'REQUEST' || approveStatusCode === 'REQ_CANCEL')" href="#" class="com-btn btn-w-332" v-on:click="onclickApprove">승인</a>
+                        <a v-if="rejectBtn" href="#" class="com-btn btn-gray btn-w-332" style="border-left: hidden" v-on:click="onclickReject">거절</a>
+                        <a v-if="role === 'ROLE_ADMIN' && approveStatusCode === 'ACCEPT'"  href="#" class="com-btn btn-w-332" v-on:click="onclickCreate">생성</a>
+                    </div>
+                </div>
+            </div>
+        </script>
+
+    </div>
+</html>

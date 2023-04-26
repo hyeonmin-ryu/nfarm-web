@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+
+    <th:block layout:fragment="css">
+
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/storage/myAdminOpenList.js}"></script>
+    </th:block>
+
+    <section class="mypage-container" layout:fragment="contents">
+        <div id="maincontentswrap">
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+            <section class="content">
+                <section class="mypage-content">
+                    <!--<h3>질환테이터 공개신청관리 리스트</h3>-->
+
+                    <section class="list-search-wrap a-r">
+                        <div class="custom-select search-select">
+                            <select ref="othbcReqstSttuscd" v-model="search.othbcReqstSttuscd">
+                                <option value="">전체</option>
+                                <option v-for="option in openStorageStatCdList" v-bind:value="option.nm">
+                                    {{option.dc}}
+                                </option>
+                            </select>
+                        </div>
+                        <input type="text" v-model="search.othbcDataNm" @keyup="onKeyup" class="ml-10" placeholder="데이터명을 입력하세요">
+                        <a href="javascript:;" class="btn btn-basic btn-small ml-10" @click="onclickSearch">검색</a>
+                    </section>
+
+                    <table class="contents-width table-list mt-50">
+                        <colgroup>
+                            <col style="width:10%;"/>
+                            <col style="width:20%;"/>
+                            <col style="width:20%;"/>
+                            <col style="width:15%;"/>
+                            <col style="width:8%;"/>
+                            <col style="width:10%;"/>
+                            <col style="width:10%;"/>
+                        </colgroup>
+                    	
+						<thead>
+                        <tr>
+                            <th scope="col">질환</th>
+                            <th scope="col">데이터명</th>
+                            <th scope="col">제공병원</th>
+                            <th scope="col">신청자</th>
+                            <th scope="col">상태</th>
+                            <th scope="col">신청일자</th>
+                            <th scope="col">처리일자</th>
+                        </tr>
+                    	</thead>
+
+	                    <tbody v-if="openStorageList.length == 0">
+                        <tr class="tr-link" >
+                            <td colspan="7" class="a-c">데이타가 없습니다.</td>
+                        </tr>
+    	                </tbody>
+
+        	            <tbody v-if="openStorageList.length > 0">
+                        <tr class="tr-link"  v-for="(item, idx) in openStorageList" v-on:click="onclickReq(item.othbcReqstId)">
+                            <td><a href="javascript:;" v-on:click="onclickReq(item.othbcReqstId)">{{item.dissNm}}</a></td>
+                            <td><a href="javascript:;" v-on:click="onclickReq(item.othbcReqstId)">{{item.othbcDataNm}}</a></td>
+                            <td><a href="javascript:;" v-on:click="onclickReq(item.othbcReqstId)">{{item.insttNm}}</a></td>
+                            <td>{{item.chargerNm}}</td>
+                            <td>{{item.othbcReqstSttuscd === null ? "-" : item.othbcReqstSttusnm}}</td>
+                            <td>{{replaceDate(item.creatDt)}}</td>
+                            <td>{{replaceDate(item.updtDt)}}</td>
+                        </tr>
+	                    </tbody>
+    	            </table>
+
+                    <!-- 페이징 -->
+        	        <section class="contents-width mt-40">
+            	        <div class="pagination fl-l">
+                	        <a href="#" v-on:click="onclickPage(pageInfo.prev)"><span class="next"></span></a>
+                    	    <a href="#" v-for="(page, idx) in pageInfo.pages" v-on:click="onclickPage(page)" v-bind:class="{active:pageInfo.curr==page}">
+                        	    {{page}}
+                        	</a>
+                        	<a href="#" v-on:click="onclickPage(pageInfo.next)"><span class="prev"></span></a>
+                    	</div>
+                	</section>
+            	</section>
+        	</section>
+        </script>
+    </section>
+</html>

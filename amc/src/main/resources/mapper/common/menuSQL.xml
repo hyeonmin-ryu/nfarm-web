@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed May 11 15:49:51 KST 2016-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="menuDao">
+
+ 	<select id="inqMenuRootList" resultType="menuDto" parameterType="menuDto" >
+			  SELECT a.MENU_ID,
+		         MENU_NM,
+		         MENU_URL,
+		         MENU_DC,
+		         MENU_USE_YN,
+		         PARNTS_MENU_ID,
+		         MENU_INDICT_ORDR
+		    FROM TB_MENU_MST a
+		  WHERE      a.MENU_ID = 'root'
+		  ORDER BY MENU_INDICT_ORDR 
+ 	</select>
+ 	
+ 	
+ 	 	<select id="inqSubMenulist" resultType="menuDto" parameterType="String" >
+			  SELECT a.MENU_ID,
+		         MENU_NM,
+		         MENU_URL,
+		         MENU_DC,
+		         MENU_USE_YN,
+		         PARNTS_MENU_ID,
+		         MENU_INDICT_ORDR
+		    FROM TB_MENU_MST a
+		  WHERE      a.PARNTS_MENU_ID = #{menuId}
+		  ORDER BY MENU_INDICT_ORDR 
+ 	</select>
+ 	
+ 	
+ 	<select id="inqMenu" resultType="menuDto" parameterType="String" >
+			  SELECT a.MENU_ID,
+		         MENU_NM,
+		         MENU_URL,
+		         MENU_DC,
+		         MENU_USE_YN,
+		         PARNTS_MENU_ID,
+		         MENU_INDICT_ORDR
+		    FROM TB_MENU_MST a
+		  WHERE      a.MENU_ID = #{menuId}
+		  ORDER BY MENU_INDICT_ORDR 
+ 	</select> 	
+ 	
+ 	
+  	<update id="modMenu" parameterType="menuDto" >
+		UPDATE TB_MENU_MST SET 
+	      MENU_NM = #{menuNm}
+		, MENU_DC = #{menuDc}
+		, MENU_URL = #{menuUrl}
+		, MENU_INDICT_ORDR = #{menuIndictOrdr}
+		, MENU_USE_YN = #{menuUseYn}
+		, UPDT_USER_ID = #{updtUserId}
+		, UPDT_DT = DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+		WHERE MENU_ID = #{menuId}
+ 	</update> 	
+ 	
+ 	
+   	<insert id="regMenu" parameterType="menuDto" >
+		INSERT INTO TB_MENU_MST
+			(MENU_ID
+			, MENU_NM
+			, MENU_DC
+			, MENU_URL
+			, MENU_INDICT_ORDR
+			, MENU_USE_YN
+			, PARNTS_MENU_ID
+			, CREAT_USER_ID
+			, CREAT_DT
+			, UPDT_USER_ID
+			, UPDT_DT)
+		VALUES(
+			  #{menuId}
+			, #{menuNm}
+			, #{menuDc}
+			, #{menuUrl}
+			, #{menuIndictOrdr}
+			, #{menuUseYn}
+			, #{parntsMenuId}
+			, #{creatUserId}
+			, DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+			, #{creatUserId}
+			, DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+			)
+
+ 	</insert> 	
+ 	
+ 	
+   	<delete id="deleteMenu" parameterType="menuDto" >
+		DELETE FROM TB_MENU_MST
+		WHERE MENU_ID = #{menuId}
+ 	</delete> 			
+ 	
+ 	
+  	 <select id="inqMenuRole" resultType="CodeDto" parameterType="menuDto" >
+			SELECT GROUP_CD AS codeGroup 
+			      ,DTL_CD AS nm
+			      ,DTL_CD_NM AS dc
+			 FROM TB_CD_GROUP_DTL
+			WHERE GROUP_CD = 'USER_ROLE_SECD'
+			AND USE_YN = 'Y'
+			ORDER BY INDICT_ORDR 
+ 	</select>	
+ 	
+ 	
+ 	
+  	<select id="inqMenuAuthRootList" resultType="menuDto" parameterType="menuDto" >
+			  SELECT a.MENU_ID,
+		         MENU_NM,
+		         MENU_URL,
+		         MENU_DC,
+		         MENU_USE_YN,
+		         PARNTS_MENU_ID,
+		         MENU_INDICT_ORDR,
+		         b.USER_ROLE_SECD,
+		         b.MENU_ID AS CHECK_ID
+		    FROM TB_MENU_MST a
+      LEFT OUTER JOIN (SELECT MENU_ID  
+                        ,USER_ROLE_SECD
+		            FROM TB_MENU_ROLE_MST
+                   WHERE USER_ROLE_SECD  = #{userRoleSecd}) b
+                    ON a.MENU_ID = b.MENU_ID		    
+		   WHERE  a.MENU_ID = 'root'
+		     AND  a.MENU_USE_YN = 'Y'
+		   ORDER BY MENU_INDICT_ORDR 
+ 	</select>
+ 	
+ 	
+ 	 	<select id="inqSubMenuAuthlist" resultType="menuDto" parameterType="menuDto" >
+			  SELECT a.MENU_ID,
+		         MENU_NM,
+		         MENU_URL,
+		         MENU_DC,
+		         MENU_USE_YN,
+		         PARNTS_MENU_ID,
+		         MENU_INDICT_ORDR,
+		         b.USER_ROLE_SECD,
+		         b.MENU_ID AS CHECK_ID
+		    FROM TB_MENU_MST a
+      LEFT OUTER JOIN (SELECT MENU_ID  
+                        ,USER_ROLE_SECD
+		                 FROM TB_MENU_ROLE_MST
+                        WHERE USER_ROLE_SECD  = #{userRoleSecd}) b	
+                         ON a.MENU_ID = b.MENU_ID	    
+		   WHERE a.PARNTS_MENU_ID = #{menuId}
+		     AND a.MENU_USE_YN = 'Y'
+		  ORDER BY MENU_INDICT_ORDR 
+ 	</select>	
+ 	
+ 	
+  	 	<select id="inqMenuAuthList" resultType="menuDto" parameterType="menuDto" >
+			  SELECT b.MENU_ID,
+		         MENU_NM,
+		         MENU_URL,
+		         MENU_DC,
+		         MENU_USE_YN,
+		         PARNTS_MENU_ID,
+		         MENU_INDICT_ORDR,
+		         b.USER_ROLE_SECD
+		    FROM TB_MENU_MST a
+      LEFT OUTER JOIN (SELECT MENU_ID  
+                        ,USER_ROLE_SECD
+		                 FROM TB_MENU_ROLE_MST
+                        WHERE USER_ROLE_SECD  = #{userRoleSecd}) b	
+                         ON a.MENU_ID = b.MENU_ID	    
+		   WHERE a.MENU_USE_YN = 'Y'
+		  ORDER BY MENU_INDICT_ORDR 
+ 	</select>	
+ 		
+ 	
+   	<delete id="deleteMenuAuth" parameterType="menuDto" >
+		DELETE FROM TB_MENU_ROLE_MST
+		WHERE USER_ROLE_SECD = #{userRoleSecd}
+ 	</delete> 	 	
+ 	
+    <insert id="regMenuAuth" parameterType="menuDto" >
+		INSERT INTO TB_MENU_ROLE_MST
+			(
+			 USER_ROLE_SECD
+			,MENU_ID
+			,CREAT_USER_ID
+			,CREAT_DT
+			,UPDT_USER_ID
+			,UPDT_DT
+			)
+		VALUES(
+			  #{userRoleSecd}
+			, #{menuId}
+			, #{creatUserId}
+			, DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+			, #{creatUserId}
+			, DATE_FORMAT(now(), '%Y-%m-%d %H:%i:%s')
+			)
+
+ 	</insert> 		
+ 	
+ 	
+ 	
+</mapper>

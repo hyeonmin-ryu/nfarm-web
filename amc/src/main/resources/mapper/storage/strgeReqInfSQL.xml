@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed May 11 15:49:51 KST 2016-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="strgeReqInfDao">
+
+
+	<select id="inqReqStorageInfoList" resultType="StrgeReqInfDto" parameterType="StorageSearchDto">
+	    SELECT
+	        R.STORGE_REQST_ID,
+	        R.DISS_CD ,
+	    	FN_CODE('DISS_CD' , R.DISS_CD ) dissNm,
+	        R.STORGE_NM,
+	        A.INSTT_NM,
+	        U.CHARGER_NM,
+	        R.BUCKET_ID,
+	    	FN_CODE('STRGE_REQ_STTUS_CD' , R.STRGE_REQ_STTUS_CD ) STRGE_REQ_STTUS_NM ,
+	    	DATE_FORMAT(R.CREAT_DT, '%Y-%m-%d') as CREAT_DT,
+	    	R.UPDT_DT
+	    FROM
+	        TB_STRGE_REQ_INF R 
+	    INNER JOIN
+	        TB_USER_MST U 
+	            on R.DISS_RSPNBER_USER_ID = U.USER_ID 
+	    INNER JOIN
+	        TB_INSTT_MST A 
+	            on U.INSTT_ID=A.INSTT_ID 
+	    WHERE 
+	        R.STORGE_NM like CONCAT('%' , #{storgeNm} , '%')
+	        
+	   	<if test='insttNm != null and !insttNm.equals("") '>
+			AND INSTT_NM like CONCAT('%' , #{insttNm} , '%')
+		</if>
+	    
+   		<if test='dissCd != null and !dissCd.equals("") '>
+			AND R.DISS_CD= #{dissCd}
+		</if>
+		
+   		<if test='userId != null and !userId.equals("") '>
+			AND U.USER_ID= #{userId}
+		</if>					
+		
+		<if test='strgeReqSttusCd != null and !strgeReqSttusCd.equals("") '>
+			AND R.STRGE_REQ_STTUS_CD= #{strgeReqSttusCd}
+		</if>
+	    
+	    ORDER BY
+	        R.CREAT_DT desc
+	</select>
+	
+	<select id = "inqStorageSeq" resultType="strgeReqInfDto" parameterType ="String">
+		SELECT 
+			   R.STORGE_REQST_ID
+		      ,A.INSTT_NM
+			  ,R.DISS_CD
+			  ,FN_CODE('DISS_CD' , R.DISS_CD ) DISS_NM
+			  ,R.STORGE_NM
+			  ,R.BUCKET_ID
+			  ,U.CHARGER_NM
+			  ,U.USER_ROLE_SECD
+			  ,B.BUCKET_DC  
+			  ,R.STRGE_REQ_STTUS_CD
+			  ,U.CHARGER_MOBLPHON_NO
+			  ,U.EMAIL
+	    	  ,FN_CODE('STRGE_REQ_STTUS_CD' , R.STRGE_REQ_STTUS_CD ) STRGE_REQ_STTUS_NM 
+	    	  ,DATE_FORMAT(R.CREAT_DT, '%Y-%m-%d') as CREAT_DT
+	    	  ,IF(A.INSTT_TY_CD = '02' , 'Y' , 'N' )diseaseMainYn
+	    	  ,R.DELETE_RESN
+	    	  ,R.DISS_RSPNBER_USER_ID
+	    	  ,R.REJECT_RESN
+	    	  ,R.CREAT_USER_ID
+		  FROM TB_STRGE_REQ_INF R
+	INNER JOIN TB_USER_MST U 
+	        ON R.DISS_RSPNBER_USER_ID = U.USER_ID
+	INNER JOIN TB_INSTT_MST A
+			ON U.INSTT_ID = A.INSTT_ID
+	LEFT OUTER JOIN TB_DTBX_BUCKET_MST B
+			ON R.BUCKET_ID = B.BUCKET_ID			
+		 WHERE R.STORGE_REQST_ID = #{storgeReqstId}
+	</select>
+
+	<insert id="regReqStorage" parameterType="strgeReqInfDto">
+		INSERT INTO TB_STRGE_REQ_INF
+					(STORGE_REQST_ID,
+					CREAT_USER_ID,
+				    CREAT_DT,
+				    UPDT_USER_ID,
+				    UPDT_DT,
+				    BUCKET_ID,
+				    STORGE_NM,
+				    DELETE_RESN,
+				    DISS_CD,
+				    DISS_RSPNBER_USER_ID,
+				    REJECT_RESN,
+				    STRGE_REQ_STTUS_CD
+				    )
+			VALUES(#{storgeReqstId},
+			        #{creatUserId},
+					now(6),
+					#{creatUserId},
+					now(6),
+					#{bucketId},
+					#{storgeNm},
+					#{deleteResn},
+					#{dissCd},
+					#{dissRspnberUserId},
+					#{rejectResn},
+					#{strgeReqSttusCd}
+					)
+	</insert>	
+	
+	<!-- 승인용.(버킷명 필요) -->
+	<update id="updtReqStorageApproveStat" parameterType="DtbxBucketMstDto">
+		UPDATE TB_STRGE_REQ_INF
+		SET UPDT_USER_ID= #{updtUserId}
+		  , UPDT_DT = now(6)
+		  , BUCKET_ID = #{bucketId}
+		  , STRGE_REQ_STTUS_CD = #{strgeReqSttusCd}
+		WHERE STORGE_REQST_ID = #{storgeReqstId}
+	</update>		
+	
+	<!-- 삭제 거절 -->
+	<update id="updtReqStorageStat" parameterType="strgeReqInfDto">
+		UPDATE TB_STRGE_REQ_INF
+		SET UPDT_USER_ID= #{updtUserId}
+		  , UPDT_DT = now(6)
+		  
+   		<if test='rejectResn != null and !rejectResn.equals("") '>
+			, REJECT_RESN = #{rejectResn}
+		</if>		
+		
+   		<if test='deleteResn != null and !deleteResn.equals("") '>
+			, DELETE_RESN = #{deleteResn}
+		</if>		  
+		  
+		  , STRGE_REQ_STTUS_CD = #{strgeReqSttusCd}
+		WHERE STORGE_REQST_ID = #{storgeReqstId}
+	</update>		
+	
+	
+	<select id= "inqMyStorageBucketList" resultType="strgeReqInfDto" parameterType="StorageSearchDto">
+		SELECT 
+			   R.STORGE_REQST_ID
+		      ,A.INSTT_NM
+			  ,R.DISS_CD
+			  ,FN_CODE('DISS_CD' , R.DISS_CD ) DISS_NM
+			  ,R.STORGE_NM
+			  ,R.BUCKET_ID
+			  ,U.CHARGER_NM
+			  ,U.USER_ROLE_SECD
+			  ,B.BUCKET_DC  
+			  ,R.STRGE_REQ_STTUS_CD
+			  ,U.CHARGER_MOBLPHON_NO
+			  ,U.EMAIL
+	    	  ,FN_CODE('STRGE_REQ_STTUS_CD' , R.STRGE_REQ_STTUS_CD ) STRGE_REQ_STTUS_NM
+	    	  ,DATE_FORMAT(R.CREAT_DT, '%Y-%m-%d') as CREAT_DT
+	    	  ,IF(A.INSTT_TY_CD ='02' , 'Y' , 'N' )diseaseMainYn
+	    	  ,R.DELETE_RESN
+	    	  ,R.DISS_RSPNBER_USER_ID
+	    	  ,R.REJECT_RESN
+	    	  ,R.CREAT_USER_ID
+		  FROM TB_STRGE_REQ_INF R
+	INNER JOIN TB_USER_MST U 
+	        ON R.DISS_RSPNBER_USER_ID = U.USER_ID
+	INNER JOIN TB_INSTT_MST A
+			ON U.INSTT_ID = A.INSTT_ID
+	LEFT OUTER JOIN TB_DTBX_BUCKET_MST B
+			ON R.BUCKET_ID = B.BUCKET_ID			
+		 WHERE R.DISS_RSPNBER_USER_ID = #{userId}
+		   AND R.STRGE_REQ_STTUS_CD = #{strgeReqSttusCd}
+	</select>	
+	
+</mapper>
