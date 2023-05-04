@@ -1,20 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed May 11 15:49:51 KST 2016-->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace ="FarmDto">
+<mapper namespace ="FarmDao">
 
-	<select id = "FarmList" resultType="FarmDto" parameterType="FarmSearchDto">
-	 	SELECT FARM_ID,
-	 		   FARM_NM,
-	 		   FMHS_NO,
-	 		   FMHS_ADDR,
-	 		   FRMR_TELNO,
-	 		   EXMN_INST_MNGR_ID,
-	 		   CRT_USR_ID,
-	 		   CRT_DT,
-	 		   CHG_USR_ID,
-	 		   CHG_DT
-	 	  FROM TB_FARM_MST
-	 	-- WHERE FARM_NM LIKE CONCAT('%', #{dataName}, '%') 
+	<select id = "farmList" resultType="FarmDto" parameterType="FarmSearchDto">
+	 	SELECT TA.FARM_ID,
+	 		   TA.FARM_NM,
+	 		   TA.FMHS_NO,
+	 		   TA.FMHS_ADDR,
+	 		   TA.FRMR_TELNO,
+	 		   TA.FRMR_NM,
+	 		   TB.EXMN_INST_ID,
+	 		   TB.EXMN_INST_NM,
+	 		   TA.CRT_USR_ID,
+	 		   TA.CRT_DT,
+	 		   TA.CHG_USR_ID,
+	 		   TA.CHG_DT
+	 	  FROM TB_FARM_MST TA, TB_EXMN_INST_MST TB
+	 	 WHERE TA.EXMN_INST_MNGR_ID = TB.EXMN_INST_ID
+ 		 <if test='farmNm != null and !farmNm.equals("") '>
+	 	   AND TA.FARM_NM like CONCAT('%' , #{farmNm} , '%')
+	 	 </if>
+	 	 <if test='exmnInstNm != null and !exmnInstNm.equals("") '>
+	 	   AND TB.EXMN_INST_NM like CONCAT('%' , #{exmnInstNm} , '%')
+	 	 </if>
 	</select>
 	
+	<select id = "growList" resultType="FarmDto" parameterType="FarmSearchDto">
+	 	SELECT TA.FARM_ID,
+	 		   TA.FARM_NM,
+	 		   TA.FMHS_NO,
+	 		   TA.FMHS_ADDR,
+	 		   TA.FRMR_TELNO,
+	 		   TA.FRMR_NM,
+	 		   TB.EXMN_INST_ID,
+	 		   TB.EXMN_INST_NM,
+	 		   TA.CRT_USR_ID,
+	 		   TA.CRT_DT,
+	 		   TA.CHG_USR_ID,
+	 		   TA.CHG_DT
+	 	  FROM TB_FARM_MST TA, TB_EXMN_INST_MST TB
+	 	 WHERE TA.EXMN_INST_MNGR_ID = TB.EXMN_INST_ID
+ 		 <if test='farmNm != null and !farmNm.equals("") '>
+	 	   AND TA.FARM_NM like CONCAT('%' , #{farmNm} , '%')
+	 	 </if>
+	 	 <if test='exmnInstNm != null and !exmnInstNm.equals("") '>
+	 	   AND TB.EXMN_INST_NM like CONCAT('%' , #{exmnInstNm} , '%')
+	 	 </if>
+	</select>
+	
+	
+	<insert id="regFarm" parameterType="farmDto" useGeneratedKeys="true" >
+ 		insert into 
+ 		tb_farm_mst (
+ 		             farm_id, 
+ 		             farm_nm, 
+ 		             fmhs_no,
+ 		             fmhs_addr,
+ 		             exmn_inst_mngr_id,
+ 		             crt_usr_id,
+ 		             crt_dt,
+ 		             chg_usr_id,
+ 		             chg_dt
+ 		             ) 
+ 		     values (
+ 		     		 #{farmId},
+ 		             #{farmNm}, 
+ 		             '1',
+ 		             #{fmhsAddr},
+ 		             '1',
+ 		             ifnull(#{crtUsrId},'admin'),
+ 		             now(),
+ 		             ifnull(#{chgUsrId},'admin'),
+ 		             now()
+ 		             )
+ 	</insert>
 </mapper>

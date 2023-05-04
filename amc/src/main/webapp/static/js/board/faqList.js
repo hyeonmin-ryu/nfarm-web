@@ -66,7 +66,7 @@ Vue.component('maincontents', {
         },
         // 목록 > 등록 클릭(화면 이동)
         onclickReg: function () {
-            location.href = "/board/faq/reg";
+            location.href = "/farm/reg";
         },
         // 목록 > 제목 클릭(상세보기)
         onclickView: function (questNo) {

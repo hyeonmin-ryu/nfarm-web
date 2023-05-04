@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 import kr.re.amc.board.dto.BoardSearchDto;
+import kr.re.amc.board.dto.FaqDto;
 import kr.re.amc.board.dto.NoticeDto;
 import kr.re.amc.cmm.EgovComAbstractDAO;
 import kr.re.amc.databox.dto.DataBoxSearchDto;
@@ -15,14 +16,24 @@ import kr.re.amc.databox.dto.DtbxReqMstDto;
 import kr.re.amc.databox.dto.DtbxSvrReqMstDto;
 import kr.re.amc.databox.dto.DtbxUserReqMstDto;
 import kr.re.amc.farm.dto.FarmDto;
+import kr.re.amc.farm.dto.FarmSearchDto;
 import kr.re.amc.storage.dto.StrgeUseInfDto;
 
 @Repository("farmDao")
 public class FarmDao extends EgovComAbstractDAO{
 	
-	public  List<FarmDto> FarmList(FarmDto farmDto) {
-		return selectList("FarmDao.FarmList", farmDto);
+	public  List<FarmDto> farmList(FarmSearchDto farmSearchDto) {
+		return selectList("FarmDao.farmList", farmSearchDto);
 	}
+	
+	public  List<FarmDto> growList(FarmSearchDto farmSearchDto) {
+		return selectList("FarmDao.growList", farmSearchDto);
+	}
+	
+	public int regFarm(FarmDto farmDto) { return
+			insert("FarmDao.regFarm", farmDto);
+	}
+	
 	/*
 	 * public DtbxReqMstDto inqDataBox(Long dtbxSn) { return
 	 * selectOne("dataBoxDao.inqDataBox", dtbxSn); }

@@ -9,17 +9,27 @@ import javax.annotation.Resource;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
 import kr.re.amc.board.dto.FaqDto;
+import kr.re.amc.board.dto.NoticeDto;
 import kr.re.amc.databox.service.DataBoxService;
 import kr.re.amc.export.dto.ExportReqDto;
 import kr.re.amc.farm.dto.FarmDto;
 import kr.re.amc.farm.dto.FarmSearchDto;
 import kr.re.amc.farm.service.FarmService;
 import kr.re.amc.users.service.UserService;
+import kr.re.amc.util.AmcUtil;
 import kr.re.amc.utils.ApiUtils.ApiResult;
 
 @RestController
@@ -53,23 +63,29 @@ public class FarmCtrl {
 	public ApiResult<PageInfo<FarmDto>> farmList(FarmSearchDto farmSearchDto) {
 
 		PageHelper.startPage(farmSearchDto.getPage(), farmSearchDto.getSize());
-		System.out.println("널체크1");
-		List<FarmDto> farmList = farmService.FarmList(farmSearchDto);
-		System.out.println("널체크2");
+		List<FarmDto> farmList = farmService.farmList(farmSearchDto);
 		PageInfo<FarmDto> pageData = new PageInfo<>(farmList);
-		System.out.println("널체크3");
 		return success(pageData);
 
 	}
 	
-	@GetMapping(value = "/farm/getList")
-	public ApiResult<PageInfo<FarmDto>> farmList2(FarmSearchDto farmSearchDto) {
-
-		List<FarmDto> pageDataBoxList = farmService.getFarmList(farmSearchDto); 
-		PageInfo<FarmDto> pageData = new PageInfo<>(pageDataBoxList);
-		return success(pageData); 
+	@PostMapping(path = "/farm/reg")
+	public ApiResult<FarmDto> regFarm(@RequestBody FarmDto farmDto) {
+		//farmDto.setChgUsrId(AmcUtil.getPrincipal().getUserId());
+		//farmDto.setCrtUsrId(AmcUtil.getPrincipal().getUserId());
+		
+		return success(farmService.regFarm(farmDto));
 	}
 	
+	@GetMapping(value = "/farm/list/grow")
+	public ApiResult<PageInfo<FarmDto>> growList(FarmSearchDto farmSearchDto) {
+
+		PageHelper.startPage(farmSearchDto.getPage(), farmSearchDto.getSize());
+		List<FarmDto> growList = farmService.growList(farmSearchDto);
+		PageInfo<FarmDto> pageData = new PageInfo<>(growList);
+		return success(pageData);
+
+	}
 	/*
 	 * @GetMapping(value = "/data/box/user") public ApiResult<UserInfoDto>
 	 * getReqUser() {

@@ -19,11 +19,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class StoragePage {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
-    // 농장 DB 리스
+    // 농장 DB 리스트
     @GetMapping(value = "/farm/list")
     public String farmList() {
 
         return "pages/farm/farmList";
+    }
+    @GetMapping(value = "/grow/list")
+    public String growList() {
+
+        return "pages/farm/growList";
     }
     // 질환데이터 저장신청 리스트
     @GetMapping(value = "/lndata/store/main")

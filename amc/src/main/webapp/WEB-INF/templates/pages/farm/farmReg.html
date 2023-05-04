@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/defaultLayout">
+
+    <th:block layout:fragment="css">
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/common/common.js}"></script>
+        <script th:src="@{/js/farm/farmReg.js}"></script>
+        <script>
+            const questNo = "[[${param.questNo}]]";
+        </script>
+    </th:block>
+    <section class="member-container" layout:fragment="contents">
+    	<th:block th:replace="fragments/defaultSubHeader :: subHeaderFragment"></th:block>
+    	
+        <div id="maincontentswrap" >
+            <maincontents ref="maincontents"></maincontents>
+        </div>
+
+        <script type="text/x-template" id="main-template" >
+        <section class="content" >
+            <div class="sub-title-box">
+                <h2>농장 DB 등록 페이지</h2>
+            </div>
+
+            <section class="contents-width join-cont-box mt-60 clearfix">
+                <h3>농장 DB 등록</h3>
+                <ul class="com-ul">
+                    <li>
+                        <span class="join-input-group w-30">
+                            <label>농장 명<span>*</span></label>
+                            <input class="w-100" type="text" ref="title" v-model="saveInfo.farmNm" placeholder="농장명을 입력해주세요" style="width: 100%;">
+                        </span>
+                    </li>
+					<li>
+                        <span class="join-input-group w-30">
+                            <label>농가 번호<span>*</span></label>
+                            <input class="w-100" type="text" ref="title" v-model="saveInfo.fmhsNo" placeholder="농가 번호를 입력해주세요" style="width: 100%;">
+                        </span>
+                    </li>
+					<li>
+                        <span class="join-input-group w-30">
+                            <label>농가 주소<span>*</span></label>
+                            <input class="w-100" type="text" ref="title" v-model="saveInfo.fmhsAddr" placeholder="농가 주소를 입력해주세요" style="width: 100%;">
+                        </span>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="contents-width a-c mt-60">
+                <a href="#" class="btn btn-line-black btn-large" v-on:click="onclickCancel">취소</a>
+                <a href="#" class="btn btn-basic btn-large ml-20" v-on:click="onclickSave">저장</a>
+            </section>
+        </section>
+
+        </script>
+    </section>
+</html>

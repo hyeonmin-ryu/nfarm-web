@@ -1,5 +1,4 @@
 
-
 let appMain;
 const TID = {
     SEARCH      : {value: 0, name: "search", code: "S"}
@@ -50,6 +49,7 @@ Vue.component('maincontents', {
         },
         onclickSearch: function () {
             this.cond.page = 1;
+            
             //this.cond.strgeReqSttusCd = this.$refs.strgeReqSttusCd.value;//처리상태
             this.getFarmList();
         },

@@ -10,7 +10,7 @@
 
     <th:block layout:fragment="script">
         <script th:src="@{/js/common/common.js}"></script>
-        <script th:src="@{/js/farm/farmList.js}"></script>
+        <script th:src="@{/js/farm/growList.js}"></script>
         <script>
             //const reqStorageStatCode = "[[${param.reqStorageStatCode}]]";
         </script>
@@ -31,15 +31,17 @@
                 <div class="path">
                     <ul class="clearfix">
                         <li><a href="/" class="home">홈</a></li>
-                        <li>농장 DB 관리</li>
-                        <li>농장 DB 리스트</li>                
+                        <li>생육 조사 관리</li>
+                        <li>생육 조사 목록</li>                
                    </ul>
                 </div>
             </div>
             
 			<section class="list-search-wrap mb-30">
-				<B>ㅤ농장명 </B><input type="text" v-model="cond.farmNm" @keyup="onKeyup" placeholder="농장명을 입력하세요" class="ml-10">
+				<B>ㅤ생육조사명 </B><input type="text" v-model="cond.farmNm" @keyup="onKeyup" placeholder="생육조사명을 입력하세요" class="ml-10">
+				<B>ㅤ생육단계 </B><input type="text" v-model="cond.exmnInstNm" @keyup="onKeyup" placeholder="생육단계를 입력하세요" class="ml-10">
 				<B>ㅤ담당기관 </B><input type="text" v-model="cond.exmnInstNm" @keyup="onKeyup" placeholder="담당기관을 입력하세요" class="ml-10">
+				<B>ㅤ담당조사원 </B><input type="text" v-model="cond.exmnInstNm" @keyup="onKeyup" placeholder="담당조사원을 입력하세요" class="ml-10">
                 <a href="#"  class="btn btn-basic btn-small ml-10" v-on:click="onclickSearch">검색</a>
             </section>
 				
@@ -53,16 +55,19 @@
                         <col style="width:10%" />
                         <col style="width:10%" />
                         <col style="width:15%" />
+                        <col style="width:15%" />
                     </colgroup>
                     <thead>
                     <tr>
-                        <th scope="col">농장아이디</th>
+                        <th scope="col">생육조사명</th>
+                        <th scope="col">생육단계</th>
                         <th scope="col">농장명</th>
-                        <th scope="col">농가번호</th>
-                        <th scope="col">농가주소</th>
-                        <th scope="col">농장주명</th>
-                        <th scope="col">농장주 전화번호</th>
-                        <th scope="col">조사기관 명</th>
+                        <th scope="col">포장지번</th>
+                        <th scope="col">담당기관</th>
+                        <th scope="col">담당조사원</th>
+                        <th scope="col">완료여부</th>
+                        <th scope="col">수정일</th>
+                        <th scope="col">등록일</th>
                     </tr>
                     </thead>
                     <tbody v-if="farmList.length == 0">
@@ -75,13 +80,15 @@
     
                     <tbody v-if="farmList.length > 0">
                     <tr v-for="(item, idx) in farmList">
-                    	<td>{{item.farmId}}</td>
+                    	<td>{{item.grwExmnNm}}</td>
+                        <td>{{item.grwStepNm}}</td>
                         <td>{{item.farmNm}}</td>
-                        <td>{{item.fmhsNo}}</td>
-                        <td>{{item.fmhsAddr}}</td>
-                        <td>{{item.frmrNm}}</td>
-                        <td>{{item.frmrTelno}}</td>
+                        <td>{{item.paveLotno}}</td>
                         <td>{{item.exmnInstNm}}</td>
+                        <td>{{item.picNm}}</td>
+                        <td>{{item.cmptnYn}}</td>
+                        <td>{{item.crtDt}}</td>
+                        <td>{{item.chgDt}}</td>
                     </tr>
                     </tbody>
                 </table>

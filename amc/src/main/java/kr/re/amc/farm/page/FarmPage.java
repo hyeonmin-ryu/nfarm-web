@@ -14,4 +14,9 @@ public class FarmPage {
     public String farmList() {
         return "pages/farm/farmList";
     }
+    
+    @GetMapping(value="/farm/reg")
+	public String faqReg() {
+		return "pages/farm/farmReg";
+	}
 }

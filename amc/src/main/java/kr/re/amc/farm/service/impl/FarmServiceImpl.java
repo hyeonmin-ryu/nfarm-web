@@ -23,7 +23,9 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 
 import kr.re.amc.board.dto.BoardSearchDto;
+import kr.re.amc.board.dto.FaqDto;
 import kr.re.amc.board.dto.NoticeDto;
+import kr.re.amc.board.dto.NoticeFileDto;
 import kr.re.amc.commons.CustomMailSender;
 import kr.re.amc.export.Dao.ExportReqDao;
 import kr.re.amc.export.dto.ExportApproverInfoDto;
@@ -44,14 +46,10 @@ import kr.re.amc.utils.StringUtil;
 @Service("FarmService")
 public class FarmServiceImpl extends EgovAbstractServiceImpl implements FarmService{
 
-	@Resource(name="exportReqDao")
-	private ExportReqDao exportReqDao;
 	
-	@Resource(name = "userDao")
-	private UserDao userDao;
+	@Resource(name = "farmDao")
+	private FarmDao farmDao;
 	
-	@Autowired
-	private CustomMailSender customMailSender;
 	
 
 	@Override
@@ -61,10 +59,28 @@ public class FarmServiceImpl extends EgovAbstractServiceImpl implements FarmServ
 	}
 	
 	@Override
-	public List<FarmDto> FarmList(FarmSearchDto farmSearchDto) {
+	public List<FarmDto> farmList(FarmSearchDto farmSearchDto) {
 		// TODO Auto-generated method stub
-		return null;
+		return farmDao.farmList(farmSearchDto);
 	}
+	
+	@Override
+	public List<FarmDto> growList(FarmSearchDto farmSearchDto) {
+		// TODO Auto-generated method stub
+		return farmDao.growList(farmSearchDto);
+	}
+	
+	@Override
+	public FarmDto regFarm(FarmDto farmDto) {
+		//farmDto.setCrtUsrId(AmcUtil.getPrincipal().getUserId());
+		//farmDto.setChgUsrId(AmcUtil.getPrincipal().getUserId());
+
+		farmDao.regFarm(farmDto);
+		
+		return farmDto;
+	}
+
+
 	/*
 	 * @Override // 상세보기 public FarmDto getFarmList(FarmDto FarmDto) { int idx = 0;
 	 * 
