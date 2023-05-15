@@ -1,4 +1,3 @@
-
 let appMain;
 const TID = {
     SEARCH      : {value: 0, name: "search", code: "S"}
@@ -20,7 +19,7 @@ Vue.component('maincontents', {
                 exnmInstNm: "",
                 sort: ""
             },
-            farmList: [],
+            growList: [],
             pageInfo: {
                 curr : 1,
                 max : 1,
@@ -38,7 +37,7 @@ Vue.component('maincontents', {
         };
     },
     mounted:function(){
-        this.getFarmList();
+        this.getGrowList();
 
     },
     methods:{
@@ -51,7 +50,7 @@ Vue.component('maincontents', {
             this.cond.page = 1;
             
             //this.cond.strgeReqSttusCd = this.$refs.strgeReqSttusCd.value;//처리상태
-            this.getFarmList();
+            this.getGrowList();
         },
         // 목록 > 신청 클릭(화면 이동)
         onclickReg: function () {
@@ -64,9 +63,9 @@ Vue.component('maincontents', {
             }*/
         },
 
-        getFarmList:function () {
+        getGrowList:function () {
             get(TID.SEARCH,
-                "/farm/list/main",
+                "/farm/list/grow",
                 this.cond,
                 this.callback);
         },
@@ -106,7 +105,7 @@ Vue.component('maincontents', {
             if (results.success) {
                 //console.log(results);
                 this.makePageNavi(results.response);
-                this.farmList = results.response.list;
+                this.growList = results.response.list;
 
             } else {
                 console.log(results);
@@ -146,7 +145,7 @@ Vue.component('maincontents', {
             } else {
                 this.cond.page = page;
                 this.pageInfo.curr = page;
-                this.getfarmList();
+                this.getGrowList();
             }
         },
     }

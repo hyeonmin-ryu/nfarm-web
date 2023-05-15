@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import kr.re.amc.board.dto.FaqDto;
 import kr.re.amc.board.dto.InquiryDto;
 import kr.re.amc.board.dto.NoticeDto;
+import kr.re.amc.cmm.dto.CodeDto;
 import kr.re.amc.export.dto.ExportApproverInfoDto;
 import kr.re.amc.export.dto.ExportReqDto;
 import kr.re.amc.export.dto.ExportSearchDto;
@@ -20,9 +21,15 @@ public interface FarmService {
     List<FarmDto> getFarmList(FarmSearchDto farmSearchDto);
 	List<FarmDto> farmList(FarmSearchDto farmSearchDto);
 	List<FarmDto> growList(FarmSearchDto farmSearchDto);
+	List<FarmDto> agencyUserList(FarmSearchDto farmSearchDto);
+	List<FarmDto> growUserList(FarmSearchDto farmSearchDto);
 	
 	public FarmDto regFarm(FarmDto farmDto);
-	
+	public FarmDto regGrow(FarmDto farmDto);
+
+	List<CodeDto> farmIdList();
+	List<CodeDto> growCodeList();
+
 	/*public ExportReqDto getExportView(Long exportReqSeq);
 	 * public List<ExportReqDto> getUseDataBoxList(ExportSearchDto exportSearchDto);
 	 * 

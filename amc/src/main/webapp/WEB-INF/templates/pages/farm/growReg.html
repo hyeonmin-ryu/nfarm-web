@@ -10,7 +10,7 @@
 
     <th:block layout:fragment="script">
         <script th:src="@{/js/common/common.js}"></script>
-        <script th:src="@{/js/farm/farmReg.js}"></script>
+        <script th:src="@{/js/farm/growReg.js}"></script>
         <script>
             const questNo = "[[${param.questNo}]]";
         </script>
@@ -25,40 +25,49 @@
         <script type="text/x-template" id="main-template" >
         <section class="content" >
             <div class="sub-title-box">
-                <h2>농장 DB 등록 페이지</h2>
+                <h2>생육조사 관리 등록 페이지</h2>
             </div>
 
             <section class="contents-width join-cont-box mt-60 clearfix">
-                <h3>농장 DB 등록</h3>
+                <h3>생육조사 DB 등록</h3>
                 <ul class="com-ul">
                     <li>
                         <span class="join-input-group w-30">
+                            <label>생육조사 명<span>*</span></label>
+                            <input class="w-100" type="text" ref="title" v-model="saveInfo.farmNm" placeholder="생육조사명을 입력해주세요" style="width: 100%;">
+                        </span>
+                    </li>
+					<li>
+						
+                        <span class="join-input-group w-30">
                             <label>농장 명<span>*</span></label>
-                            <input class="w-100" type="text" ref="title" v-model="saveInfo.farmNm" placeholder="농장명을 입력해주세요" style="width: 100%;">
+							<select id="farmIdList" ref="farmIdList" v-model="saveInfo.farmId" style="width: 100%;" onchange="selectChange()">
+        	                    <option value="">농장명을 선택하세요.</option>
+                		        <option v-for="(item, idx) in farmIdList"  v-bind:value="item.dc">{{item.nm}}</option>
+                      		</select>
+                        </span>
+                    </li>
+					<li>
+        	           	<span class="join-input-group mr-40">
+                    		<label>농가 번호</label>
+                            <input class="w-100" type="text" ref="title" v-model="saveInfo.farmId" placeholder="" style="width: 100%;" readonly >      
+							<p>{{farmIdList.dc}}dasdasdas</p>            
+							<label>{{farmIdList.dc}}</label>    		
+                  		</span>
+             		</li>	
+					<li>
+                        <span class="join-input-group w-30">
+                            <label>농장 명<span>*</span></label>
+							<select id="growStepList" ref="growStepList" v-model="saveInfo.growCode" style="width: 100%;" onchange="selectChange()">
+        	                    <option value="">농장명을 선택하세요.</option>
+                		        <option v-for="(item, idx) in growStepList"  v-bind:value="item.dc">{{item.nm}}</option>
+                      		</select>
                         </span>
                     </li>
 					<li>
                         <span class="join-input-group w-30">
-                            <label>농가 번호<span>*</span></label>
-                            <input class="w-100" type="text" ref="title" v-model="saveInfo.fmhsNo" placeholder="농가 번호를 입력해주세요" style="width: 100%;">
-                        </span>
-                    </li>
-					<li>
-                        <span class="join-input-group w-30">
-                            <label>농가 주소<span>*</span></label>
-                            <input class="w-100" type="text" ref="title" v-model="saveInfo.fmhsAddr" placeholder="농가 주소를 입력해주세요" style="width: 100%;">
-                        </span>
-                    </li>		
-					<li>
-                        <span class="join-input-group w-30">
-                            <label>농장주 명<span>*</span></label>
-                            <input class="w-100" type="text" ref="title" v-model="saveInfo.frmrNm" placeholder="농장주명을 입력해주세요" style="width: 100%;">
-                        </span>
-                    </li>
-					<li>
-                        <span class="join-input-group w-30">
-                            <label>농장주 전화번호<span>*</span></label>
-                            <input class="w-100" type="text" ref="title" v-model="saveInfo.frmrTelno" placeholder="농장주 전화번호를 입력해주세요" style="width: 100%;">
+                            <label>포장 지번<span>*</span></label>
+                            <input class="w-100" type="text" ref="title" v-model="saveInfo.frmrTelno" placeholder="포장 지번을 입력해주세요" style="width: 100%;">
                         </span>
                     </li>
                 </ul>

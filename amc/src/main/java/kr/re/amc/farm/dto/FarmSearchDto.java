@@ -23,5 +23,10 @@ public class FarmSearchDto implements Serializable{
 	
     private String farmNm;         //농장명
     private String exmnInstNm;     //조사기관명
+    private String exmnInstId;     //조사기관ID
+    private String picNm;          //담당자이름
+    private String usrId;          //담당자이름
+    private String usrNm;          //담당자이름
+    
 
 }

@@ -9,6 +9,7 @@ import kr.re.amc.board.dto.BoardSearchDto;
 import kr.re.amc.board.dto.FaqDto;
 import kr.re.amc.board.dto.NoticeDto;
 import kr.re.amc.cmm.EgovComAbstractDAO;
+import kr.re.amc.cmm.dto.CodeDto;
 import kr.re.amc.databox.dto.DataBoxSearchDto;
 import kr.re.amc.databox.dto.DtbxBlckStrgeReqMstDto;
 import kr.re.amc.databox.dto.DtbxDataReqMstDto;
@@ -30,8 +31,28 @@ public class FarmDao extends EgovComAbstractDAO{
 		return selectList("FarmDao.growList", farmSearchDto);
 	}
 	
-	public int regFarm(FarmDto farmDto) { return
-			insert("FarmDao.regFarm", farmDto);
+	public  List<FarmDto> agencyUserList(FarmSearchDto farmSearchDto) {
+		return selectList("FarmDao.agencyUserList", farmSearchDto);
+	}
+	
+	public  List<FarmDto> growUserList(FarmSearchDto farmSearchDto) {
+		return selectList("FarmDao.growUserList", farmSearchDto);
+	}
+	
+	public int regFarm(FarmDto farmDto) { 
+		return insert("FarmDao.regFarm", farmDto);
+	}
+	
+	public int regGrow(FarmDto farmDto) { 
+		return insert("FarmDao.regGrow", farmDto);
+	}
+
+	public List<CodeDto> farmIdList() {
+		return selectList("FarmDao.farmIdList" );
+	}
+	
+	public List<CodeDto> growCodeList() {
+		return selectList("FarmDao.growCodeList" );
 	}
 	
 	/*

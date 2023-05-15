@@ -21,7 +21,6 @@ window.addEventListener('load', function() {
 });
 
 function get(tid, uri, params, callback){
-
     axios.get(uri, {
         params:params
     })

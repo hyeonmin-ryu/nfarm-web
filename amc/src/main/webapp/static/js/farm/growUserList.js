@@ -17,11 +17,12 @@ Vue.component('maincontents', {
             cond: {
                 page: 1,
                 size: 5,
-                farmNm: "",
-                exnmInstNm: "",
+                exmnInstNm: "",
+				usrId:"",
+				usrNm:"",
                 sort: ""
             },
-            farmList: [],
+            growUserList: [],
             pageInfo: {
                 curr : 1,
                 max : 1,
@@ -39,7 +40,7 @@ Vue.component('maincontents', {
         };
     },
     mounted:function(){
-        this.getFarmList();
+        this.getGrowUserList();
 
     },
     methods:{
@@ -51,7 +52,7 @@ Vue.component('maincontents', {
         onclickSearch: function () {
             this.cond.page = 1;
             //this.cond.strgeReqSttusCd = this.$refs.strgeReqSttusCd.value;//처리상태
-            this.getFarmList();
+            this.getGrowUserList();
         },
         // 목록 > 신청 클릭(화면 이동)
         onclickReg: function () {
@@ -64,9 +65,9 @@ Vue.component('maincontents', {
             }*/
         },
 
-        getFarmList:function () {
+        getGrowUserList:function () {
             get(TID.SEARCH,
-                "/farm/list/main",
+                "/farm/list/growUserList",
                 this.cond,
                 this.callback);
         },
@@ -106,7 +107,7 @@ Vue.component('maincontents', {
             if (results.success) {
                 //console.log(results);
                 this.makePageNavi(results.response);
-                this.farmList = results.response.list;
+                this.growUserList = results.response.list;
 
             } else {
                 console.log(results);
@@ -146,7 +147,7 @@ Vue.component('maincontents', {
             } else {
                 this.cond.page = page;
                 this.pageInfo.curr = page;
-                this.getFarmList();
+                this.getGrowUserList();
             }
         },
     }

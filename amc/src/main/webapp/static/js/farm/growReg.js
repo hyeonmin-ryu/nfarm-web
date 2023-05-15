@@ -1,11 +1,12 @@
 
 /*
- * @name : farmReg.js
+ * @name : growReg.js
  * @date : 2023-05-14
  * @author : yhm
  * @version : 1.0.0
  * @modifyed :
  */
+
 
 let appMain;
 const TID = {
@@ -17,7 +18,6 @@ window.onload = function(){
         el: '#maincontentswrap',
     });
 }
-
 Vue.component('maincontents', {
     template : "#main-template",
     data: function() {
@@ -30,15 +30,14 @@ Vue.component('maincontents', {
                 frmrNm    : "",
                 frmrTelno : ""
             },
+            farmIdList: getFarmCodeList("FARM_ID",this.callBack),
+            growStepList: getGrowCodeList("GROW_STEP",this.callBack),
 
         };
     },
     mounted:function(){
-        this.getUserInfo();
-        if(!isNull(this.questNo)){
-            this.faqReg = false;
-            this.getFaqView();
-        }
+
+
 
 
     },
@@ -52,7 +51,7 @@ Vue.component('maincontents', {
         // 저장 메소드 호출
         onclickSave:function () {
             if(!this.saveInfo.farmNm){
-                alertMsg("농장명은 필수입니다.", this.$refs.farmNm );
+                alertMsg("농장명dddddddddddd은 필수입니다.", this.$refs.farmNm );
                 return false;
             }
 
@@ -75,6 +74,7 @@ Vue.component('maincontents', {
                 alertMsg("농장주전화번호는 필수입니다.", this.$refs.frmrTelno );
                 return false;
             }
+            
 
             confirmMsg("저장하시겠습니까?",this.save);
         },
@@ -84,28 +84,29 @@ Vue.component('maincontents', {
                 this.saveInfo,
                 this.callback);
         },
-        callback: function (tid, results) {
+        callBack: function (tid, results) {
             switch (tid) {
                 case TID.SEARCH:
                     this.searchCallback(results);
                     break;
-                case "usrInfo":
-                    if (results.success) {
-                        this.userInfo = results.response;
-                    } else {
-                        alertMsg(results.error.message);
-                    }
-                    break;
-                case "INQRY_TYCD":
-                    this.questionTypeList = results.response;
+                case "FARM_ID":
+					//console.log(results.response);
+                    this.farmIdList = results.response;
                     setTimeout(function() {
-                        loadSelect();
+                        
                     },300);
                     break;
-                case TID.SAVE:
+               case "GROW_STEP":
+					//console.log(results.response);
+                    this.growStepList = results.response;
+                    setTimeout(function() {
+                        
+                    },300);
+                    break;
+               case TID.SAVE:
                     this.saveCallback(results);
                     break;
-            }
+            };
         },
         searchCallback: function (results) {
             if (results.success) {
@@ -131,3 +132,24 @@ Vue.component('maincontents', {
         }
     }
 });
+
+function getFarmCodeList(codeId,callback){
+    get(codeId,
+        "/get/farmCodeList",
+        {},
+        callback);
+}
+function getGrowCodeList(codeId,callback){
+    get(codeId,
+        "/get/growCodeList",
+        {},
+        callback);
+}
+
+function selectChange(){
+	
+    const data= document.querySelector("#farmIdList").value;
+    appMain.$refs.maincontents.searchChange(data);
+    
+}
+

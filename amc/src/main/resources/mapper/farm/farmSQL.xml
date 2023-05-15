@@ -26,26 +26,21 @@
 	</select>
 	
 	<select id = "growList" resultType="FarmDto" parameterType="FarmSearchDto">
-	 	SELECT TA.FARM_ID,
-	 		   TA.FARM_NM,
-	 		   TA.FMHS_NO,
-	 		   TA.FMHS_ADDR,
-	 		   TA.FRMR_TELNO,
-	 		   TA.FRMR_NM,
-	 		   TB.EXMN_INST_ID,
-	 		   TB.EXMN_INST_NM,
-	 		   TA.CRT_USR_ID,
-	 		   TA.CRT_DT,
-	 		   TA.CHG_USR_ID,
-	 		   TA.CHG_DT
-	 	  FROM TB_FARM_MST TA, TB_EXMN_INST_MST TB
-	 	 WHERE TA.EXMN_INST_MNGR_ID = TB.EXMN_INST_ID
- 		 <if test='farmNm != null and !farmNm.equals("") '>
-	 	   AND TA.FARM_NM like CONCAT('%' , #{farmNm} , '%')
-	 	 </if>
-	 	 <if test='exmnInstNm != null and !exmnInstNm.equals("") '>
-	 	   AND TB.EXMN_INST_NM like CONCAT('%' , #{exmnInstNm} , '%')
-	 	 </if>
+	 	select TA.GRW_EXMN_YR ,
+			   TA.FARM_ID,
+			   TB.FARM_NM,
+			   (select ia.GRW_STEP_NM  from TB_CRP_GRW_STEP_MST ia where TA.CRP_CD = IA.CRP_CD and TA.GRW_STEP_CD = IA.GRW_STEP_CD) as GRW_STEP_NM,
+			   TC.EXMN_INST_NM,
+			   TC.PIC_NM,
+			   TA.GRW_STEP_CD,
+			   TA.GRW_EXMN_NM,
+			   TA.CRT_USR_ID,
+			   TA.CRT_DT,
+			   TA.CHG_USR_ID,
+			   TA.CHG_DT
+	      from TB_GRW_EXMN_MST TA, TB_FARM_MST TB, TB_EXMN_INST_MST TC 
+	   	 where TA.FARM_ID = TB.FARM_ID  
+		   AND TB.EXMN_INST_MNGR_ID = TC.EXMN_INST_ID
 	</select>
 	
 	
@@ -57,6 +52,8 @@
  		             fmhs_no,
  		             fmhs_addr,
  		             exmn_inst_mngr_id,
+ 		             frmr_nm,
+ 		             frmr_telno,
  		             crt_usr_id,
  		             crt_dt,
  		             chg_usr_id,
@@ -68,10 +65,71 @@
  		             '1',
  		             #{fmhsAddr},
  		             '1',
+ 		             #{frmrNm},
+ 		             #{frmrTelno},
  		             ifnull(#{crtUsrId},'admin'),
  		             now(),
  		             ifnull(#{chgUsrId},'admin'),
  		             now()
  		             )
  	</insert>
+ 	
+ 	<select id="farmIdList" resultType="CodeDto" parameterType="String" >
+		SELECT FARM_ID AS DC
+		      ,FARM_NM AS NM
+		  FROM TB_FARM_MST
+      ORDER BY FARM_ID 
+ 	</select> 	
+ 	
+ 	<select id="growCodeList" resultType="CodeDto" parameterType="String" >
+		SELECT GRW_STEP_CD AS DC
+		      ,GRW_STEP_NM AS NM
+		  FROM TB_CRP_GRW_STEP_MST
+		 WHERE CRP_CD = '0000'
+      ORDER BY GRW_STEP_CD 
+ 	</select> 	
+ 	
+ 	<select id="agencyUserList" resultType="FarmDto" parameterType="FarmSearchDto" >
+	 	SELECT TA.EXMN_INST_ID,
+	       	   TA.EXMN_INST_NM,
+		       TA.EXMN_INST_DESC,
+		       TA.PIC_NM,
+		       TA.PIC_TELNO,
+		       TA.MNG_INST_YN,
+		       (SELECT COUNT(*) FROM TB_USR_MST IA WHERE IA.EXMN_INST_ID = TA.EXMN_INST_ID AND USE_STOP_YN = 'N') AS USER_TOTAL_COUNT,
+		       TA.CRT_USR_ID,
+		       TA.CRT_DT,
+		       TA.CHG_USR_ID,
+		       TA.CHG_DT
+	      FROM TB_EXMN_INST_MST TA
+	     WHERE TA.EXMN_INST_ID like CONCAT('%' , #{exmnInstId} , '%')
+	       AND TA.EXMN_INST_NM like CONCAT('%' , #{exmnInstNm} , '%')
+	       AND TA.PIC_NM like CONCAT('%' , #{picNm} , '%')
+	</select>
+	
+ 	<select id="growUserList" resultType="FarmDto" parameterType="FarmSearchDto" >
+		SELECT TA.USR_ID,
+			   TA.USR_NM,
+			   TA.EMAIL_ADDR,
+			   TA.USR_TELNO,
+			   TA.EXMN_INST_ID,
+			   TA.LAST_CNTN_DT,
+			   TA.TMPR_PSWD_YN,
+			   TA.PSWD_CHG_DT,
+			   TA.USE_STOP_YN,
+			   TA.USE_STOP_YMD,
+			   TA.SRVC_PRVDR,
+			   TA.CRT_USR_ID,
+			   TA.CRT_DT,
+			   TA.CHG_USR_ID,
+			   TA.CHG_DT,
+			   TB.EXMN_INST_NM
+		  FROM TB_USR_MST TA, TB_EXMN_INST_MST TB
+		 WHERE TA.EXMN_INST_ID = TB.EXMN_INST_ID
+		   AND TA.USR_ID like CONCAT('%' , #{usrId} , '%')
+		   AND TA.USR_NM like CONCAT('%' , #{usrNm} , '%')
+		   AND TB.EXMN_INST_NM like CONCAT('%' , #{exmnInstNm} , '%')
+	  </select>
+	  
+	  	
 </mapper>
